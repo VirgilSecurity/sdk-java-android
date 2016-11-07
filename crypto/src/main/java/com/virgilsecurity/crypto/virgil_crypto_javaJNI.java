@@ -500,20 +500,21 @@ public class virgil_crypto_javaJNI {
 		// Build native library name according to current system
 		String osName = System.getProperty("os.name").toLowerCase();
 		String osArch = System.getProperty("os.arch").toLowerCase();
-
+		String suffix = "";
 		StringBuilder resourceName = new StringBuilder();
 		for (String os : new String[] { "linux", "windows", "mac os" }) {
 			if (osName.startsWith(os)) {
 				resourceName.append(os);
 
 				if ("windows".equals(os)) {
-					resourceName.append(File.separator).append(osArch);
+					resourceName.append("/").append(osArch);
+					suffix = ".dll";
 				}
 
 				break;
 			}
 		}
-		resourceName.append(File.separator).append(libraryName);
+		resourceName.append("/").append(libraryName);
 
 		InputStream in = virgil_crypto_javaJNI.class.getClassLoader().getResourceAsStream(resourceName.toString());
 		if (in == null) {
@@ -522,7 +523,7 @@ public class virgil_crypto_javaJNI {
 
 		byte[] buffer = new byte[1024];
 		int read = -1;
-		File temp = File.createTempFile(libraryName, "");
+		File temp = File.createTempFile(libraryName, suffix);
 		FileOutputStream fos = new FileOutputStream(temp);
 
 		while ((read = in.read(buffer)) != -1) {
