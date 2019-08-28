@@ -502,6 +502,7 @@ public class VirgilCrypto {
    */
   public byte[] decrypt(byte[] data, VirgilPrivateKey privateKey) throws DecryptionException {
     try (RecipientCipher cipher = new RecipientCipher()) {
+      cipher.setRandom(this.rng);
 
       cipher.startDecryptionWithKey(privateKey.getIdentifier(), privateKey.getPrivateKey(),
           new byte[0]);
@@ -535,6 +536,7 @@ public class VirgilCrypto {
   public void decrypt(InputStream inputStream, OutputStream outputStream,
       VirgilPrivateKey privateKey) throws DecryptionException {
     try (RecipientCipher cipher = new RecipientCipher()) {
+      cipher.setRandom(this.rng);
       cipher.startDecryptionWithKey(privateKey.getIdentifier(), privateKey.getPrivateKey(),
           new byte[0]);
 
@@ -604,6 +606,7 @@ public class VirgilCrypto {
   public byte[] decryptThenVerify(byte[] data, VirgilPrivateKey privateKey,
       List<VirgilPublicKey> signersPublicKeys) throws CryptoException {
     try (RecipientCipher cipher = new RecipientCipher()) {
+      cipher.setRandom(this.rng);
       cipher.startDecryptionWithKey(privateKey.getIdentifier(), privateKey.getPrivateKey(),
           new byte[0]);
 

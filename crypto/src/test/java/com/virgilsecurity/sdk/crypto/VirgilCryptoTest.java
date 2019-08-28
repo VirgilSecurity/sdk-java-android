@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -134,6 +135,7 @@ public class VirgilCryptoTest {
     byte[] encrypted = crypto.encrypt(TEXT.getBytes(), recipients);
     for (VirgilPrivateKey privateKey : privateKeys) {
       byte[] decrypted = crypto.decrypt(encrypted, privateKey);
+
       assertArrayEquals(TEXT.getBytes(), decrypted);
     }
   }
@@ -430,5 +432,26 @@ public class VirgilCryptoTest {
         new ByteArrayInputStream(TEXT.getBytes()), keyPair.getPublicKey());
 
     assertFalse(valid);
+  }
+
+  @Test
+  @Ignore
+  public void encrypt_decrypt_benchmark() throws CryptoException {
+    System.out.println("Key type: " + this.keyType);
+    List<VirgilPublicKey> recipients = new ArrayList<>();
+    VirgilKeyPair keyPair = crypto.generateKeyPair();
+    recipients.add(keyPair.getPublicKey());
+
+    // Encrypt
+    long startEnc = System.nanoTime();
+    byte[] encrypted = crypto.encrypt(TEXT.getBytes(), recipients);
+    long endEnc = System.nanoTime();
+    System.out.println(String.format("Encrypt: %f ms", (endEnc - startEnc) / 1e6));
+
+    // Decrypt
+    long startDec = System.nanoTime();
+    crypto.decrypt(encrypted, keyPair.getPrivateKey());
+    long endDec = System.nanoTime();
+    System.out.println(String.format("Decrypt: %f ms", (endDec - startDec) / 1e6));
   }
 }
