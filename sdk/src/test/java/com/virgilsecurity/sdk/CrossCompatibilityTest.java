@@ -230,7 +230,7 @@ public class CrossCompatibilityTest extends PropertyManager {
     final String apiPublicKeyIdentifier = dataProvider.getJsonByKey(23, "api_key_id");
     final String apiAppId = dataProvider.getJsonByKey(23, "app_id");
 
-    PrivateKey privateKey = crypto.importPrivateKey(
+    VirgilPrivateKey privateKey = crypto.importPrivateKey(
         ConvertionUtils.base64ToBytes(dataProvider.getJsonByKey(23, "api_private_key_base64")))
         .getPrivateKey();
 
@@ -251,7 +251,7 @@ public class CrossCompatibilityTest extends PropertyManager {
   @Test
   public void stc_3_json() throws CryptoException {
     // STC_3
-    CardCrypto cardCrypto = new VirgilCardCrypto();
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto();
     VirgilCardVerifier cardVerifier = Mockito.mock(VirgilCardVerifier.class);
     Mockito.when(cardVerifier.verifyCard(Mockito.any(Card.class))).thenReturn(true);
 
@@ -279,7 +279,7 @@ public class CrossCompatibilityTest extends PropertyManager {
   @Test
   public void stc_3_string() throws CryptoException {
     // STC_2
-    CardCrypto cardCrypto = new VirgilCardCrypto();
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto();
     VirgilCardVerifier cardVerifier = Mockito.mock(VirgilCardVerifier.class);
     Mockito.when(cardVerifier.verifyCard(Mockito.any(Card.class))).thenReturn(true);
 
@@ -308,7 +308,7 @@ public class CrossCompatibilityTest extends PropertyManager {
   public void stc_4_json() throws CryptoException {
     // STC_4
     final JsonObject baseData = dataProvider.getJsonObject(4);
-    CardCrypto cardCrypto = new VirgilCardCrypto();
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto();
     VirgilCardVerifier cardVerifier = Mockito.mock(VirgilCardVerifier.class);
     Mockito.when(cardVerifier.verifyCard(Mockito.any(Card.class))).thenReturn(true);
 
@@ -322,7 +322,7 @@ public class CrossCompatibilityTest extends PropertyManager {
     assertEquals(card.getIdentity(), "test");
     assertArrayEquals(
         ConvertionUtils.base64ToBytes(dataProvider.getJsonByKey(4, "public_key_base64")),
-        crypto.exportPublicKey((VirgilPublicKey) card.getPublicKey()));
+        crypto.exportPublicKey(card.getPublicKey()));
     assertEquals(card.getVersion(), "5.0");
 
     RawSignedModel rawSignedModel = RawSignedModel.fromJson(importedFromJson);
@@ -364,7 +364,7 @@ public class CrossCompatibilityTest extends PropertyManager {
   public void stc_4_string() throws CryptoException {
     // STC_4
     final JsonObject baseData = dataProvider.getJsonObject(4);
-    CardCrypto cardCrypto = new VirgilCardCrypto();
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto();
     VirgilCardVerifier cardVerifier = Mockito.mock(VirgilCardVerifier.class);
     Mockito.when(cardVerifier.verifyCard(Mockito.any(Card.class))).thenReturn(true);
 
@@ -378,7 +378,7 @@ public class CrossCompatibilityTest extends PropertyManager {
     assertEquals(card.getIdentity(), "test");
     assertArrayEquals(
         ConvertionUtils.base64ToBytes(dataProvider.getJsonByKey(4, "public_key_base64")),
-        crypto.exportPublicKey((VirgilPublicKey) card.getPublicKey()));
+        crypto.exportPublicKey(card.getPublicKey()));
     assertEquals(card.getVersion(), "5.0");
 
     RawSignedModel rawSignedModel = RawSignedModel.fromString(importedFromString);

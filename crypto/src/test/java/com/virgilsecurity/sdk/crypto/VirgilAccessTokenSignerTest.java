@@ -53,8 +53,8 @@ public class VirgilAccessTokenSignerTest {
   private static final byte[] TOKEN = "the token".getBytes(StandardCharsets.UTF_8);
 
   private VirgilAccessTokenSigner signer;
-  private PublicKey publicKey;
-  private PrivateKey privateKey;
+  private VirgilPublicKey publicKey;
+  private VirgilPrivateKey privateKey;
 
   @Test
   public void generateTokenSignature() throws CryptoException {
@@ -64,14 +64,14 @@ public class VirgilAccessTokenSignerTest {
   }
 
   @Test
-  public void generateTokenSignature_nullKey() throws CryptoException {
+  public void generateTokenSignature_nullKey() {
     assertThrows(NullArgumentException.class, () -> {
       this.signer.generateTokenSignature(TOKEN, null);
     });
   }
 
   @Test
-  public void generateTokenSignature_nullToken() throws CryptoException {
+  public void generateTokenSignature_nullToken() {
     assertThrows(NullArgumentException.class, () -> {
       this.signer.generateTokenSignature(null, this.privateKey);
     });
@@ -103,14 +103,14 @@ public class VirgilAccessTokenSignerTest {
   }
 
   @Test
-  public void verifyTokenSignature_nullKey() throws CryptoException {
+  public void verifyTokenSignature_nullKey() {
     assertThrows(NullArgumentException.class, () -> {
       this.signer.generateTokenSignature(TOKEN, null);
     });
   }
 
   @Test
-  public void verifyTokenSignature_nullToken() throws CryptoException {
+  public void verifyTokenSignature_nullToken() {
     assertThrows(NullArgumentException.class, () -> {
       this.signer.generateTokenSignature(null, this.privateKey);
     });

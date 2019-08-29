@@ -63,7 +63,7 @@ public class KeyStorageExample {
     privateKeyStorage.store(privateKey, "Alice", null);
 
     // Load a private key
-    Tuple<PrivateKey, Map<String, String>> privateKeyEntry = privateKeyStorage.load("Alice");
+    Tuple<VirgilPrivateKey, Map<String, String>> privateKeyEntry = privateKeyStorage.load("Alice");
 
     // Delete a private key
     privateKeyStorage.delete("Alice");

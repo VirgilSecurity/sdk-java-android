@@ -33,14 +33,10 @@
 
 package com.virgilsecurity.sdk.common;
 
-import com.virgilsecurity.sdk.crypto.CardCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
-import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
 
 import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class Generator {
   private static final String IDENTITY = "TEST-java-v5-";
@@ -50,16 +46,10 @@ public class Generator {
 
   public static String cardId() {
     byte[] fingerprint = randomBytes(32);
-    CardCrypto crypto = new VirgilCardCrypto();
+    VirgilCardCrypto crypto = new VirgilCardCrypto();
 
-    try {
-      return ConvertionUtils.toString(Arrays.copyOfRange(crypto.computeSha512(fingerprint), 0, 32),
+    return ConvertionUtils.toString(Arrays.copyOfRange(crypto.computeSha512(fingerprint), 0, 32),
           StringEncoding.HEX);
-    } catch (CryptoException e) {
-      fail(e.getMessage());
-    }
-
-    return null;
   }
 
   public static String firstName() {

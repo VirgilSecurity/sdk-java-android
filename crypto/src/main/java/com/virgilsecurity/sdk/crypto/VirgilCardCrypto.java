@@ -40,12 +40,12 @@ import com.virgilsecurity.sdk.exception.NullArgumentException;
  * The {@link VirgilCardCrypto} class provides a cryptographic operations in applications, such as
  * hashing, signature generation and verification, and encryption and decryption.
  *
- * @see CardCrypto
- * @see PrivateKey
- * @see PublicKey
+ * @see VirgilCardCrypto
+ * @see VirgilPrivateKey
+ * @see VirgilPublicKey
  * @see VirgilCrypto
  */
-public class VirgilCardCrypto implements CardCrypto {
+public class VirgilCardCrypto {
 
   private VirgilCrypto virgilCrypto;
 
@@ -65,88 +65,84 @@ public class VirgilCardCrypto implements CardCrypto {
     this.virgilCrypto = virgilCrypto;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * Exports the {@code publicKey} into material representation.
    *
-   * @see com.virgilsecurity.sdk.crypto.CardCrypto#exportPublicKey(com.virgilsecurity.sdk.crypto.
-   * PublicKey)
+   * @param publicKey The public key.
+   *
+   * @return Public key in material representation of {@code byte[]}.
+   *
+   * @throws CryptoException If problems occurred while exporting key.
    */
-  @Override
-  public byte[] exportPublicKey(PublicKey publicKey) throws CryptoException {
+  public byte[] exportPublicKey(VirgilPublicKey publicKey) throws CryptoException {
     if (publicKey == null) {
       throw new NullArgumentException("publicKey");
     }
-    if (!(publicKey instanceof VirgilPublicKey)) {
-      throw new CryptoException("VirgilCrypto -> 'publicKey' should be of 'VirgilPublicKey' type");
-    }
 
-    return virgilCrypto.exportPublicKey((VirgilPublicKey) publicKey);
+    return virgilCrypto.exportPublicKey(publicKey);
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * Generates the fingerprint(512-bit hash) for the specified {@code data}.
    *
-   * @see com.virgilsecurity.sdk.crypto.CardCrypto#computeSha512(byte[])
+   * @param data The input data for which to compute the fingerprint.
+   *
+   * @return The fingerprint for specified data.
    */
-  @Override
   public byte[] computeSha512(byte[] data) {
     return virgilCrypto.computeHash(data);
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * Generates the digital signature for the specified {@code data} using the specified
+   * {@link VirgilPrivateKey}.
    *
-   * @see com.virgilsecurity.sdk.crypto.CardCrypto#generateSignature(byte[],
-   * com.virgilsecurity.sdk.crypto.PrivateKey)
+   * @param data       The input data for which to compute the signature.
+   * @param privateKey The private key.
+   *
+   * @return The digital signature for the specified data.
+   *
+   * @throws CryptoException If problems occurred while generating signature.
    */
-  @Override
-  public byte[] generateSignature(byte[] data, PrivateKey privateKey) throws CryptoException {
-    if (privateKey == null) {
-      throw new NullArgumentException("privateKey");
-    }
-    if (!(privateKey instanceof VirgilPrivateKey)) {
-      throw new CryptoException(
-          "VirgilCrypto -> 'privateKey' should be of 'VirgilPrivateKey' type");
-    }
-
-    return virgilCrypto.generateSignature(data, (VirgilPrivateKey) privateKey);
+  public byte[] generateSignature(byte[] data, VirgilPrivateKey privateKey) throws CryptoException {
+    return virgilCrypto.generateSignature(data, privateKey); // TODO test empty data signature
   }
 
   /**
    * Gets Virgil Crypto.
    *
-   * @return the virgil crypto
+   * @return The virgil crypto.
    */
   public VirgilCrypto getVirgilCrypto() {
     return virgilCrypto;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * Imports the public key from its material representation.
    *
-   * @see com.virgilsecurity.sdk.crypto.CardCrypto#importPublicKey(byte[])
+   * @param data The public key material representation bytes.
+   *
+   * @return The instance of {@link VirgilPublicKey} imported.
+   *
+   * @throws CryptoException If problems occurred while importing key.
    */
-  @Override
-  public PublicKey importPublicKey(byte[] data) throws CryptoException {
+  public VirgilPublicKey importPublicKey(byte[] data) throws CryptoException {
     return virgilCrypto.importPublicKey(data);
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * Verifies that a digital signature is valid by checking the {@code signature}, with provided
+   * {@code publicKey} and {@code data}.
    *
-   * @see com.virgilsecurity.sdk.crypto.CardCrypto#verifySignature(byte[], byte[],
-   * com.virgilsecurity.sdk.crypto.PublicKey)
+   * @param signature The digital signature for the {@code data}.
+   * @param data      The input data for which the {@code signature} has been generated.
+   * @param publicKey The {@link VirgilPublicKey}.
+   *
+   * @return {@code true} if signature is valid, {@code false} otherwise.
+   *
+   * @throws CryptoException If problems occurred while verifying signature.
    */
-  @Override
-  public boolean verifySignature(byte[] signature, byte[] data, PublicKey publicKey)
-      throws CryptoException {
-    if (publicKey == null) {
-      throw new NullArgumentException("publicKey");
-    }
-    if (!(publicKey instanceof VirgilPublicKey)) {
-      throw new CryptoException("VirgilCrypto -> 'publicKey' should be of 'VirgilPublicKey' type");
-    }
-
-    return virgilCrypto.verifySignature(signature, data, (VirgilPublicKey) publicKey);
+  public boolean verifySignature(byte[] signature, byte[] data, VirgilPublicKey publicKey) throws CryptoException {
+    return virgilCrypto.verifySignature(signature, data, publicKey);
   }
 }

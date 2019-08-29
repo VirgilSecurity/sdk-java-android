@@ -62,7 +62,7 @@ public class Mocker extends PropertyManager {
 
   public Mocker() {
     this.crypto = new VirgilCrypto();
-    AccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner();
+    VirgilAccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner();
 
     VirgilPrivateKey privateKey = getApiPrivateKey();
     VirgilPrivateKey privateKeyFake = null;
@@ -206,7 +206,8 @@ public class Mocker extends PropertyManager {
   }
 
   private JwtGenerator initJwtGenerator(String appId, VirgilPrivateKey privateKey,
-                                        String apiPublicKeyIdentifier, TimeSpan timeSpan, AccessTokenSigner accessTokenSigner) {
+                                        String apiPublicKeyIdentifier, TimeSpan timeSpan,
+                                        VirgilAccessTokenSigner accessTokenSigner) {
     return new JwtGenerator(appId, privateKey, apiPublicKeyIdentifier, timeSpan, accessTokenSigner);
   }
 }

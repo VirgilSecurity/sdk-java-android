@@ -77,7 +77,7 @@ public class CardsManagerTest extends PropertyManager {
 
   private Mocker mocker;
   private VirgilCrypto crypto;
-  private CardCrypto cardCrypto;
+  private VirgilCardCrypto cardCrypto;
   private VirgilCardClient cardClient;
   private CardManager cardManager;
   private VirgilCardVerifier cardVerifier;

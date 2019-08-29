@@ -42,6 +42,7 @@ import com.virgilsecurity.sdk.storage.PrivateKeyStorage;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
 import com.virgilsecurity.sdk.utils.Tuple;
 
+import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,8 +57,8 @@ public class PublicKeyManagementExample {
     VirgilCrypto crypto = new VirgilCrypto();
 
     // prepare a user's private key
-    Tuple<PrivateKey, Map<String, String>> bobPrivateKeyEntry = privateKeyStorage.load("Bob");
-    VirgilPrivateKey bobPrivateKey = (VirgilPrivateKey) bobPrivateKeyEntry.getLeft();
+    Tuple<VirgilPrivateKey, Map<String, String>> bobPrivateKeyEntry = privateKeyStorage.load("Bob");
+    VirgilPrivateKey bobPrivateKey = bobPrivateKeyEntry.getLeft();
 
     try {
       // using cardManager search for user's cards on Cards Service
@@ -66,7 +67,7 @@ public class PublicKeyManagementExample {
       List<VirgilPublicKey> aliceRelevantCardsPublicKeys = new ArrayList<>();
       for (Card card : cards) {
         if (!card.isOutdated()) {
-          aliceRelevantCardsPublicKeys.add((VirgilPublicKey) card.getPublicKey());
+          aliceRelevantCardsPublicKeys.add(card.getPublicKey());
         }
       }
 
@@ -96,8 +97,8 @@ public class PublicKeyManagementExample {
     byte[] dataToEncrypt = ConvertionUtils.toBytes(messageToEncrypt);
 
     // prepare a user's private key
-    Tuple<PrivateKey, Map<String, String>> alicePrivateKeyEntry = privateKeyStorage.load("Alice");
-    VirgilPrivateKey alicePrivateKey = (VirgilPrivateKey) alicePrivateKeyEntry.getLeft();
+    Tuple<VirgilPrivateKey, Map<String, String>> alicePrivateKeyEntry = privateKeyStorage.load("Alice");
+    VirgilPrivateKey alicePrivateKey = alicePrivateKeyEntry.getLeft();
 
     // using cardManager search for user's cards on Cards Service
     try {
@@ -106,7 +107,7 @@ public class PublicKeyManagementExample {
       List<VirgilPublicKey> bobRelevantCardsPublicKeys = new ArrayList<>();
       for (Card card : cards) {
         if (!card.isOutdated()) {
-          bobRelevantCardsPublicKeys.add((VirgilPublicKey) card.getPublicKey());
+          bobRelevantCardsPublicKeys.add(card.getPublicKey());
         }
       }
       // sign a message with a private key then encrypt on a public key

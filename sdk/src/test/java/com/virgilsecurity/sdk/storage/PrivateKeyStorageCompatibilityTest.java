@@ -59,11 +59,11 @@ public class PrivateKeyStorageCompatibilityTest {
   private PrivateKeyStorage privateKeyStorage;
 
   @BeforeEach
-  public void setUp() throws CryptoException {
+  public void setUp() {
     this.crypto = new VirgilCrypto();
     this.keyName = UUID.randomUUID().toString();
 
-    PrivateKeyExporter keyExporter = new VirgilPrivateKeyExporter(this.crypto);
+    VirgilPrivateKeyExporter keyExporter = new VirgilPrivateKeyExporter(this.crypto);
     KeyStorage keyStorage = new JsonFileKeyStorage(
         System.getProperty("java.io.tmpdir") + File.separator + this.keyName);
     privateKeyStorage = new PrivateKeyStorage(keyExporter, keyStorage);
@@ -73,21 +73,20 @@ public class PrivateKeyStorageCompatibilityTest {
   public void stc_7() throws CryptoException {
     // STC_7
     // Generate PrivateKey
-    PrivateKey privateKey = this.crypto.generateKeyPair().getPrivateKey();
+    VirgilPrivateKey privateKey = this.crypto.generateKeyPair().getPrivateKey();
 
     // Store PrivateKey
     this.privateKeyStorage.store(privateKey, this.keyName, null);
 
     // Load PrivateKey
-    Tuple<PrivateKey, Map<String, String>> privateKeyInfo = this.privateKeyStorage
+    Tuple<VirgilPrivateKey, Map<String, String>> privateKeyInfo = this.privateKeyStorage
         .load(this.keyName);
     assertNotNull(privateKeyInfo);
 
     // Loaded PrivateKey is exactly the same as instantiated
-    VirgilPrivateKey virgilPrivateKey = (VirgilPrivateKey) privateKey;
-    VirgilPrivateKey loadedVirgilPrivateKey = (VirgilPrivateKey) privateKeyInfo.getLeft();
-    assertArrayEquals(virgilPrivateKey.getIdentifier(), loadedVirgilPrivateKey.getIdentifier());
-    assertArrayEquals(TestUtils.exportPrivateKey(virgilPrivateKey.getPrivateKey()),
+    VirgilPrivateKey loadedVirgilPrivateKey = privateKeyInfo.getLeft();
+    assertArrayEquals(privateKey.getIdentifier(), loadedVirgilPrivateKey.getIdentifier());
+    assertArrayEquals(TestUtils.exportPrivateKey(privateKey.getPrivateKey()),
         TestUtils.exportPrivateKey(loadedVirgilPrivateKey.getPrivateKey()));
     assertTrue(privateKeyInfo.getRight().isEmpty());
 

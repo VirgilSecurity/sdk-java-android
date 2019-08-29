@@ -36,12 +36,13 @@ package com.virgilsecurity.sdk.cards.validation;
 import com.virgilsecurity.sdk.cards.Card;
 import com.virgilsecurity.sdk.cards.CardSignature;
 import com.virgilsecurity.sdk.cards.SignerType;
-import com.virgilsecurity.sdk.crypto.CardCrypto;
-import com.virgilsecurity.sdk.crypto.PublicKey;
+import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilPublicKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
 import com.virgilsecurity.sdk.utils.Validator;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -56,7 +57,7 @@ public class VirgilCardVerifier implements CardVerifier {
 
   private String virgilPublicKeyBase64 = "MCowBQYDK2VwAyEAljOYGANYiVq1WbvVvoYIKtvZi2ji9bAhxyu6iV/LF8M=";
 
-  private CardCrypto cardCrypto;
+  private VirgilCardCrypto cardCrypto;
   private boolean verifySelfSignature;
   private boolean verifyVirgilSignature;
   private List<Whitelist> whitelists;
@@ -66,18 +67,18 @@ public class VirgilCardVerifier implements CardVerifier {
    *
    * @param cardCrypto the crypto
    */
-  public VirgilCardVerifier(CardCrypto cardCrypto) {
+  public VirgilCardVerifier(VirgilCardCrypto cardCrypto) {
     this(cardCrypto, new ArrayList<Whitelist>());
   }
 
   /**
    * Instantiates a new Virgil card verifier.
    *
-   * @param cardCrypto            the card crypto
-   * @param verifySelfSignature   whether the self signature should be verified
-   * @param verifyVirgilSignature whether the virgil signature should be verified
+   * @param cardCrypto            The card crypto.
+   * @param verifySelfSignature   Whether the self signature should be verified.
+   * @param verifyVirgilSignature Whether the virgil signature should be verified.
    */
-  public VirgilCardVerifier(CardCrypto cardCrypto, boolean verifySelfSignature,
+  public VirgilCardVerifier(VirgilCardCrypto cardCrypto, boolean verifySelfSignature,
                             boolean verifyVirgilSignature) {
     this(cardCrypto, verifySelfSignature, verifyVirgilSignature, new ArrayList<Whitelist>());
   }
@@ -85,13 +86,13 @@ public class VirgilCardVerifier implements CardVerifier {
   /**
    * Instantiates a new Virgil card verifier.
    *
-   * @param cardCrypto            the card crypto
-   * @param verifySelfSignature   whether the self signature should be verified
-   * @param verifyVirgilSignature whether the virgil signature should be verified
-   * @param whitelists            the white lists that should contain Card signatures, otherwise Card validation will be
-   *                              failed
+   * @param cardCrypto            The card crypto.
+   * @param verifySelfSignature   Whether the self signature should be verified.
+   * @param verifyVirgilSignature Whether the virgil signature should be verified.
+   * @param whitelists            The white lists that should contain Card signatures, otherwise Card validation will be
+   *                              failed.
    */
-  public VirgilCardVerifier(CardCrypto cardCrypto, boolean verifySelfSignature,
+  public VirgilCardVerifier(VirgilCardCrypto cardCrypto, boolean verifySelfSignature,
                             boolean verifyVirgilSignature, List<Whitelist> whitelists) {
     Validator.checkNullAgrument(cardCrypto,
         "VirgilCardVerifier -> 'cardCrypto' should not be null");
@@ -107,18 +108,18 @@ public class VirgilCardVerifier implements CardVerifier {
   /**
    * Instantiates a new Virgil card verifier.
    *
-   * @param cardCrypto the card crypto
-   * @param whitelists the white lists that should contain Card signatures, otherwise Card validation will be
-   *                   failed
+   * @param cardCrypto The card crypto
+   * @param whitelists The white lists that should contain Card signatures, otherwise Card validation will be
+   *                   failed.
    */
-  public VirgilCardVerifier(CardCrypto cardCrypto, List<Whitelist> whitelists) {
+  public VirgilCardVerifier(VirgilCardCrypto cardCrypto, List<Whitelist> whitelists) {
     this(cardCrypto, true, true, whitelists);
   }
 
   /**
    * Sets white lists.
    *
-   * @param whitelist the white lists
+   * @param whitelist The white lists.
    */
   public void addWhiteList(Whitelist whitelist) {
     this.whitelists.add(whitelist);
@@ -127,16 +128,16 @@ public class VirgilCardVerifier implements CardVerifier {
   /**
    * Gets card crypto.
    *
-   * @return the card crypto
+   * @return The card crypto.
    */
-  public CardCrypto getCardCrypto() {
+  public VirgilCardCrypto getCardCrypto() {
     return cardCrypto;
   }
 
   /**
    * Gets white list.
    *
-   * @return the white list
+   * @return The white list.
    */
   public List<Whitelist> getWhitelists() {
     return whitelists;
@@ -146,7 +147,7 @@ public class VirgilCardVerifier implements CardVerifier {
    * Gets whether the self signature verification should be verified.
    *
    * @return {@code true} if the self signature verification should be verified, otherwise
-   * {@code false}
+   * {@code false}.
    */
   public boolean isVerifySelfSignature() {
     return verifySelfSignature;
@@ -156,7 +157,7 @@ public class VirgilCardVerifier implements CardVerifier {
    * Gets whether the virgil signature verification should be verified.
    *
    * @return {@code true} if the virgil signature verification should be verified, otherwise
-   * {@code false}
+   * {@code false}.
    */
   public boolean isVerifyVirgilSignature() {
     return verifyVirgilSignature;
@@ -170,7 +171,7 @@ public class VirgilCardVerifier implements CardVerifier {
    * Sets whether the self signature verification should be verified.
    *
    * @param verifySelfSignature {@code true} if the self signature verification should be verified, otherwise
-   *                            {@code false}
+   *                            {@code false}.
    */
   public void setVerifySelfSignature(boolean verifySelfSignature) {
     this.verifySelfSignature = verifySelfSignature;
@@ -180,7 +181,7 @@ public class VirgilCardVerifier implements CardVerifier {
    * Sets whether the virgil signature verification should be verified.
    *
    * @param verifyVirgilSignature {@code true} if the virgil signature verification should be verified, otherwise
-   *                              {@code false}
+   *                              {@code false}.
    */
   public void setVerifyVirgilSignature(boolean verifyVirgilSignature) {
     this.verifyVirgilSignature = verifyVirgilSignature;
@@ -189,7 +190,7 @@ public class VirgilCardVerifier implements CardVerifier {
   /**
    * Sets white lists.
    *
-   * @param whitelists the white lists
+   * @param whitelists The white lists.
    */
   public void setWhitelists(List<Whitelist> whitelists) {
     this.whitelists = whitelists;
@@ -205,7 +206,7 @@ public class VirgilCardVerifier implements CardVerifier {
 
     if (verifyVirgilSignature) {
       byte[] publicKeyData = ConvertionUtils.base64ToBytes(virgilPublicKeyBase64);
-      PublicKey publicKey = cardCrypto.importPublicKey(publicKeyData);
+      VirgilPublicKey publicKey = cardCrypto.importPublicKey(publicKeyData);
 
       if (!verify(card, SignerType.VIRGIL.getRawValue(), publicKey)) {
         LOGGER.info(
@@ -225,7 +226,7 @@ public class VirgilCardVerifier implements CardVerifier {
       for (VerifierCredentials verifierCredentials : whitelist.getVerifiersCredentials()) {
         for (CardSignature cardSignature : card.getSignatures()) {
           if (Objects.equals(cardSignature.getSigner(), verifierCredentials.getSigner())) {
-            PublicKey publicKey = cardCrypto.importPublicKey(verifierCredentials.getPublicKey());
+            VirgilPublicKey publicKey = cardCrypto.importPublicKey(verifierCredentials.getPublicKey());
             containsSignature = true;
             String signer = cardSignature.getSigner();
             if (!verify(card, signer, publicKey)) {
@@ -252,12 +253,13 @@ public class VirgilCardVerifier implements CardVerifier {
   /**
    * Verifies provided Card.
    *
-   * @param card            the card
-   * @param signer          the signer
-   * @param signerPublicKey the signer's public key
-   * @return {@code true} if Card is valid, otherwise {@code false}
+   * @param card            The card.
+   * @param signer          The signer.
+   * @param signerPublicKey The signer's public key.
+   *
+   * @return {@code true} if Card is valid, otherwise {@code false}.
    */
-  private boolean verify(Card card, String signer, PublicKey signerPublicKey) {
+  private boolean verify(Card card, String signer, VirgilPublicKey signerPublicKey) {
     CardSignature cardSignature = null;
     for (CardSignature signature : card.getSignatures()) {
       if (Objects.equals(signature.getSigner(), signer)) {

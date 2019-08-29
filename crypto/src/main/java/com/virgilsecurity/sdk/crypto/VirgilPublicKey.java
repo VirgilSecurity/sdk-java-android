@@ -40,7 +40,7 @@ import java.util.Objects;
 /**
  * A public key.
  */
-public class VirgilPublicKey implements PublicKey, Serializable {
+public class VirgilPublicKey implements Serializable {
 
   private static final long serialVersionUID = -9006213204395528391L;
 

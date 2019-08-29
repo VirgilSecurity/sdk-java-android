@@ -37,7 +37,7 @@ import com.virgilsecurity.sdk.cards.Card;
 import com.virgilsecurity.sdk.cards.model.RawSignedModel;
 import com.virgilsecurity.sdk.client.exceptions.VirgilCardServiceException;
 import com.virgilsecurity.sdk.common.StringEncoding;
-import com.virgilsecurity.sdk.crypto.CardCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 
 import java.util.ArrayList;
@@ -57,13 +57,12 @@ public class CardUtils {
   /**
    * Generate Virgil Card identifier by card content snapshot.
    *
-   * @param cardCrypto      the {@link CardCrypto}
-   * @param contentSnapshot the card content snapshot.
-   * @return the generated Virgil Card identifier.
-   * @throws CryptoException if card identifier couldn't be generated
+   * @param cardCrypto      The {@link VirgilCardCrypto}.
+   * @param contentSnapshot The card content snapshot.
+   *
+   * @return The generated Virgil Card identifier.
    */
-  public static String generateCardId(CardCrypto cardCrypto, byte[] contentSnapshot)
-      throws CryptoException {
+  public static String generateCardId(VirgilCardCrypto cardCrypto, byte[] contentSnapshot) {
     byte[] fingerprint = Arrays.copyOfRange(cardCrypto.computeSha512(contentSnapshot), 0, 32);
     String cardId = ConvertionUtils.toString(fingerprint, StringEncoding.HEX);
 
@@ -73,12 +72,14 @@ public class CardUtils {
   /**
    * Parse Card models into Cards.
    *
-   * @param crypto     the {@linkplain CardCrypto}.
-   * @param cardModels card models.
-   * @return list of {@linkplain Card}s.
-   * @throws CryptoException if parsing failed.
+   * @param crypto     The {@linkplain VirgilCardCrypto}.
+   * @param cardModels Card models.
+   *
+   * @return List of {@linkplain Card}s.
+   *
+   * @throws CryptoException If parsing failed.
    */
-  public static List<Card> parseCards(CardCrypto crypto, List<RawSignedModel> cardModels)
+  public static List<Card> parseCards(VirgilCardCrypto crypto, List<RawSignedModel> cardModels)
       throws CryptoException {
     List<Card> cards = new ArrayList<>();
     for (RawSignedModel cardModel : cardModels) {
@@ -90,9 +91,10 @@ public class CardUtils {
   /**
    * Check if identities provided for search are equals to Cards identities.
    *
-   * @param cards      the {@linkplain Card}s.
-   * @param identities the identites.
-   * @throws VirgilCardServiceException
+   * @param cards      The {@linkplain Card}s.
+   * @param identities The identites.
+   *
+   * @throws VirgilCardServiceException If some service error has happened.
    */
   public static void validateCardsWithIdentities(Collection<Card> cards,
                                                  Collection<String> identities) throws VirgilCardServiceException {

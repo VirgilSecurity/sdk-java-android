@@ -35,9 +35,8 @@ package com.virgilsecurity.sdk.jwt;
 
 import com.virgilsecurity.sdk.FakeDataFactory;
 import com.virgilsecurity.sdk.common.TimeSpan;
-import com.virgilsecurity.sdk.crypto.AccessTokenSigner;
-import com.virgilsecurity.sdk.crypto.PrivateKey;
 import com.virgilsecurity.sdk.crypto.VirgilAccessTokenSigner;
+import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +54,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class JwtGeneratorTest {
 
   private FakeDataFactory fake;
-  private AccessTokenSigner signer;
+  private VirgilAccessTokenSigner signer;
   private JwtGenerator generator;
   private String identity;
 
@@ -65,7 +64,7 @@ public class JwtGeneratorTest {
     VirgilAccessTokenSigner signer = new VirgilAccessTokenSigner();
 
     String appId = fake.getApplicationId();
-    PrivateKey privateKey = fake.getApiPrivateKey();
+    VirgilPrivateKey privateKey = fake.getApiPrivateKey();
     final String apiPublicKeyId = fake.getApiPublicKeyId();
 
     JwtGenerator generator = new JwtGenerator(appId, privateKey, apiPublicKeyId,

@@ -33,12 +33,13 @@
 
 package com.virgilsecurity.sdk.jwt;
 
-import com.virgilsecurity.sdk.crypto.AccessTokenSigner;
-import com.virgilsecurity.sdk.crypto.PublicKey;
+import com.virgilsecurity.sdk.crypto.VirgilAccessTokenSigner;
+import com.virgilsecurity.sdk.crypto.VirgilPublicKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.exception.NullArgumentException;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
 
+import java.security.PublicKey;
 import java.util.logging.Logger;
 
 /**
@@ -47,19 +48,19 @@ import java.util.logging.Logger;
 public class JwtVerifier {
   private static final Logger LOGGER = Logger.getLogger(JwtVerifier.class.getName());
 
-  private PublicKey apiPublicKey;
+  private VirgilPublicKey apiPublicKey;
   private String apiPublicKeyIdentifier;
-  private AccessTokenSigner accessTokenSigner;
+  private VirgilAccessTokenSigner accessTokenSigner;
 
   /**
    * Instantiates a new Jwt verifier.
    *
-   * @param apiPublicKey           the api public key
-   * @param apiPublicKeyIdentifier the api public key identifier
-   * @param accessTokenSigner      the access token signer
+   * @param apiPublicKey           The api public key.
+   * @param apiPublicKeyIdentifier The api public key identifier.
+   * @param accessTokenSigner      The access token signer.
    */
-  public JwtVerifier(PublicKey apiPublicKey, String apiPublicKeyIdentifier,
-                     AccessTokenSigner accessTokenSigner) {
+  public JwtVerifier(VirgilPublicKey apiPublicKey, String apiPublicKeyIdentifier,
+                     VirgilAccessTokenSigner accessTokenSigner) {
     this.apiPublicKey = apiPublicKey;
     this.apiPublicKeyIdentifier = apiPublicKeyIdentifier;
     this.accessTokenSigner = accessTokenSigner;
@@ -68,9 +69,11 @@ public class JwtVerifier {
   /**
    * Checks whether the token's signature is valid.
    *
-   * @param jwtToken the jwt token
-   * @return {@code true} if the token's signature is valid, otherwise {@code false}
-   * @throws CryptoException if issue occurred during token's signature verification
+   * @param jwtToken The jwt token.
+   *
+   * @return {@code true} if the token's signature is valid, otherwise {@code false}.
+   *
+   * @throws CryptoException If issue occurred during token's signature verification.
    */
   public boolean verifyToken(Jwt jwtToken) throws CryptoException {
     if (jwtToken == null) {

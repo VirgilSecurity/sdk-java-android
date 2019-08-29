@@ -34,12 +34,13 @@
 package com.virgilsecurity.sdk.jwt;
 
 import com.virgilsecurity.sdk.common.TimeSpan;
-import com.virgilsecurity.sdk.crypto.AccessTokenSigner;
-import com.virgilsecurity.sdk.crypto.PrivateKey;
+import com.virgilsecurity.sdk.crypto.VirgilAccessTokenSigner;
+import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.utils.Base64Url;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
 
+import java.security.PrivateKey;
 import java.util.Date;
 import java.util.Map;
 
@@ -49,23 +50,23 @@ import java.util.Map;
  */
 public class JwtGenerator {
 
-  private final PrivateKey apiKey;
+  private final VirgilPrivateKey apiKey;
   private final String apiPublicKeyIdentifier;
-  private final AccessTokenSigner accessTokenSigner;
+  private final VirgilAccessTokenSigner accessTokenSigner;
   private final String appId;
   private final TimeSpan ttl;
 
   /**
    * Instantiates a new Jwt generator.
    *
-   * @param appId                  the application identifier
-   * @param apiKey                 the api private key
-   * @param apiPublicKeyIdentifier the api public key identifier
-   * @param ttl                    the lifetime of token - when it expires at
-   * @param accessTokenSigner      the access token signer
+   * @param appId                  The application identifier.
+   * @param apiKey                 The api private key.
+   * @param apiPublicKeyIdentifier The api public key identifier.
+   * @param ttl                    The lifetime of token - when it expires at.
+   * @param accessTokenSigner      The access token signer.
    */
-  public JwtGenerator(String appId, PrivateKey apiKey, String apiPublicKeyIdentifier, TimeSpan ttl,
-                      AccessTokenSigner accessTokenSigner) {
+  public JwtGenerator(String appId, VirgilPrivateKey apiKey, String apiPublicKeyIdentifier, TimeSpan ttl,
+                      VirgilAccessTokenSigner accessTokenSigner) {
     this.appId = appId;
     this.apiKey = apiKey;
     this.apiPublicKeyIdentifier = apiPublicKeyIdentifier;
@@ -76,9 +77,11 @@ public class JwtGenerator {
   /**
    * Generate token jwt.
    *
-   * @param identity the identity
-   * @return the generated Jwt
-   * @throws CryptoException if issue occurred while generating token signature
+   * @param identity The identity.
+   *
+   * @return The generated Jwt.
+   *
+   * @throws CryptoException If issue occurred while generating token signature.
    */
   public Jwt generateToken(String identity) throws CryptoException {
     JwtHeaderContent jwtHeaderContent = new JwtHeaderContent(apiPublicKeyIdentifier);
@@ -93,10 +96,12 @@ public class JwtGenerator {
   /**
    * Generate token jwt.
    *
-   * @param identity       the identity
-   * @param additionalData the additional data associated with token
-   * @return the generated Jwt
-   * @throws CryptoException if issue occurred while generating token signature
+   * @param identity       The identity.
+   * @param additionalData The additional data associated with token.
+   *
+   * @return The generated Jwt.
+   *
+   * @throws CryptoException If issue occurred while generating token signature.
    */
   public Jwt generateToken(String identity, Map<String, String> additionalData)
       throws CryptoException {

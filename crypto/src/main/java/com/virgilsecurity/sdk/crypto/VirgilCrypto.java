@@ -780,6 +780,10 @@ public class VirgilCrypto {
    * @throws CryptoException if key couldn't be exported
    */
   public byte[] exportPrivateKey(VirgilPrivateKey privateKey) throws CryptoException {
+    if (privateKey == null) {
+      throw new NullArgumentException("privateKey");
+    }
+
     try (KeyAsn1Serializer serializer = new KeyAsn1Serializer()) {
       serializer.setupDefaults();
 

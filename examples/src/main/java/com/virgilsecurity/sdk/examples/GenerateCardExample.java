@@ -48,6 +48,7 @@ import com.virgilsecurity.sdk.jwt.accessProviders.CallbackJwtProvider.GetTokenCa
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider;
 import com.virgilsecurity.sdk.utils.Base64;
 
+import java.security.PrivateKey;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -58,7 +59,7 @@ public class GenerateCardExample {
   public static void main(String[] args) throws CryptoException {
     String identity = "Alice";
     VirgilCrypto virgilCrypto = new VirgilCrypto();
-    CardCrypto cardCrypto = new VirgilCardCrypto(virgilCrypto);
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto(virgilCrypto);
     AccessTokenProvider accessTokenProvider = new CallbackJwtProvider(null);
     CardManager cardManager = new CardManager(cardCrypto, accessTokenProvider,
         new VirgilCardVerifier(cardCrypto, true, false));
@@ -82,7 +83,7 @@ public class GenerateCardExample {
     String identity = "Alice";
 
     VirgilCrypto virgilCrypto = new VirgilCrypto();
-    CardCrypto cardCrypto = new VirgilCardCrypto(virgilCrypto);
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto(virgilCrypto);
     AccessTokenProvider accessTokenProvider = new CallbackJwtProvider(null);
     CardManager cardManager = new CardManager(cardCrypto, accessTokenProvider,
         new VirgilCardVerifier(cardCrypto));
@@ -105,8 +106,8 @@ public class GenerateCardExample {
 
     VirgilCrypto virgilCrypto = new VirgilCrypto();
     // Import API Private key from string
-    PrivateKey apiKey = virgilCrypto.importPrivateKey(Base64.decode(apiKeyBase64)).getPrivateKey();
-    AccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner(virgilCrypto);
+    VirgilPrivateKey apiKey = virgilCrypto.importPrivateKey(Base64.decode(apiKeyBase64)).getPrivateKey();
+    VirgilAccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner(virgilCrypto);
     JwtGenerator jwtGenerator = new JwtGenerator(appId, apiKey, apiKeyId,
         TimeSpan.fromTime(1, TimeUnit.DAYS), accessTokenSigner);
 
@@ -118,18 +119,14 @@ public class GenerateCardExample {
     VirgilCrypto virgilCrypto = new VirgilCrypto();
 
     // Initialize CardManager
-    CardCrypto cardCrypto = new VirgilCardCrypto(virgilCrypto);
-    AccessTokenProvider accessTokenProvider = new CallbackJwtProvider(new GetTokenCallback() {
-
-      @Override
-      public String onGetToken(TokenContext tokenContext) {
-        // Make call to your Server to obtain Jwt token
-        try {
-          return jwtTokenGeneratorOnServer(tokenContext);
-        } catch (CryptoException e) {
-          // Handle an error here
-          return null;
-        }
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto(virgilCrypto);
+    AccessTokenProvider accessTokenProvider = new CallbackJwtProvider(tokenContext -> {
+      // Make call to your Server to obtain Jwt token
+      try {
+        return jwtTokenGeneratorOnServer(tokenContext);
+      } catch (CryptoException e) {
+        // Handle an error here
+        return null;
       }
     });
     CardManager cardManager = new CardManager(cardCrypto, accessTokenProvider,

@@ -34,10 +34,9 @@
 package com.virgilsecurity.sdk.examples;
 
 import com.virgilsecurity.sdk.common.TimeSpan;
-import com.virgilsecurity.sdk.crypto.AccessTokenSigner;
-import com.virgilsecurity.sdk.crypto.PrivateKey;
 import com.virgilsecurity.sdk.crypto.VirgilAccessTokenSigner;
 import com.virgilsecurity.sdk.crypto.VirgilCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.jwt.Jwt;
 import com.virgilsecurity.sdk.jwt.JwtGenerator;
@@ -47,6 +46,7 @@ import com.virgilsecurity.sdk.jwt.accessProviders.CallbackJwtProvider.GetTokenCa
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
 
+import java.security.PrivateKey;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -66,9 +66,9 @@ public class AuthenticationJwtExample {
 
     // import a private key
     VirgilCrypto crypto = new VirgilCrypto();
-    PrivateKey apiKey = crypto.importPrivateKey(apiKeyData).getPrivateKey();
+    VirgilPrivateKey apiKey = crypto.importPrivateKey(apiKeyData).getPrivateKey();
 
-    AccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner();
+    VirgilAccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner();
 
     String appId = "be00e10e4e1f4bf58f9b4dc85d79c77a"; // APP_ID
     String apiKeyId = "70b447e321f3a0fd"; // API_KEY_ID
@@ -95,13 +95,7 @@ public class AuthenticationJwtExample {
     final String authenticatedQueryToServerSide = "eyJraWQiOiI3MGI0NDdlMzIxZjNhMGZkIiwidHlwIjoiSldUIiwiYWxnIjoiVkVEUzUxMiIsImN0eSI6InZpcmdpbC1qd3Q7dj0xIn0.eyJleHAiOjE1MTg2OTg5MTcsImlzcyI6InZpcmdpbC1iZTAwZTEwZTRlMWY0YmY1OGY5YjRkYzg1ZDc5Yzc3YSIsInN1YiI6ImlkZW50aXR5LUFsaWNlIiwiaWF0IjoxNTE4NjEyNTE3fQ.MFEwDQYJYIZIAWUDBAIDBQAEQP4Yo3yjmt8WWJ5mqs3Yrqc_VzG6nBtrW2KIjP-kxiIJL_7Wv0pqty7PDbDoGhkX8CJa6UOdyn3rBWRvMK7p7Ak";
 
     // Setup AccessTokenProvider
-    GetTokenCallback getTokenCallback = new GetTokenCallback() {
-
-      @Override
-      public String onGetToken(TokenContext tokenContext) {
-        return authenticatedQueryToServerSide;
-      }
-    };
+    GetTokenCallback getTokenCallback = tokenContext -> authenticatedQueryToServerSide;
     AccessTokenProvider accessTokenProvider = new CallbackJwtProvider(getTokenCallback);
   }
 }

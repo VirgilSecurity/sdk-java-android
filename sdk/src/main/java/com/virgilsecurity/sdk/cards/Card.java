@@ -37,8 +37,8 @@ import com.virgilsecurity.sdk.cards.model.RawCardContent;
 import com.virgilsecurity.sdk.cards.model.RawSignature;
 import com.virgilsecurity.sdk.cards.model.RawSignedModel;
 import com.virgilsecurity.sdk.client.exceptions.VirgilCardVerificationException;
-import com.virgilsecurity.sdk.crypto.CardCrypto;
-import com.virgilsecurity.sdk.crypto.PublicKey;
+import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilPublicKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.exception.NullArgumentException;
 import com.virgilsecurity.sdk.utils.CardUtils;
@@ -58,7 +58,7 @@ public class Card {
   private String identifier;
 
   private String identity;
-  private PublicKey publicKey;
+  private VirgilPublicKey publicKey;
   private String version;
   private Date createdAt;
   private String previousCardId;
@@ -71,11 +71,13 @@ public class Card {
    * Parse card from provided raw signed model.
    *
    * @param cardCrypto The card crypto.
-   * @param cardModel  The card model to be parsed
-   * @return The card that is parsed from provided {@link RawSignedModel}
+   * @param cardModel  The card model to be parsed.
+   *
+   * @return The card that is parsed from provided {@link RawSignedModel}.
+   *
    * @throws CryptoException If any crypto operation fails.
    */
-  public static Card parse(CardCrypto cardCrypto, RawSignedModel cardModel) throws CryptoException {
+  public static Card parse(VirgilCardCrypto cardCrypto, RawSignedModel cardModel) throws CryptoException {
     if (cardCrypto == null) {
       throw new NullArgumentException("Card -> 'crypto' should not be null");
     }
@@ -88,7 +90,7 @@ public class Card {
 
     String cardId = CardUtils.generateCardId(cardCrypto, cardModel.getContentSnapshot());
 
-    PublicKey publicKey =
+    VirgilPublicKey publicKey =
         cardCrypto.importPublicKey(ConvertionUtils.base64ToBytes(rawCardContent.getPublicKey()));
 
     // Converting RawSignatures to CardSignatures
@@ -123,15 +125,15 @@ public class Card {
   /**
    * Instantiates a new Card.
    *
-   * @param identifier      uniquely identifies the Card in Virgil Services
-   * @param identity        unique identity value
-   * @param publicKey       the public key
-   * @param version         the version of Card (ex. "5.0")
-   * @param createdAt       when the Card was created at
-   * @param signatures      the list of signatures
-   * @param contentSnapshot the card content snapshot
+   * @param identifier      Uniquely identifies the Card in Virgil Services.
+   * @param identity        Unique identity value.
+   * @param publicKey       The public key.
+   * @param version         The version of Card (ex. "5.0").
+   * @param createdAt       When the Card was created at.
+   * @param signatures      The list of signatures.
+   * @param contentSnapshot The card content snapshot.
    */
-  public Card(String identifier, String identity, PublicKey publicKey, String version,
+  public Card(String identifier, String identity, VirgilPublicKey publicKey, String version,
               Date createdAt, List<CardSignature> signatures, byte[] contentSnapshot) {
     this.identifier = identifier;
     this.identity = identity;
@@ -145,18 +147,18 @@ public class Card {
   /**
    * Instantiates a new Card.
    *
-   * @param identifier      the card identitier
-   * @param identity        unique identity value
-   * @param publicKey       the public key
-   * @param version         the version of Card (ex. "5.0")
-   * @param createdAt       when the Card was created at
-   * @param previousCardId  the previous Card identifier that current card is used to override
-   * @param previousCard    the previous Card that current card is used to override
-   * @param signatures      the list of signatures
-   * @param isOutdated      whether the card is overridden by another card
-   * @param contentSnapshot the card content snapshot
+   * @param identifier      Uniquely identifies the Card in Virgil Services.
+   * @param identity        Unique identity value.
+   * @param publicKey       The public key.
+   * @param version         The version of Card (ex. "5.0").
+   * @param createdAt       When the Card was created at.
+   * @param previousCardId  The previous Card identifier that current card is used to override.
+   * @param previousCard    The previous Card that current card is used to override.
+   * @param signatures      The list of signatures.
+   * @param isOutdated      Whether the card is overridden by another card.
+   * @param contentSnapshot The card content snapshot.
    */
-  public Card(String identifier, String identity, PublicKey publicKey, String version,
+  public Card(String identifier, String identity, VirgilPublicKey publicKey, String version,
               Date createdAt, String previousCardId, Card previousCard, List<CardSignature> signatures,
               boolean isOutdated, byte[] contentSnapshot) {
     this.identifier = identifier;
@@ -174,17 +176,17 @@ public class Card {
   /**
    * Instantiates a new Card.
    *
-   * @param identifier      uniquely identifies the Card in Virgil Services
-   * @param identity        unique identity value
-   * @param publicKey       the public key
-   * @param version         the version of Card (ex. "5.0")
-   * @param createdAt       when the Card was created at
-   * @param previousCardId  the previous Card identifier that current card is used to override
-   * @param previousCard    the previous Card that current card is used to override
-   * @param signatures      the list of signatures
-   * @param contentSnapshot the card content snapshot
+   * @param identifier      Uniquely identifies the Card in Virgil Services.
+   * @param identity        Unique identity value.
+   * @param publicKey       The public key.
+   * @param version         The version of Card (ex. "5.0").
+   * @param createdAt       When the Card was created at.
+   * @param previousCardId  The previous Card identifier that current card is used to override.
+   * @param previousCard    The previous Card that current card is used to override.
+   * @param signatures      The list of signatures.
+   * @param contentSnapshot The card content snapshot.
    */
-  public Card(String identifier, String identity, PublicKey publicKey, String version,
+  public Card(String identifier, String identity, VirgilPublicKey publicKey, String version,
               Date createdAt, String previousCardId, Card previousCard, List<CardSignature> signatures,
               byte[] contentSnapshot) {
     this.identifier = identifier;
@@ -201,16 +203,16 @@ public class Card {
   /**
    * Instantiates a new Card.
    *
-   * @param identifier      uniquely identifies the Card in Virgil Services
-   * @param identity        unique identity value
-   * @param publicKey       the public key
-   * @param version         the version of Card (ex. "5.0")
-   * @param createdAt       when the Card was created at
-   * @param previousCardId  the previous Card identifier that current card is used to override
-   * @param signatures      the list of signatures
-   * @param contentSnapshot the card content snapshot
+   * @param identifier      Uniquely identifies the Card in Virgil Services.
+   * @param identity        Unique identity value.
+   * @param publicKey       The public key.
+   * @param version         The version of Card (ex. "5.0").
+   * @param createdAt       When the Card was created at.
+   * @param previousCardId  The previous Card identifier that current card is used to override.
+   * @param signatures      The list of signatures.
+   * @param contentSnapshot The card content snapshot.
    */
-  public Card(String identifier, String identity, PublicKey publicKey, String version,
+  public Card(String identifier, String identity, VirgilPublicKey publicKey, String version,
               Date createdAt, String previousCardId, List<CardSignature> signatures,
               byte[] contentSnapshot) {
     this.identifier = identifier;
@@ -221,12 +223,12 @@ public class Card {
     this.previousCardId = previousCardId;
     this.signatures = signatures;
     this.contentSnapshot = contentSnapshot;
-  }
+  } // TODO move to builder?
 
   /**
    * Get Card's content snapshot which is representation of {@link RawCardContent}.
    *
-   * @return the content snapshot as byte [ ]
+   * @return The content snapshot as byte [ ].
    */
   public byte[] getContentSnapshot() {
     return contentSnapshot;
@@ -235,7 +237,7 @@ public class Card {
   /**
    * Gets the date and time fo card creation in UTC.
    *
-   * @return the created at
+   * @return The created at.
    */
   public Date getCreatedAt() {
     return createdAt;
@@ -244,7 +246,7 @@ public class Card {
   /**
    * Gets the Card identifier that uniquely identifies the Card in Virgil Services.
    *
-   * @return the Card identifier
+   * @return The Card identifier.
    */
   public String getIdentifier() {
     return identifier;
@@ -253,7 +255,7 @@ public class Card {
   /**
    * Gets the identity value that can be anything which identifies the user in your application.
    *
-   * @return the identity
+   * @return The identity.
    */
   public String getIdentity() {
     return identity;
@@ -262,7 +264,7 @@ public class Card {
   /**
    * Get previous Card that current card is used to override to.
    *
-   * @return the previous card
+   * @return The previous card.
    */
   public Card getPreviousCard() {
     return previousCard;
@@ -271,7 +273,7 @@ public class Card {
   /**
    * Get previous Card identifier that current card is used to override to.
    *
-   * @return the previous card id
+   * @return The previous card id.
    */
   public String getPreviousCardId() {
     return previousCardId;
@@ -280,16 +282,16 @@ public class Card {
   /**
    * Gets the public key.
    *
-   * @return the public key
+   * @return The public key.
    */
-  public PublicKey getPublicKey() {
+  public VirgilPublicKey getPublicKey() {
     return publicKey;
   }
 
   /**
    * Gets raw signed model from current Card.
    *
-   * @return the {@link RawSignedModel} exported from this Card
+   * @return The {@link RawSignedModel} exported from this Card.
    */
   public RawSignedModel getRawCard() {
     RawSignedModel cardModel = new RawSignedModel(contentSnapshot);
@@ -308,6 +310,13 @@ public class Card {
     return cardModel;
   }
 
+  /**
+   * Gets self signature.
+   *
+   * @return The self {@link CardSignature}.
+   *
+   * @throws VirgilCardVerificationException If self signature was not found in signatures list.
+   */
   public CardSignature getSelfSignature() throws VirgilCardVerificationException {
     for (CardSignature cardSignature : signatures) {
       if (cardSignature.getSigner().equals(SignerType.SELF.getRawValue())) {
@@ -331,7 +340,7 @@ public class Card {
   /**
    * Gets the version of the card.
    *
-   * @return the version
+   * @return The version.
    */
   public String getVersion() {
     return version;
@@ -347,7 +356,7 @@ public class Card {
   /**
    * Whether the card is overridden by another card.
    *
-   * @return if the Card is outdated - {@code true}, otherwise {@code false}
+   * @return If the Card is outdated - {@code true}, otherwise {@code false}.
    */
   public boolean isOutdated() {
     return isOutdated;
@@ -356,7 +365,7 @@ public class Card {
   /**
    * Sets Card's content snapshot which is representation of {@link RawCardContent}.
    *
-   * @param contentSnapshot the content snapshot as byte [ ]
+   * @param contentSnapshot The content snapshot as byte [ ].
    */
   public void setContentSnapshot(byte[] contentSnapshot) {
     this.contentSnapshot = contentSnapshot;
@@ -365,7 +374,7 @@ public class Card {
   /**
    * Sets whether the card is overridden by another card.
    *
-   * @param outdated if the Card is outdated - {@code true}, otherwise {@code false}
+   * @param outdated If the Card is outdated - {@code true}, otherwise {@code false}.
    */
   public void setOutdated(boolean outdated) {
     isOutdated = outdated;
@@ -374,10 +383,10 @@ public class Card {
   /**
    * Set previous Card that current card is used to override to.
    *
-   * @param previousCard the previous card
+   * @param previousCard The previous card.
    */
   public void setPreviousCard(Card previousCard) {
-    Validator.checkNullAgrument(previousCard, "Card -> 'previousCard' shoud not be null");
+    Validator.checkNullAgrument(previousCard, "Card -> 'previousCard' should not be null");
     this.previousCard = previousCard;
   }
 }

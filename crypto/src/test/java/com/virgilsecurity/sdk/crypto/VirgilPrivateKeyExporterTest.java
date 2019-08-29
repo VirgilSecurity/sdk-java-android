@@ -74,29 +74,29 @@ public class VirgilPrivateKeyExporterTest {
   }
 
   @ExporterTest
-  public void exportPrivateKey(PrivateKeyExporter exporter) throws CryptoException {
+  public void exportPrivateKey(VirgilPrivateKeyExporter exporter) throws CryptoException {
     byte[] exportedKeyData = exporter.exportPrivateKey(privateKey);
     assertNotNull(exportedKeyData);
   }
 
   @ExporterTest
-  public void importPrivateKey(PrivateKeyExporter exporter) throws CryptoException {
+  public void importPrivateKey(VirgilPrivateKeyExporter exporter) throws CryptoException {
     byte[] exportedKeyData = exporter.exportPrivateKey(privateKey);
 
-    VirgilPrivateKey importedKey = (VirgilPrivateKey) exporter.importPrivateKey(exportedKeyData);
+    VirgilPrivateKey importedKey = exporter.importPrivateKey(exportedKeyData);
     assertNotNull(importedKey);
     assertEquals(privateKey, importedKey);
   }
 
   @ExporterTest
-  public void importPrivateKey_invalidData(PrivateKeyExporter exporter) throws CryptoException {
+  public void importPrivateKey_invalidData(VirgilPrivateKeyExporter exporter) {
     assertThrows(CryptoException.class, () -> {
       exporter.importPrivateKey("wrong_data".getBytes());
     });
   }
 
   @ExporterTest
-  public void importPrivateKey_null(PrivateKeyExporter exporter) throws CryptoException {
+  public void importPrivateKey_null(VirgilPrivateKeyExporter exporter) {
     assertThrows(NullArgumentException.class, () -> {
       exporter.importPrivateKey(null);
     });
