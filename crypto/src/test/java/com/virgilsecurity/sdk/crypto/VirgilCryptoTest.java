@@ -37,6 +37,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import com.virgilsecurity.crypto.foundation.KeyProvider;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
@@ -454,4 +455,14 @@ public class VirgilCryptoTest {
     long endDec = System.nanoTime();
     System.out.println(String.format("Decrypt: %f ms", (endDec - startDec) / 1e6));
   }
+
+  @Test
+  public void generateKeyPair_exportPrivateKey_in_cycle() throws CryptoException {
+    for (int i = 0; i < 1000; i++) {
+      VirgilKeyPair kp = crypto.generateKeyPair(KeyType.SECP256R1);
+      byte[] privateKeyData = crypto.exportPrivateKey(kp.getPrivateKey());
+      assertNotNull(privateKeyData);
+    }
+  }
+
 }

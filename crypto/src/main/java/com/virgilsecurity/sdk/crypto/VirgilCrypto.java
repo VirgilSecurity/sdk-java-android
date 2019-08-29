@@ -912,9 +912,14 @@ public class VirgilCrypto {
       serializer.setupDefaults();
 
       KeyAlg keyAlg = KeyAlgFactory.createFromKey(privateKey.getPrivateKey(), this.rng);
-      RawPrivateKey rawPrivateKey = keyAlg.exportPrivateKey(privateKey.getPrivateKey());
-
-      return serializer.serializePrivateKey(rawPrivateKey);
+      try (RawPrivateKey rawPrivateKey = keyAlg.exportPrivateKey(privateKey.getPrivateKey())) {
+        return serializer.serializePrivateKey(rawPrivateKey);
+      }
+      finally {
+        if (keyAlg instanceof AutoCloseable) {
+          ((AutoCloseable) keyAlg).close();
+        }
+      }
     } catch (Exception e) {
       throw new CryptoException(e);
     }
@@ -1142,17 +1147,22 @@ public class VirgilCrypto {
       serializer.setupDefaults();
 
       KeyAlg keyAlg = KeyAlgFactory.createFromKey(publicKey, this.rng);
-      RawPublicKey rawPublicKey = keyAlg.exportPublicKey(publicKey);
-
-      byte[] publicKeyDer = serializer.serializePublicKey(rawPublicKey);
-      byte[] hash;
-      if (useSHA256Fingerprints) {
-        hash = computeHash(publicKeyDer, HashAlgorithm.SHA256);
-      } else {
-        hash = computeHash(publicKeyDer, HashAlgorithm.SHA512);
-        hash = Arrays.copyOfRange(hash, 0, 8);
+      try (RawPublicKey rawPublicKey = keyAlg.exportPublicKey(publicKey)) {
+        byte[] publicKeyDer = serializer.serializePublicKey(rawPublicKey);
+        byte[] hash;
+        if (useSHA256Fingerprints) {
+          hash = computeHash(publicKeyDer, HashAlgorithm.SHA256);
+        } else {
+          hash = computeHash(publicKeyDer, HashAlgorithm.SHA512);
+          hash = Arrays.copyOfRange(hash, 0, 8);
+        }
+        return hash;
       }
-      return hash;
+      finally {
+        if (keyAlg instanceof AutoCloseable) {
+          ((AutoCloseable) keyAlg).close();
+        }
+      }
     } catch (Exception e) {
       // This should never happen
       throw new CryptoException(e);
