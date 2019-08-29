@@ -97,7 +97,7 @@ class CloudKeyStorageTest {
     fun retrieveCloudEntries_empty() {
         // KTC-19
         this.keyStorage.retrieveCloudEntries()
-        val entries = this.keyStorage.retrieveAll()
+        val entries = this.keyStorage.retrieveAllEntries()
         assertTrue(entries.isEmpty())
     }
 
@@ -113,10 +113,10 @@ class CloudKeyStorageTest {
         this.keyStorage.retrieveCloudEntries()
         this.keyStorage.store(name = name, data = privateKeyData, meta = meta)
 
-        val entries = this.keyStorage.retrieveAll()
+        val entries = this.keyStorage.retrieveAllEntries()
         assertEquals(1, entries.size)
 
-        val entry = this.keyStorage.retrieve(name)
+        val entry = this.keyStorage.retrieveEntry(name)
         assertNotNull(entry)
         assertEquals(name, entry.name)
         assertArrayEquals(privateKeyData, entry.data)
@@ -139,10 +139,10 @@ class CloudKeyStorageTest {
         this.keyStorage.store(name = name, data = privateKeyData, meta = meta)
         this.keyStorage.store(name = name2, data = privateKeyData, meta = meta)
 
-        val entries = this.keyStorage.retrieveAll()
+        val entries = this.keyStorage.retrieveAllEntries()
         assertEquals(2, entries.size)
 
-        var entry = this.keyStorage.retrieve(name)
+        var entry = this.keyStorage.retrieveEntry(name)
         assertNotNull(entry)
         assertEquals(name, entry.name)
         assertArrayEquals(privateKeyData, entry.data)
@@ -150,7 +150,7 @@ class CloudKeyStorageTest {
         assertEquals(entry.creationDate, entry.modificationDate)
         assertTrue(meta == entry.meta)
 
-        entry = this.keyStorage.retrieve(name2)
+        entry = this.keyStorage.retrieveEntry(name2)
         assertNotNull(entry)
         assertEquals(name2, entry.name)
         assertArrayEquals(privateKeyData, entry.data)
@@ -169,14 +169,14 @@ class CloudKeyStorageTest {
         this.keyStorage.retrieveCloudEntries()
         this.keyStorage.store(name = name, data = privateKeyData)
 
-        val entries = this.keyStorage.retrieveAll()
+        val entries = this.keyStorage.retrieveAllEntries()
         assertEquals(1, entries.size)
 
         assertTrue(this.keyStorage.exists("test"))
         assertFalse(this.keyStorage.exists("test2"))
 
         this.keyStorage.retrieveCloudEntries()
-        val entries2 = this.keyStorage.retrieveAll()
+        val entries2 = this.keyStorage.retrieveAllEntries()
         assertEquals(1, entries2.size)
 
         assertTrue(this.keyStorage.exists("test"))
@@ -217,16 +217,16 @@ class CloudKeyStorageTest {
         this.keyStorage.store(keyEntries)
 
         // 99 keys exist and equals to what was stored
-        assertEquals(numberOfKeys - 1, this.keyStorage.retrieveAll().size)
+        assertEquals(numberOfKeys - 1, this.keyStorage.retrieveAllEntries().size)
 
-        var firstEntry = this.keyStorage.retrieve("first")
+        var firstEntry = this.keyStorage.retrieveEntry("first")
         assertNotNull(firstEntry)
         assertEquals("first", firstEntry.name)
         assertArrayEquals(firstPrivateKeyData, firstEntry.data)
 
         for (i in second..preLast) {
             val name = "$i"
-            val entry = this.keyStorage.retrieve(name)
+            val entry = this.keyStorage.retrieveEntry(name)
             assertNotNull(entry)
             val privateKey = this.virgilCrypto.importPrivateKey(entry.data)
             assertArrayEquals(privateKeys[i].identifier,
@@ -238,15 +238,15 @@ class CloudKeyStorageTest {
         this.keyStorage.retrieveCloudEntries()
 
         // 99 keys exist and equals to what was stored
-        assertEquals(numberOfKeys - 1, this.keyStorage.retrieveAll().size)
-        firstEntry = this.keyStorage.retrieve("first")
+        assertEquals(numberOfKeys - 1, this.keyStorage.retrieveAllEntries().size)
+        firstEntry = this.keyStorage.retrieveEntry("first")
         assertNotNull(firstEntry)
         assertEquals("first", firstEntry.name)
         assertArrayEquals(firstPrivateKeyData, firstEntry.data)
 
         for (i in 1..(numberOfKeys - 2)) {
             val name = "$i"
-            val entry = this.keyStorage.retrieve(name)
+            val entry = this.keyStorage.retrieveEntry(name)
             assertNotNull(entry)
             val privateKey = this.virgilCrypto.importPrivateKey(entry.data)
             assertArrayEquals(privateKeys[i].identifier, privateKey.privateKey.identifier)
@@ -257,21 +257,21 @@ class CloudKeyStorageTest {
         this.keyStorage.store(name = "last", data = lastPrivateKeyData)
 
         // 100 keys exist and equals to what was stored
-        assertEquals(numberOfKeys, this.keyStorage.retrieveAll().size)
-        firstEntry = this.keyStorage.retrieve("first")
+        assertEquals(numberOfKeys, this.keyStorage.retrieveAllEntries().size)
+        firstEntry = this.keyStorage.retrieveEntry("first")
         assertNotNull(firstEntry)
         assertEquals("first", firstEntry.name)
         assertArrayEquals(firstPrivateKeyData, firstEntry.data)
 
         for (i in 1..(numberOfKeys - 2)) {
             val name = "$i"
-            val entry = this.keyStorage.retrieve(name)
+            val entry = this.keyStorage.retrieveEntry(name)
             assertNotNull(entry)
             val privateKey = this.virgilCrypto.importPrivateKey(entry.data)
             assertArrayEquals(privateKeys[i].identifier, privateKey.privateKey.identifier)
         }
 
-        var lastEntry = this.keyStorage.retrieve("last")
+        var lastEntry = this.keyStorage.retrieveEntry("last")
         assertNotNull(lastEntry)
         assertEquals("last", lastEntry.name)
         assertArrayEquals(lastPrivateKeyData, lastEntry.data)
@@ -280,21 +280,21 @@ class CloudKeyStorageTest {
         this.keyStorage.retrieveCloudEntries()
 
         // 100 keys exist and equals to what was stored
-        assertEquals(numberOfKeys, this.keyStorage.retrieveAll().size)
-        firstEntry = this.keyStorage.retrieve("first")
+        assertEquals(numberOfKeys, this.keyStorage.retrieveAllEntries().size)
+        firstEntry = this.keyStorage.retrieveEntry("first")
         assertNotNull(firstEntry)
         assertEquals("first", firstEntry.name)
         assertArrayEquals(firstPrivateKeyData, firstEntry.data)
 
         for (i in 1..(numberOfKeys - 2)) {
             val name = "$i"
-            val entry = this.keyStorage.retrieve(name)
+            val entry = this.keyStorage.retrieveEntry(name)
             assertNotNull(entry)
             val privateKey = this.virgilCrypto.importPrivateKey(entry.data)
             assertArrayEquals(privateKeys[i].identifier, privateKey.privateKey.identifier)
         }
 
-        lastEntry = this.keyStorage.retrieve("last")
+        lastEntry = this.keyStorage.retrieveEntry("last")
         assertNotNull(lastEntry)
         assertEquals("last", lastEntry.name)
         assertArrayEquals(lastPrivateKeyData, lastEntry.data)
@@ -322,19 +322,19 @@ class CloudKeyStorageTest {
         this.keyStorage.store(keyEntries)
 
         // 100 keys exist and equals to what was stored
-        assertEquals(numberOfKeys, this.keyStorage.retrieveAll().size)
+        assertEquals(numberOfKeys, this.keyStorage.retrieveAllEntries().size)
 
         // Delete all entries
         this.keyStorage.deleteAll()
 
         // No entries exist
-        assertTrue(this.keyStorage.retrieveAll().isEmpty())
+        assertTrue(this.keyStorage.retrieveAllEntries().isEmpty())
 
         // Retrieve cloud entries
         this.keyStorage.retrieveCloudEntries()
 
         // No entries exist
-        assertTrue(this.keyStorage.retrieveAll().isEmpty())
+        assertTrue(this.keyStorage.retrieveAllEntries().isEmpty())
     }
 
     @Test
@@ -345,13 +345,13 @@ class CloudKeyStorageTest {
         this.keyStorage.deleteAll()
 
         // No entries exist
-        assertTrue(this.keyStorage.retrieveAll().isEmpty())
+        assertTrue(this.keyStorage.retrieveAllEntries().isEmpty())
 
         // Retrieve cloud entries
         this.keyStorage.retrieveCloudEntries()
 
         // No entries exist
-        assertTrue(this.keyStorage.retrieveAll().isEmpty())
+        assertTrue(this.keyStorage.retrieveAllEntries().isEmpty())
     }
 
     @Test
@@ -377,42 +377,42 @@ class CloudKeyStorageTest {
 
         // Delete entry
         this.keyStorage.delete(keyEntries[0].name)
-        assertEquals(numberOfKeys - 1, this.keyStorage.retrieveAll().size)
+        assertEquals(numberOfKeys - 1, this.keyStorage.retrieveAllEntries().size)
         try {
-            this.keyStorage.retrieve(keyEntries[0].name)
+            this.keyStorage.retrieveEntry(keyEntries[0].name)
             fail<String>("Entry ${keyEntries[0].name} deleted")
         } catch (e: EntryNotFoundException) {
         }
 
         // Delete 2 entries
         this.keyStorage.delete(arrayListOf(keyEntries[1].name, keyEntries[2].name))
-        assertEquals(numberOfKeys - 3, this.keyStorage.retrieveAll().size)
+        assertEquals(numberOfKeys - 3, this.keyStorage.retrieveAllEntries().size)
         try {
-            this.keyStorage.retrieve(keyEntries[1].name)
+            this.keyStorage.retrieveEntry(keyEntries[1].name)
             fail<String>("Entry ${keyEntries[1].name} deleted")
         } catch (e: EntryNotFoundException) {
         }
         try {
-            this.keyStorage.retrieve(keyEntries[2].name)
+            this.keyStorage.retrieveEntry(keyEntries[2].name)
             fail<String>("Entry ${keyEntries[2].name} deleted")
         } catch (e: EntryNotFoundException) {
         }
 
         // Retrieve cloud entries
         this.keyStorage.retrieveCloudEntries()
-        assertEquals(numberOfKeys - 3, this.keyStorage.retrieveAll().size)
+        assertEquals(numberOfKeys - 3, this.keyStorage.retrieveAllEntries().size)
         try {
-            this.keyStorage.retrieve(keyEntries[0].name)
+            this.keyStorage.retrieveEntry(keyEntries[0].name)
             fail<String>("Entry ${keyEntries[0].name} deleted")
         } catch (e: EntryNotFoundException) {
         }
         try {
-            this.keyStorage.retrieve(keyEntries[1].name)
+            this.keyStorage.retrieveEntry(keyEntries[1].name)
             fail<String>("Entry ${keyEntries[1].name} deleted")
         } catch (e: EntryNotFoundException) {
         }
         try {
-            this.keyStorage.retrieve(keyEntries[2].name)
+            this.keyStorage.retrieveEntry(keyEntries[2].name)
             fail<String>("Entry ${keyEntries[2].name} deleted")
         } catch (e: EntryNotFoundException) {
         }
@@ -447,7 +447,7 @@ class CloudKeyStorageTest {
         assertArrayEquals(cloudEntry.data, keyEntries[1].value)
         assertEquals(cloudEntry.meta, meta)
 
-        val cloudEntry2 = this.keyStorage.retrieve(keyEntries[0].name)
+        val cloudEntry2 = this.keyStorage.retrieveEntry(keyEntries[0].name)
         assertNotNull(cloudEntry2)
         assertEquals(cloudEntry2.name, keyEntries[0].name)
         assertArrayEquals(cloudEntry2.data, keyEntries[1].value)
@@ -455,7 +455,7 @@ class CloudKeyStorageTest {
 
         this.keyStorage.retrieveCloudEntries()
 
-        val cloudEntry3 = this.keyStorage.retrieve(keyEntries[0].name)
+        val cloudEntry3 = this.keyStorage.retrieveEntry(keyEntries[0].name)
         assertNotNull(cloudEntry3)
         assertEquals(cloudEntry3.name, keyEntries[0].name)
         assertArrayEquals(cloudEntry3.data, keyEntries[1].value)
@@ -486,24 +486,24 @@ class CloudKeyStorageTest {
         val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
 
         this.keyStorage.updateRecipients(arrayListOf(keyPair.publicKey), keyPair.privateKey)
-        assertEquals(numberOfKeys, this.keyStorage.retrieveAll().size)
+        assertEquals(numberOfKeys, this.keyStorage.retrieveAllEntries().size)
 
         this.keyStorage.retrieveCloudEntries()
-        assertEquals(numberOfKeys, this.keyStorage.retrieveAll().size)
+        assertEquals(numberOfKeys, this.keyStorage.retrieveAllEntries().size)
     }
 
     @Test
     fun outOfSync() {
         // KTC-28
         try {
-            this.keyStorage.retrieveAll()
+            this.keyStorage.retrieveAllEntries()
             fail<String>("Storage should be out of sync")
         } catch (e: CloudKeyStorageException) {
             assertTrue(e is CloudStorageOutOfSyncException)
         }
 
         try {
-            this.keyStorage.retrieve("test")
+            this.keyStorage.retrieveEntry("test")
             fail<String>("Storage should be out of sync")
         } catch (e: CloudKeyStorageException) {
             assertTrue(e is CloudStorageOutOfSyncException)
@@ -581,7 +581,7 @@ class CloudKeyStorageTest {
         this.keyStorage.retrieveCloudEntries()
         this.keyStorage.store(name = name, data = privateKeyData)
         this.keyStorage.deleteAll()
-        assertTrue(this.keyStorage.retrieveAll().isEmpty())
+        assertTrue(this.keyStorage.retrieveAllEntries().isEmpty())
     }
 
     @Test

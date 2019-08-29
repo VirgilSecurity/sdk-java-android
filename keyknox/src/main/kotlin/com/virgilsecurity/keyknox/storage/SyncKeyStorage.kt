@@ -225,7 +225,7 @@ class SyncKeyStorage {
         val keychainEntries = this.keyStorage.retrieveAll().filter {
             this.keychainUtils.filterKeyknoxKeychainEntry(it)
         }
-        val cloudEntries = this.cloudKeyStorage.retrieveAll()
+        val cloudEntries = this.cloudKeyStorage.retrieveAllEntries()
 
         val keychainSet = keychainEntries.map { it.name }
         val cloudSet = cloudEntries.map { it.name }
@@ -290,7 +290,7 @@ class SyncKeyStorage {
 
     private fun syncStoreEntries(entriesToStore: List<String>) {
         entriesToStore.forEach { name ->
-            val cloudEntry = this.cloudKeyStorage.retrieve(name)
+            val cloudEntry = this.cloudKeyStorage.retrieveEntry(name)
 
             val meta = this.keychainUtils.createMetaForKeychain(cloudEntry)
             this.keyStorage.store(cloudEntry.name, cloudEntry.data, meta)
@@ -302,7 +302,7 @@ class SyncKeyStorage {
         entriesToCompare.forEach { name ->
             val keychainEntry = keychainEntries.firstOrNull { name == it.name }
                     ?: throw KeychainEntryNotFoundWhileComparingException()
-            val cloudEntry = this.cloudKeyStorage.retrieve(name)
+            val cloudEntry = this.cloudKeyStorage.retrieveEntry(name)
             val keychainDate = this.keychainUtils.extractModificationDate(keychainEntry)
 
             if (keychainDate.second < cloudEntry.modificationDate) {

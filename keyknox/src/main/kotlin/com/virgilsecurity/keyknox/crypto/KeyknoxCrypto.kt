@@ -47,9 +47,7 @@ import com.virgilsecurity.sdk.crypto.VirgilPublicKey
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException
 import java.util.*
 
-class KeyknoxCrypto : KeyknoxCryptoProtocol {
-
-    private val crypto: VirgilCrypto = VirgilCrypto(false)
+class KeyknoxCrypto(private val crypto: VirgilCrypto) : KeyknoxCryptoProtocol {
 
     @Throws(CryptoException::class, IllegalArgumentException::class)
     override fun encrypt(data: ByteArray,

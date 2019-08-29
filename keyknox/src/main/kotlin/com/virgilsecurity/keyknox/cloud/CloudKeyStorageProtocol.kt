@@ -77,7 +77,7 @@ interface CloudKeyStorageProtocol {
      *
      * @return all entries
      */
-    fun retrieveAll(): List<CloudEntry>
+    fun retrieveAllEntries(): List<CloudEntry>
 
     /**
      * Retrieve entry loaded from Cloud.
@@ -86,7 +86,7 @@ interface CloudKeyStorageProtocol {
      *
      * @return CloudEntry
      */
-    fun retrieve(name: String): CloudEntry
+    fun retrieveEntry(name: String): CloudEntry
 
     /**
      * Check if entry exists in list of loaded from Cloud entries.

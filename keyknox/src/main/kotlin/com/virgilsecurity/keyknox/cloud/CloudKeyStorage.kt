@@ -35,22 +35,19 @@ package com.virgilsecurity.keyknox.cloud
 
 
 import com.virgilsecurity.keyknox.KeyknoxManager
-import com.virgilsecurity.keyknox.client.KeyknoxClient
-import com.virgilsecurity.keyknox.crypto.KeyknoxCrypto
 import com.virgilsecurity.keyknox.exception.CloudStorageOutOfSyncException
 import com.virgilsecurity.keyknox.exception.EntryAlreadyExistsException
 import com.virgilsecurity.keyknox.exception.EntryNotFoundException
 import com.virgilsecurity.keyknox.exception.EntrySavingException
-import com.virgilsecurity.keyknox.model.CloudEntries
 import com.virgilsecurity.keyknox.model.CloudEntry
 import com.virgilsecurity.keyknox.model.DecryptedKeyknoxValue
-import com.virgilsecurity.keyknox.utils.Serializer
+import com.virgilsecurity.sdk.crypto.PublicKey
+import com.virgilsecurity.sdk.crypto.VirgilCrypto
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKey
 import com.virgilsecurity.sdk.crypto.VirgilPublicKey
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider
 import com.virgilsecurity.sdk.storage.JsonKeyEntry
 import com.virgilsecurity.sdk.storage.KeyEntry
-import com.virgilsecurity.sdk.utils.ConvertionUtils
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -60,28 +57,53 @@ import java.util.concurrent.ConcurrentHashMap
 open class CloudKeyStorage : CloudKeyStorageProtocol {
 
     val keyknoxManager: KeyknoxManager
+
+    // Public keys used for encryption and signature verification
+    private val publicKeys: List<VirgilPublicKey>
+
+    // Private key used for decryption and signing
+    private val privateKey: VirgilPrivateKey
+
     private var cache: MutableMap<String, CloudEntry> = ConcurrentHashMap()
     private var decryptedKeyknoxData: DecryptedKeyknoxValue? = null
+    private val cloudEntrySerializer = CloudEntrySerializer()
 
-    constructor(keyknoxManager: KeyknoxManager) {
+    // Shows whether this storage was synced
+    var storageWasSynced: Boolean = false
+        get() = this.decryptedKeyknoxData != null
+        private set
+
+    /**
+     * Instantiates [CloudKeyStorage] with provided [keyknoxManager], [publicKeys] which are used for encryption and
+     * signature verification and [privateKey] that is used for decryption and signature verification.
+     */
+    constructor(
+        keyknoxManager: KeyknoxManager,
+        publicKeys: List<VirgilPublicKey>,
+        privateKey: VirgilPrivateKey
+    ) {
         this.keyknoxManager = keyknoxManager
+        this.publicKeys = publicKeys
+        this.privateKey = privateKey
     }
 
+    /**
+     * Instantiates [CloudKeyStorage] with provided [accessTokenProvider] which is [AccessTokenProvider] implementation,
+     * [VirgilCrypto], [publicKeys] which are used for encryption and signature verification and [privateKey] that is
+     * used for decryption and signature verification.
+     */
     constructor(accessTokenProvider: AccessTokenProvider,
-                publicKeys: List<VirgilPublicKey>, privateKey: VirgilPrivateKey) {
-        this.keyknoxManager = KeyknoxManager(accessTokenProvider = accessTokenProvider,
-                                             crypto = KeyknoxCrypto(),
-                                             keyknoxClient = KeyknoxClient(),
-                                             publicKeys = publicKeys,
-                                             privateKey = privateKey)
-    }
-
-    fun isStorageSynced(): Boolean {
-        return this.decryptedKeyknoxData != null
+                crypto: VirgilCrypto,
+                publicKeys: List<VirgilPublicKey>,
+                privateKey: VirgilPrivateKey
+    ) {
+        this.keyknoxManager = KeyknoxManager(accessTokenProvider = accessTokenProvider, crypto = crypto)
+        this.publicKeys = publicKeys
+        this.privateKey = privateKey
     }
 
     override fun store(keyEntries: List<KeyEntry>): List<CloudEntry> {
-        if (!isStorageSynced()) {
+        if (!storageWasSynced) {
             throw CloudStorageOutOfSyncException()
         }
         synchronized(this.cache) {
@@ -98,12 +120,18 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
                 cloudEntries.add(cloudEntry)
                 this.cache[cloudEntry.name] = cloudEntry
             }
-            val data = serializeEntries(this.cache.values)
+            val entryData = cloudEntrySerializer.serializeEntries(this.cache.values)
 
             val hash = this.decryptedKeyknoxData?.keyknoxHash
 
-            val response = this.keyknoxManager.pushValue(data, hash)
-            val newEntries = deserializeEntries(response.value)
+            val response = keyknoxManager.pushValue(
+                data = entryData,
+                previousHash = hash,
+                publicKeys = this.publicKeys,
+                privateKey = this.privateKey
+            )
+
+            val newEntries = cloudEntrySerializer.deserializeEntries(response.value)
             cacheEntries(newEntries)
             this.decryptedKeyknoxData = response
 
@@ -114,15 +142,17 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
     override fun store(name: String, data: ByteArray, meta: Map<String, String>?): CloudEntry {
         val keyEntry = JsonKeyEntry(name, data)
         keyEntry.meta = meta ?: keyEntry.meta
-        val cloudEntries = store(arrayListOf(keyEntry))
+        val cloudEntries = store(listOf(keyEntry))
+
         if (cloudEntries.size != 1) {
             throw EntrySavingException()
         }
+
         return cloudEntries.first()
     }
 
     override fun update(name: String, data: ByteArray, meta: Map<String, String>?): CloudEntry {
-        if (!isStorageSynced()) {
+        if (!storageWasSynced) {
             throw CloudStorageOutOfSyncException()
         }
         val now = Date()
@@ -134,20 +164,26 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
 
             this.cache[name] = cloudEntry
 
-            val value = serializeEntries(this.cache.values)
+            val entryData = cloudEntrySerializer.serializeEntries(this.cache.values)
 
-            val response = this.keyknoxManager.pushValue(value, this.decryptedKeyknoxData?.keyknoxHash)
-            cacheEntries(deserializeEntries(response.value))
+            val response = this.keyknoxManager.pushValue(
+                data = entryData,
+                previousHash = this.decryptedKeyknoxData?.keyknoxHash,
+                publicKeys = this.publicKeys,
+                privateKey = this.privateKey
+            )
+            cacheEntries(cloudEntrySerializer.deserializeEntries(response.value))
             this.decryptedKeyknoxData = response
 
             return cloudEntry
         }
     }
 
-    override fun retrieveAll(): List<CloudEntry> {
-        if (!isStorageSynced()) {
+    override fun retrieveAllEntries(): List<CloudEntry> {
+        if (!storageWasSynced) {
             throw CloudStorageOutOfSyncException()
         }
+
         synchronized(this.cache) {
             val cacheEntries = mutableListOf<CloudEntry>()
             cacheEntries.addAll(this.cache.values)
@@ -156,26 +192,28 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
         }
     }
 
-    override fun retrieve(name: String): CloudEntry {
-        if (!isStorageSynced()) {
+    override fun retrieveEntry(name: String): CloudEntry {
+        if (!storageWasSynced) {
             throw CloudStorageOutOfSyncException()
         }
+
         return this.cache[name] ?: throw EntryNotFoundException(name)
     }
 
     override fun exists(name: String): Boolean {
-        if (!isStorageSynced()) {
+        if (!storageWasSynced) {
             throw CloudStorageOutOfSyncException()
         }
+
         return this.cache.containsKey(name)
     }
 
     override fun delete(name: String) {
-        delete(arrayListOf(name))
+        delete(listOf(name))
     }
 
     override fun delete(names: List<String>) {
-        if (!isStorageSynced()) {
+        if (!storageWasSynced) {
             throw CloudStorageOutOfSyncException()
         }
         synchronized(this.cache) {
@@ -187,9 +225,14 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
             names.forEach { name ->
                 this.cache.remove(name)
             }
-            val data = serializeEntries(this.cache.values)
-            val response = this.keyknoxManager.pushValue(data, this.decryptedKeyknoxData?.keyknoxHash)
-            cacheEntries(deserializeEntries(response.value))
+            val entryData = cloudEntrySerializer.serializeEntries(this.cache.values)
+            val response = this.keyknoxManager.pushValue(
+                data = entryData,
+                previousHash = this.decryptedKeyknoxData?.keyknoxHash,
+                publicKeys = this.publicKeys,
+                privateKey = this.privateKey
+            )
+            cacheEntries(cloudEntrySerializer.deserializeEntries(response.value))
             this.decryptedKeyknoxData = response
         }
     }
@@ -197,7 +240,7 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
     override fun deleteAll() {
         synchronized(this.cache) {
             val response = this.keyknoxManager.resetValue()
-            cacheEntries(deserializeEntries(response.value), true)
+            cacheEntries(cloudEntrySerializer.deserializeEntries(response.value), true)
             this.decryptedKeyknoxData = response
         }
     }
@@ -205,7 +248,7 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
     override fun retrieveCloudEntries() {
         synchronized(this.cache) {
             val response = this.keyknoxManager.pullValue()
-            cacheEntries(deserializeEntries(response.value), true)
+            cacheEntries(cloudEntrySerializer.deserializeEntries(response.value), true)
             this.decryptedKeyknoxData = response
         }
     }
@@ -221,10 +264,13 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
                 return
             }
 
-            val response = this.keyknoxManager.updateRecipients(value = decryptedKeyknoxData.value,
-                    previousHash = decryptedKeyknoxData.keyknoxHash,
-                    newPublicKeys = newPublicKeys, newPrivateKey = newPrivateKey)
-            cacheEntries(deserializeEntries(response.value))
+            val response = this.keyknoxManager.pushValue(
+                data = decryptedKeyknoxData.value,
+                previousHash = decryptedKeyknoxData.keyknoxHash,
+                publicKeys = this.publicKeys,
+                privateKey = this.privateKey
+            )
+            cacheEntries(cloudEntrySerializer.deserializeEntries(response.value))
             this.decryptedKeyknoxData = response
         }
     }
@@ -238,23 +284,9 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
         }
     }
 
-    fun deserializeEntries(data: ByteArray?): MutableList<CloudEntry> {
-        if (data == null || data.isEmpty()) {
-            return arrayListOf()
-        }
-        val json = ConvertionUtils.toString(data)
-        val cloudEntries = Serializer.gson.fromJson(json, CloudEntries::class.java)
-
-        return cloudEntries?.values?.toMutableList() ?: mutableListOf()
+    companion object {
+        private const val ROOT = "DEFAULT"
+        private const val PATH = "DEFAULT"
+        private const val KEY = "DEFAULT"
     }
-
-    fun serializeEntries(cloudEntries: Collection<CloudEntry>): ByteArray {
-        val map = mutableMapOf<String, CloudEntry>()
-        cloudEntries.forEach { entry ->
-            map[entry.name] = entry
-        }
-        val json = Serializer.gson.toJson(CloudEntries(map))
-        return ConvertionUtils.toBytes(json)
-    }
-
 }

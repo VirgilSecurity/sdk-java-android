@@ -31,65 +31,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.keyknox.client
+package com.virgilsecurity.keyknox.cloud
 
-import com.virgilsecurity.keyknox.model.DecryptedKeyknoxValue
-import com.virgilsecurity.keyknox.model.EncryptedKeyknoxValue
+import com.virgilsecurity.keyknox.model.CloudEntries
+import com.virgilsecurity.keyknox.model.CloudEntry
+import com.virgilsecurity.keyknox.utils.Serializer
+import com.virgilsecurity.sdk.utils.ConvertionUtils
 
 /**
- * Interface for interactions with Keyknox service.
+ * CloudEntrySerializer class.
  */
-interface KeyknoxClientProtocol {
+class CloudEntrySerializer {
 
-    /**
-     * Get keys for given root.
-     *
-     * @param params params
-     *
-     * @return set of keys
-     */
-    fun getKeys(params: KeyknoxGetKeysParams, token: String): Set<String>
+    fun deserializeEntries(data: ByteArray?): MutableList<CloudEntry> {
+        if (data == null || data.isEmpty()) {
+            return arrayListOf()
+        }
+        val json = ConvertionUtils.toString(data)
+        val cloudEntries = Serializer.gson.fromJson(json, CloudEntries::class.java)
 
-    /**
-     * Delete recipient.
-     *
-     * @param params params
-     *
-     * @return DecryptedKeyknoxValue
-     */
-    fun deleteRecipient(params: KeyknoxDeleteRecipientParams, token: String): DecryptedKeyknoxValue
+        return cloudEntries?.values?.toMutableList() ?: mutableListOf()
+    }
 
-    /**
-     * Push value to Keyknox service.
-     *
-     * @param params params
-     * @param meta metadata
-     * @param value encrypted blob
-     * @param previousHash hash of previous blob
-     * @param token auth token
-     *
-     * @return EncryptedKeyknoxValue
-     */
-    fun pushValue(params: KeyknoxPushParams?, meta: ByteArray, value: ByteArray, previousHash: ByteArray?, token: String): EncryptedKeyknoxValue
-
-    /**
-     * Pulls values from Keyknox service.
-     *
-     * @param params params
-     * @param token auth token
-     *
-     * @return EncryptedKeyknoxValue
-     */
-    fun pullValue(params: KeyknoxPullParams?, token: String): EncryptedKeyknoxValue
-
-    /**
-     * Resets Keyknox value (makes it empty). Also increments version.
-     *
-     * @param params params
-     * @param token auth token
-     *
-     * @return DecryptedKeyknoxValue
-     */
-    fun resetValue(params: KeyknoxResetParams?, token: String): DecryptedKeyknoxValue
-
+    fun serializeEntries(cloudEntries: Collection<CloudEntry>): ByteArray {
+        val map = mutableMapOf<String, CloudEntry>()
+        cloudEntries.forEach { entry ->
+            map[entry.name] = entry
+        }
+        val json = Serializer.gson.toJson(CloudEntries(map))
+        return ConvertionUtils.toBytes(json)
+    }
 }

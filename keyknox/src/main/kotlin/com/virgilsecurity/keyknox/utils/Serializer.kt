@@ -104,45 +104,6 @@ interface Serializer {
                 }
             }
 
-//
-//            val cloudEntriesConverter = object : Converter {
-//                override fun canConvert(cls: Class<*>): Boolean {
-//                    return cls == CloudEntries::class.java
-//                }
-//
-//                override fun fromJson(jv: JsonValue): CloudEntries {
-//                    val map = mutableMapOf<String, CloudEntry>()
-//                    jv.obj?.forEach { key, value ->
-//                        value as JsonObject
-//                        val entry = klaxon.parseFromJsonObject<CloudEntry>(value)
-//                        if (entry != null) {
-//                            if (entry.meta == null) {
-//                                entry.meta = mutableMapOf()
-//                            }
-//                            map[key] = entry
-//                        }
-//                    }
-//                    return CloudEntries(map)
-//                }
-//
-//                override fun toJson(value: Any): String {
-//                    fun joinToString(list: Collection<*>, open: String, close: String) = open + list.joinToString(", ") + close
-//
-//                    value as Map<*, *>
-//                    val valueList = arrayListOf<String>()
-//                    value.entries.forEach { entry ->
-//                        val jsonValue = klaxon.toJsonString(entry.value as Any)
-//                        valueList.add("\"${entry.key}\": $jsonValue")
-//                    }
-//                    return joinToString(valueList, "{", "}")
-//                }
-//            }
-//
-//            val klaxon = Klaxon().converter(byteArrayConverter).converter(dateConverter).converter(cloudEntriesConverter)
-//                    .fieldConverter(Base64EncodedArray::class, byteArrayConverter)
-//                    .fieldConverter(DateAsTimestamp::class, dateConverter)
-//            klaxon
-
             val gson = GsonBuilder().registerTypeAdapter(Date::class.java, dateConverter)
                     .registerTypeAdapter(ByteArray::class.java, byteArrayConverter)
                     .registerTypeAdapter(CloudEntries::class.java, cloudEntriesConverter).disableHtmlEscaping().create()
