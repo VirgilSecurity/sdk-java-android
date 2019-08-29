@@ -80,6 +80,7 @@ public class CardManager {
   private static final String TOKEN_CONTEXT_OPERATION_PUBLISH = "publish";
   private static final String TOKEN_CONTEXT_OPERATION_GET = "get";
   private static final String TOKEN_CONTEXT_OPERATION_SEARCH = "search";
+  private static final String TOKEN_CONTEXT_OPERATION_GET_OUTDATED = "get-outdated";
 
   private static final String TOKEN_CONTEXT_SERVICE = "cards";
   private ModelSigner modelSigner;
@@ -955,6 +956,46 @@ public class CardManager {
 
     return result;
   }
+
+  /**
+   * Returns list of cards that were replaced with newer ones.
+   *
+   * @param cardIds card ids to check.
+   * @return list of outdated cards.
+   * @throws CryptoException
+   * @throws VirgilServiceException
+   */
+  public List<Card> getOutdated(Collection<String> cardIds) throws CryptoException, VirgilServiceException {
+    AccessToken token = accessTokenProvider
+            .getToken(new TokenContext(TOKEN_CONTEXT_OPERATION_GET_OUTDATED, false, TOKEN_CONTEXT_SERVICE));
+
+    List<String> outdatedCards;
+    try {
+      outdatedCards = cardClient.getOutdated(cardIds, token.stringRepresentation());
+    } catch (VirgilServiceException exceptionOuter) {
+      if (exceptionOuter.getHttpError() != null
+              && exceptionOuter.getHttpError().getCode() == HttpURLConnection.HTTP_UNAUTHORIZED
+              && retryOnUnauthorized) {
+        LOGGER.fine("Token is expired, trying to reload...");
+        token = accessTokenProvider.getToken(
+                new TokenContext(TOKEN_CONTEXT_OPERATION_GET_OUTDATED, true, TOKEN_CONTEXT_SERVICE));
+        try {
+          outdatedCards = cardClient.getOutdated(cardIds, token.stringRepresentation());
+        } catch (VirgilServiceException exceptionInner) {
+          LOGGER.log(Level.SEVERE, "An error occurred while searching for cards", exceptionOuter);
+          throw exceptionInner;
+        }
+      } else {
+        if (exceptionOuter.getHttpError() != null) {
+          LOGGER.log(Level.SEVERE, "Http error code: " + exceptionOuter.getHttpError().getCode(),
+                  exceptionOuter);
+        } else {
+          LOGGER.log(Level.SEVERE, "Virgil Service error: " + exceptionOuter.getErrorCode(),
+                  exceptionOuter);
+        }
+        throw exceptionOuter;
+      }
+    }
 
   /**
    * Sets if the card manager should retry request with new token on {@code unauthorized} http

@@ -59,6 +59,15 @@ public interface CardClient {
       throws VirgilServiceException;
 
   /**
+   * Returns list of cards that were replaced with newer ones.
+   *
+   * @param  cardIds card ids to check.
+   * @param token   token to authorize the request.
+   * @return list of cards identifiers.
+   */
+  List<String> getOutdated(Collection<String> cardIds, String token) throws VirgilServiceException;
+
+  /**
    * Publishes card in Virgil Cards service.
    *
    * @param rawCard raw signed model of card to be published.

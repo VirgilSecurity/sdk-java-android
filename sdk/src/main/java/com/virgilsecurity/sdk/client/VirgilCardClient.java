@@ -155,6 +155,30 @@ public class VirgilCardClient implements CardClient {
     }
   }
 
+  @Override
+  public List<String> getOutdated(Collection<String> cardIds, String token) throws VirgilServiceException {
+    if (cardIds == null) {
+      throw new NullArgumentException("CardClient -> 'cardIds' should not be null");
+    }
+
+    try {
+      URL url = new URL(serviceUrl, Endpoints.ACTIONS_GET_OUTDATED.path);
+      GetOutdatedRequestData requestData = new GetOutdatedRequestData(cardIds);
+      String body = ConvertionUtils.getGson().toJson(requestData);
+
+      String[] cards = httpClient.execute(url, "POST", token,
+              new ByteArrayInputStream(ConvertionUtils.toBytes(body)), String[].class);
+
+      return Arrays.asList(cards);
+    } catch (VirgilServiceException e) {
+      LOGGER.log(Level.SEVERE, "Some service issue occurred during request executing", e);
+      throw e;
+    } catch (Exception e) {
+      LOGGER.log(Level.SEVERE, "Some issue occurred during request executing", e);
+      throw new VirgilCardServiceException(e);
+    }
+  }
+
   /**
    * Gets http client that is used to fire requests.
    *
@@ -307,9 +331,27 @@ public class VirgilCardClient implements CardClient {
     }
   }
 
+  private class GetOutdatedRequestData {
+    @SerializedName("card_ids")
+    private List<String> cardIds;
+
+    public GetOutdatedRequestData() {
+      this(Collections.EMPTY_LIST);
+    }
+
+    public GetOutdatedRequestData(Collection<String> cardIds) {
+      this.cardIds = new ArrayList<>(cardIds);
+    }
+
+    public List<String> getCardIds() {
+      return cardIds;
+    }
+  }
+
   private enum Endpoints {
     ACTIONS_DELETE("actions/revoke"),
-    ACTIONS_SEARCH("actions/search");
+    ACTIONS_SEARCH("actions/search"),
+    ACTIONS_GET_OUTDATED("actions/outdated");
 
     private final String path;
 

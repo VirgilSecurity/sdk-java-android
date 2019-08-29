@@ -1,0 +1,52 @@
+apply plugin: 'kotlin'
+//apply plugin: 'org.junit.platform.gradle.plugin'
+//apply plugin: 'org.jetbrains.dokka'
+
+dependencies {
+    // Virgil
+    implementation project(":crypto")
+    implementation project(":sdk")
+    implementation "com.virgilsecurity.crypto:common:$versions.virgilCrypto"
+    implementation "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"
+
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$versions.kotlinVersion"
+
+    // Gson
+    implementation "com.google.code.gson:gson:$versions.gson"
+
+    // Tests
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$versions.junit"
+    testRuntime "org.junit.jupiter:junit-jupiter-engine:$versions.junit"
+}
+
+sourceSets.main.java.srcDirs = ["${buildDir}/generated/", "src/main/kotlin"]
+
+sourceCompatibility = 1.8
+
+task generateVersionVirgilAgent {
+    outputs.dir "$buildDir/generated"
+    doFirst {
+        def versionFile = file("$buildDir/generated/com/virgilsecurity/keyknox/build/VersionVirgilAgent.kt")
+        versionFile.parentFile.mkdirs()
+        versionFile.text =
+                """
+package com.virgilsecurity.keyknox.build;
+
+object VersionVirgilAgent {
+    const val VERSION = "$project.version"
+}
+"""
+    }
+}
+
+compileKotlin.dependsOn(generateVersionVirgilAgent)
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+
