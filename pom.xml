@@ -31,11 +31,14 @@
   ~ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   ~ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.virgilsecurity.sdk</groupId>
   <artifactId>parent</artifactId>
-  <version>5.2.1</version>
+  <version>5.2.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Virgil SDK - Parent</name>
   <description>
@@ -81,7 +84,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
-    
+
     <version.crypto>0.10.0</version.crypto>
     <version.gson>2.8.5</version.gson>
     <version.android>4.1.1.4</version.android>
@@ -92,6 +95,7 @@
     <version.testng>6.14.3</version.testng>
     <version.jsonsimple>1.1.1</version.jsonsimple>
     <version.restassured>2.9.0</version.restassured>
+    <version.jmh>1.21</version.jmh>
     <gpg.keyname>empty</gpg.keyname>
   </properties>
 
@@ -145,6 +149,17 @@
         <artifactId>mockito-core</artifactId>
         <version>${version.mockito}</version>
         <scope>test</scope>
+      </dependency>
+      <!-- Benchmarks -->
+      <dependency>
+        <groupId>org.openjdk.jmh</groupId>
+        <artifactId>jmh-core</artifactId>
+        <version>${version.jmh}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openjdk.jmh</groupId>
+        <artifactId>jmh-generator-annprocess</artifactId>
+        <version>${version.jmh}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -206,8 +221,9 @@
           <version>4.4.0</version>
           <extensions>true</extensions>
           <configuration>
-            <ndkArchitectures>arm64-v8a armeabi armeabi-v7a mips mips64 x86
-                                                       x86_64</ndkArchitectures>
+            <ndkArchitectures>arm64-v8a armeabi armeabi-v7a mips mips64
+              x86
+              x86_64</ndkArchitectures>
           </configuration>
         </plugin>
         <plugin>
@@ -345,6 +361,7 @@
       </activation>
       <modules>
         <module>examples</module>
+        <module>benchmark</module>
       </modules>
     </profile>
   </profiles>
