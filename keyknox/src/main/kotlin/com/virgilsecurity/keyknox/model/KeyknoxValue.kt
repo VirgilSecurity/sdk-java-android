@@ -36,7 +36,6 @@ package com.virgilsecurity.keyknox.model
 import com.virgilsecurity.keyknox.client.KeyknoxClient
 import com.virgilsecurity.keyknox.client.model.KeyknoxData
 import com.virgilsecurity.keyknox.client.model.KeyknoxDataV2
-import java.util.*
 
 /**
  * Class represents value stored in Keyknox cloud.
@@ -48,22 +47,42 @@ open class KeyknoxValue {
     val key: String
     val owner: String
     val identities: Collection<String>
-    val meta: ByteArray?
-    val value: ByteArray?
-    val keyknoxHash: ByteArray?
+    val meta: ByteArray
+    val value: ByteArray
+    val keyknoxHash: ByteArray
 
-    constructor(keyknoxData: KeyknoxDataV2, keyknoxHash: ByteArray) : this(keyknoxData.root,
-        keyknoxData.path, keyknoxData.key, keyknoxData.owner, keyknoxData.identities,
-        keyknoxData.meta, keyknoxData.value, keyknoxHash) {
-    }
+    constructor(keyknoxData: KeyknoxDataV2, keyknoxHash: ByteArray) : this(
+        keyknoxData.root,
+        keyknoxData.path,
+        keyknoxData.key,
+        keyknoxData.owner,
+        keyknoxData.identities,
+        keyknoxData.meta,
+        keyknoxData.value,
+        keyknoxHash
+    )
 
     constructor(keyknoxData: KeyknoxData, keyknoxHash: ByteArray, identity: String): this(
-        KeyknoxClient.DEFAULT_ROOT, KeyknoxClient.DEFAULT_PATH, KeyknoxClient.DEFAULT_KEY,
-    identity, setOf(identity), keyknoxData.meta, keyknoxData.value,keyknoxHash)
+        KeyknoxClient.DEFAULT_ROOT,
+        KeyknoxClient.DEFAULT_PATH,
+        KeyknoxClient.DEFAULT_KEY,
+        identity,
+        setOf(identity),
+        keyknoxData.meta,
+        keyknoxData.value,
+        keyknoxHash
+    )
 
-    constructor(root: String, path: String, key: String, owner: String,
-                identities: Collection<String>, meta: ByteArray, value: ByteArray,
-                keyknoxHash: ByteArray) {
+    constructor(
+        root: String,
+        path: String,
+        key: String,
+        owner: String,
+        identities: Collection<String>,
+        meta: ByteArray,
+        value: ByteArray,
+        keyknoxHash: ByteArray
+    ) {
         this.root = root
         this.path = path
         this.key = key
@@ -78,51 +97,86 @@ open class KeyknoxValue {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as DecryptedKeyknoxValue
+        other as KeyknoxValue
 
-        if (!Arrays.equals(meta, other.meta)) return false
-        if (!Arrays.equals(value, other.value)) return false
-        if (!Arrays.equals(keyknoxHash, other.keyknoxHash)) return false
+        if (root != other.root) return false
+        if (path != other.path) return false
+        if (key != other.key) return false
+        if (owner != other.owner) return false
+        if (identities != other.identities) return false
+        if (!meta.contentEquals(other.meta)) return false
+        if (!value.contentEquals(other.value)) return false
+        if (!keyknoxHash.contentEquals(other.keyknoxHash)) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = meta?.let { Arrays.hashCode(it) } ?: 0
-        result = 31 * result + (value?.let { Arrays.hashCode(it) } ?: 0)
-        result = 31 * result + (keyknoxHash?.let { Arrays.hashCode(it) } ?: 0)
+        var result = root.hashCode()
+        result = 31 * result + path.hashCode()
+        result = 31 * result + key.hashCode()
+        result = 31 * result + owner.hashCode()
+        result = 31 * result + identities.hashCode()
+        result = 31 * result + meta.contentHashCode()
+        result = 31 * result + value.contentHashCode()
+        result = 31 * result + keyknoxHash.contentHashCode()
         return result
     }
 }
 
 /**
  * Decrypted value stored in Keyknox cloud.
- *
  */
-class DecryptedKeyknoxValue (root: String, path: String, key: String, owner: String,
-                            identities: Collection<String>, meta: ByteArray, value: ByteArray,
-                            keyknoxHash: ByteArray) :
-        KeyknoxValue(root, path, key, owner, identities, meta, value, keyknoxHash) {
+class DecryptedKeyknoxValue : KeyknoxValue {
 
-    constructor(keyknoxData: KeyknoxDataV2, keyknoxHash: ByteArray):
-            super (keyknoxData = keyknoxData, keyknoxHash = keyknoxHash)
+    constructor(
+        root: String,
+        path: String,
+        key: String,
+        owner: String,
+        identities: Collection<String>,
+        meta: ByteArray,
+        value: ByteArray,
+        keyknoxHash: ByteArray
+    ) : super(root, path, key, owner, identities, meta, value, keyknoxHash)
 
-    constructor(keyknoxData: KeyknoxData, keyknoxHash: ByteArray, identity: String):
-            super (keyknoxData = keyknoxData, keyknoxHash = keyknoxHash, identity = identity)
+    constructor(keyknoxData: KeyknoxDataV2, keyknoxHash: ByteArray) : super(
+        keyknoxData = keyknoxData,
+        keyknoxHash = keyknoxHash
+    )
+
+    constructor(keyknoxData: KeyknoxData, keyknoxHash: ByteArray, identity: String) : super(
+        keyknoxData = keyknoxData,
+        keyknoxHash = keyknoxHash,
+        identity = identity
+    )
 }
 
 /**
  * Encrypted value stored in Keyknox cloud.
  *
  */
-class EncryptedKeyknoxValue (root: String, path: String, key: String, owner: String,
-                            identities: Collection<String>, meta: ByteArray, value: ByteArray,
-                            keyknoxHash: ByteArray) :
-    KeyknoxValue(root, path, key, owner, identities, meta, value, keyknoxHash) {
+class EncryptedKeyknoxValue : KeyknoxValue {
 
-    constructor(keyknoxData: KeyknoxDataV2, keyknoxHash: ByteArray):
-            super (keyknoxData = keyknoxData, keyknoxHash = keyknoxHash)
+    constructor(
+        root: String,
+        path: String,
+        key: String,
+        owner: String,
+        identities: Collection<String>,
+        meta: ByteArray,
+        value: ByteArray,
+        keyknoxHash: ByteArray
+    ) : super(root, path, key, owner, identities, meta, value, keyknoxHash)
 
-    constructor(keyknoxData: KeyknoxData, keyknoxHash: ByteArray, identity: String):
-            super (keyknoxData = keyknoxData, keyknoxHash = keyknoxHash, identity = identity)
+    constructor(keyknoxData: KeyknoxDataV2, keyknoxHash: ByteArray) : super(
+        keyknoxData = keyknoxData,
+        keyknoxHash = keyknoxHash
+    )
+
+    constructor(keyknoxData: KeyknoxData, keyknoxHash: ByteArray, identity: String) : super(
+        keyknoxData = keyknoxData,
+        keyknoxHash = keyknoxHash,
+        identity = identity
+    )
 }

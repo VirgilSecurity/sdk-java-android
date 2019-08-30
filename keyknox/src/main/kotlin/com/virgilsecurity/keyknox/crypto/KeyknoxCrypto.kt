@@ -88,21 +88,22 @@ class KeyknoxCrypto(private val crypto: VirgilCrypto) : KeyknoxCryptoProtocol {
 
         requires(publicKeys.isNotEmpty(), "privateKey")
 
+        if (encryptedKeyknoxValue.meta.isEmpty() && encryptedKeyknoxValue.value.isEmpty()) {
 
-        if ((encryptedKeyknoxValue.meta == null || encryptedKeyknoxValue.meta.isEmpty()) &&
-                (encryptedKeyknoxValue.value == null || encryptedKeyknoxValue.value.isEmpty())) {
-
-            return DecryptedKeyknoxValue(meta = ByteArray(0),
-                                         value = ByteArray(0),
-                                         version = encryptedKeyknoxValue.version,
-                                         keyknoxHash = encryptedKeyknoxValue.keyknoxHash)
+            return DecryptedKeyknoxValue(
+                root = encryptedKeyknoxValue.root,
+                path = encryptedKeyknoxValue.path,
+                key = encryptedKeyknoxValue.key,
+                owner = encryptedKeyknoxValue.owner,
+                identities = encryptedKeyknoxValue.identities,
+                meta = ByteArray(0),
+                value = ByteArray(0),
+                keyknoxHash = encryptedKeyknoxValue.keyknoxHash
+            )
         }
 
         val meta = encryptedKeyknoxValue.meta
         val value = encryptedKeyknoxValue.value
-
-        requireNotNull(meta) { "'meta' should not be null" }
-        requireNotNull(value) { "'value' should not be null" }
 
         val decryptedData = RecipientCipher().use { cipher ->
             cipher.startDecryptionWithKey(privateKey.identifier,
@@ -144,9 +145,14 @@ class KeyknoxCrypto(private val crypto: VirgilCrypto) : KeyknoxCryptoProtocol {
             decryptedData
         }
 
-        return DecryptedKeyknoxValue(meta,
-                                     decryptedData,
-                                     encryptedKeyknoxValue.version,
-                                     encryptedKeyknoxValue.keyknoxHash)
+        return DecryptedKeyknoxValue(
+            root = encryptedKeyknoxValue.root,
+            path = encryptedKeyknoxValue.path,
+            key = encryptedKeyknoxValue.key,
+            owner = encryptedKeyknoxValue.owner,
+            identities = encryptedKeyknoxValue.identities,
+            meta = meta,
+            value = decryptedData,
+            keyknoxHash = encryptedKeyknoxValue.keyknoxHash)
     }
 }

@@ -41,7 +41,6 @@ import com.virgilsecurity.keyknox.exception.EntryNotFoundException
 import com.virgilsecurity.keyknox.exception.EntrySavingException
 import com.virgilsecurity.keyknox.model.CloudEntry
 import com.virgilsecurity.keyknox.model.DecryptedKeyknoxValue
-import com.virgilsecurity.sdk.crypto.PublicKey
 import com.virgilsecurity.sdk.crypto.VirgilCrypto
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKey
 import com.virgilsecurity.sdk.crypto.VirgilPublicKey
@@ -159,8 +158,14 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
         synchronized(this.cache) {
             val creationDate = this.cache[name]?.creationDate ?: now
 
-            val cloudEntry = CloudEntry(name = name, data = data, creationDate = creationDate, modificationDate = now, meta = meta
-                    ?: mapOf())
+            val cloudEntry = CloudEntry(
+                name = name,
+                data = data,
+                creationDate =
+                creationDate,
+                modificationDate = now,
+                meta = meta ?: mapOf()
+            )
 
             this.cache[name] = cloudEntry
 
@@ -172,6 +177,7 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
                 publicKeys = this.publicKeys,
                 privateKey = this.privateKey
             )
+
             cacheEntries(cloudEntrySerializer.deserializeEntries(response.value))
             this.decryptedKeyknoxData = response
 
@@ -200,7 +206,7 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
         return this.cache[name] ?: throw EntryNotFoundException(name)
     }
 
-    override fun exists(name: String): Boolean {
+    override fun existsEntry(name: String): Boolean {
         if (!storageWasSynced) {
             throw CloudStorageOutOfSyncException()
         }
@@ -208,11 +214,11 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
         return this.cache.containsKey(name)
     }
 
-    override fun delete(name: String) {
-        delete(listOf(name))
+    override fun deleteEntry(name: String) {
+        deleteEntries(listOf(name))
     }
 
-    override fun delete(names: List<String>) {
+    override fun deleteEntries(names: List<String>) {
         if (!storageWasSynced) {
             throw CloudStorageOutOfSyncException()
         }
@@ -237,7 +243,7 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
         }
     }
 
-    override fun deleteAll() {
+    override fun deleteAllEntries() {
         synchronized(this.cache) {
             val response = this.keyknoxManager.resetValue()
             cacheEntries(cloudEntrySerializer.deserializeEntries(response.value), true)
@@ -247,7 +253,7 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
 
     override fun retrieveCloudEntries() {
         synchronized(this.cache) {
-            val response = this.keyknoxManager.pullValue()
+            val response = this.keyknoxManager.pullValue(publicKeys = this.publicKeys, privateKey = this.privateKey)
             cacheEntries(cloudEntrySerializer.deserializeEntries(response.value), true)
             this.decryptedKeyknoxData = response
         }
@@ -259,8 +265,7 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
 
 
             // Cloud is empty, no need to update anything
-            if ((decryptedKeyknoxData.value == null || decryptedKeyknoxData.value.isEmpty()) &&
-                    (decryptedKeyknoxData.meta == null || decryptedKeyknoxData.meta.isEmpty())) {
+            if (decryptedKeyknoxData.value.isEmpty() && decryptedKeyknoxData.meta.isEmpty()) {
                 return
             }
 
@@ -285,8 +290,8 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
     }
 
     companion object {
-        private const val ROOT = "DEFAULT"
-        private const val PATH = "DEFAULT"
-        private const val KEY = "DEFAULT"
+        public const val ROOT = "DEFAULT"
+        public const val PATH = "DEFAULT"
+        public const val KEY = "DEFAULT"
     }
 }

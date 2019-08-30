@@ -106,7 +106,7 @@ class SyncKeyStorage {
             throw KeychainEntryNotFoundWhileUpdatingException()
         }
         try {
-            this.cloudKeyStorage.exists(name)
+            this.cloudKeyStorage.existsEntry(name)
         } catch (e: Exception) {
             throw CloudEntryNotFoundWhileUpdatingException()
         }
@@ -138,7 +138,7 @@ class SyncKeyStorage {
             }
         }
 
-        this.cloudKeyStorage.delete(names)
+        this.cloudKeyStorage.deleteEntries(names)
 
         names.forEach { name ->
             this.keyStorage.delete(name)
@@ -186,7 +186,7 @@ class SyncKeyStorage {
             if (this.keyStorage.exists(keyEntry.name)) {
                 throw KeychainEntryAlreadyExistsWhileStoringException(keyEntry.name)
             }
-            if (this.cloudKeyStorage.exists(keyEntry.name)) {
+            if (this.cloudKeyStorage.existsEntry(keyEntry.name)) {
                 throw CloudEntryAlreadyExistsWhileStoringException(keyEntry.name)
             }
         }
@@ -273,7 +273,7 @@ class SyncKeyStorage {
      * Deletes all entries in both Keychain and Keyknox Cloud.
      */
     fun deleteAll() {
-        this.cloudKeyStorage.deleteAll()
+        this.cloudKeyStorage.deleteAllEntries()
 
         val entriesToDelete = this.keyStorage.retrieveAll()
                 .filter { this.keychainUtils.filterKeyknoxKeychainEntry(it) }

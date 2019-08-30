@@ -138,7 +138,8 @@ class KeyknoxManager(
 //            } else {
 //                throw TamperedServerResponseException()
 //            }
-            // TODO do we need this check?
+
+            // TODO do we need this check above?
         }
         return run(operation)
     }
@@ -156,103 +157,6 @@ class KeyknoxManager(
         }
         return run(operation)
     }
-
-//    /**
-//     * Updates public keys for ecnryption and signature verification and private key for decryption and signature generation.
-//     *
-//     * @param newPublicKeys New public keys that will be used for encryption and signature verification.
-//     * @param newPrivateKey New private key that will be used for decryption and signature generation.
-//     *
-//     * @return DecryptedKeyknoxValue.
-//     */
-//    @JvmOverloads
-//    fun updateRecipients(newPublicKeys: List<VirgilPublicKey>? = null,
-//                         newPrivateKey: VirgilPrivateKey? = null): DecryptedKeyknoxValue {
-//
-//        val tmpPublicKeys = newPublicKeys ?: this.publicKeys
-//        if (tmpPublicKeys.isEmpty()) {
-//            throw EmptyPublicKeysException()
-//        }
-//        val tmpPrivateKey = newPrivateKey ?: this.privateKey
-//
-//        val pullOperation = { b: Boolean ->
-//            val tokenContext = TokenContext("get", b, "keyknox")
-//            val token = this.accessTokenProvider.getToken(tokenContext)
-//            this.keyknoxClient.pullValue(token.stringRepresentation())
-//        }
-//        val pulledValue = run(pullOperation)
-//        val decryptedValue = this.crypto.decrypt(pulledValue, this.privateKey, this.publicKeys)
-//
-//        if (decryptedValue.meta == null
-//                || decryptedValue.meta.isEmpty()
-//                || decryptedValue.value == null
-//                || decryptedValue.value.isEmpty()) {
-//
-//            // Empty data, no need to re-encrypt anything
-//            return decryptedValue
-//        }
-//
-//        this.privateKey = tmpPrivateKey
-//        this.publicKeys = tmpPublicKeys
-//        val encryptedValue = this.crypto.encrypt(decryptedValue.value, tmpPrivateKey, tmpPublicKeys)
-//
-//        val pushOperation = { b: Boolean ->
-//            val tokenContext = TokenContext("put", b, "keyknox")
-//            val token = this.accessTokenProvider.getToken(tokenContext)
-//            val response = this.keyknoxClient.pushValue(encryptedValue.first,
-//                                                        encryptedValue.second,
-//                                                        pulledValue.keyknoxHash,
-//                                                        token.stringRepresentation())
-//            verifyServerResponse(encryptedValue, response)
-//            this.crypto.decrypt(response, this.privateKey, this.publicKeys)
-//        }
-//        return run(pushOperation)
-//    }
-//
-//    /**
-//     * Updates public keys for ecnryption and signature verification and private key for decryption
-//     * and signature generation.
-//     *
-//     * @param value Current Keyknox value.
-//     * @param previousHash Previous Keyknox value hash.
-//     * @param newPublicKeys New public keys that will be used for encryption and signature verification.
-//     * @param newPrivateKey New private key that will be used for decryption and signature generation.
-//     *
-//     * @return DecryptedKeyknoxValue.
-//     */
-//    @JvmOverloads
-//    fun updateRecipients(value: ByteArray?,
-//                         previousHash: ByteArray?,
-//                         newPublicKeys: List<VirgilPublicKey>? = null,
-//                         newPrivateKey: VirgilPrivateKey? = null): DecryptedKeyknoxValue {
-//
-//        val tmpPublicKeys = newPublicKeys ?: this.publicKeys
-//        if (tmpPublicKeys.isEmpty()) {
-//            throw EmptyPublicKeysException()
-//        }
-//        val tmpPrivateKey = newPrivateKey ?: this.privateKey
-//        val encryptedValue: Pair<ByteArray, ByteArray> = if (value == null) {
-//            this.crypto.encrypt(byteArrayOf(), tmpPrivateKey, tmpPublicKeys)
-//        } else {
-//            this.crypto.encrypt(value, tmpPrivateKey, tmpPublicKeys)
-//        }
-//
-//        this.privateKey = tmpPrivateKey
-//        this.publicKeys = tmpPublicKeys
-//
-//        val operation = { b: Boolean ->
-//            val tokenContext = TokenContext("put", b, "keyknox")
-//            val token = this.accessTokenProvider.getToken(tokenContext)
-//            val response = this.keyknoxClient.pushValue(encryptedValue.first,
-//                                                        encryptedValue.second,
-//                                                        previousHash,
-//                                                        token.stringRepresentation())
-//
-//            verifyServerResponse(encryptedValue, response)
-//            this.crypto.decrypt(response, this.privateKey, this.publicKeys)
-//        }
-//        return run(operation)
-//    }
 
     private fun verifyServerResponse(encryptedValue: Pair<ByteArray, ByteArray>, response: EncryptedKeyknoxValue) {
         if (!Arrays.equals(encryptedValue.first, response.meta)) {

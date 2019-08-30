@@ -172,15 +172,15 @@ class CloudKeyStorageTest {
         val entries = this.keyStorage.retrieveAllEntries()
         assertEquals(1, entries.size)
 
-        assertTrue(this.keyStorage.exists("test"))
-        assertFalse(this.keyStorage.exists("test2"))
+        assertTrue(this.keyStorage.existsEntry("test"))
+        assertFalse(this.keyStorage.existsEntry("test2"))
 
         this.keyStorage.retrieveCloudEntries()
         val entries2 = this.keyStorage.retrieveAllEntries()
         assertEquals(1, entries2.size)
 
-        assertTrue(this.keyStorage.exists("test"))
-        assertFalse(this.keyStorage.exists("test2"))
+        assertTrue(this.keyStorage.existsEntry("test"))
+        assertFalse(this.keyStorage.existsEntry("test2"))
     }
 
     @Test
@@ -325,7 +325,7 @@ class CloudKeyStorageTest {
         assertEquals(numberOfKeys, this.keyStorage.retrieveAllEntries().size)
 
         // Delete all entries
-        this.keyStorage.deleteAll()
+        this.keyStorage.deleteAllEntries()
 
         // No entries exist
         assertTrue(this.keyStorage.retrieveAllEntries().isEmpty())
@@ -342,7 +342,7 @@ class CloudKeyStorageTest {
         // KTC-24
 
         // Delete all entries
-        this.keyStorage.deleteAll()
+        this.keyStorage.deleteAllEntries()
 
         // No entries exist
         assertTrue(this.keyStorage.retrieveAllEntries().isEmpty())
@@ -376,7 +376,7 @@ class CloudKeyStorageTest {
         this.keyStorage.store(keyEntries)
 
         // Delete entry
-        this.keyStorage.delete(keyEntries[0].name)
+        this.keyStorage.deleteEntry(keyEntries[0].name)
         assertEquals(numberOfKeys - 1, this.keyStorage.retrieveAllEntries().size)
         try {
             this.keyStorage.retrieveEntry(keyEntries[0].name)
@@ -385,7 +385,7 @@ class CloudKeyStorageTest {
         }
 
         // Delete 2 entries
-        this.keyStorage.delete(arrayListOf(keyEntries[1].name, keyEntries[2].name))
+        this.keyStorage.deleteEntries(arrayListOf(keyEntries[1].name, keyEntries[2].name))
         assertEquals(numberOfKeys - 3, this.keyStorage.retrieveAllEntries().size)
         try {
             this.keyStorage.retrieveEntry(keyEntries[1].name)
@@ -510,7 +510,7 @@ class CloudKeyStorageTest {
         }
 
         try {
-            this.keyStorage.exists("test")
+            this.keyStorage.existsEntry("test")
             fail<String>("Storage should be out of sync")
         } catch (e: CloudKeyStorageException) {
             assertTrue(e is CloudStorageOutOfSyncException)
@@ -550,14 +550,14 @@ class CloudKeyStorageTest {
         }
 
         try {
-            this.keyStorage.delete(keyEntries[0].name)
+            this.keyStorage.deleteEntry(keyEntries[0].name)
             fail<String>("Storage should be out of sync")
         } catch (e: CloudKeyStorageException) {
             assertTrue(e is CloudStorageOutOfSyncException)
         }
 
         try {
-            this.keyStorage.delete(arrayListOf(keyEntries[0].name, keyEntries[1].name))
+            this.keyStorage.deleteEntries(arrayListOf(keyEntries[0].name, keyEntries[1].name))
             fail<String>("Storage should be out of sync")
         } catch (e: CloudKeyStorageException) {
             assertTrue(e is CloudStorageOutOfSyncException)
@@ -580,7 +580,7 @@ class CloudKeyStorageTest {
 
         this.keyStorage.retrieveCloudEntries()
         this.keyStorage.store(name = name, data = privateKeyData)
-        this.keyStorage.deleteAll()
+        this.keyStorage.deleteAllEntries()
         assertTrue(this.keyStorage.retrieveAllEntries().isEmpty())
     }
 

@@ -95,26 +95,26 @@ interface CloudKeyStorageProtocol {
      *
      * @return true if entry exists, false - otherwise
      */
-    fun exists(name: String): Boolean
+    fun existsEntry(name: String): Boolean
 
     /**
      * Deletes entry from Cloud.
      *
      * @param name name
      */
-    fun delete(name: String)
+    fun deleteEntry(name: String)
 
     /**
      * Deletes entries from Cloud.
      *
      * @param names names of entries to delete
      */
-    fun delete(names: List<String>)
+    fun deleteEntries(names: List<String>)
 
     /**
      * Deletes all entries from Cloud.
      */
-    fun deleteAll()
+    fun deleteAllEntries()
 
     /**
      * Retrieves entries from Cloud.
