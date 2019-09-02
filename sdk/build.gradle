@@ -1,5 +1,6 @@
 dependencies {
     api project(":crypto")
+    implementation project(":common")
     
     testImplementation "org.junit.jupiter:junit-jupiter:$versions.junit"
     testImplementation "com.virgilsecurity.crypto:common:$versions.virgilCrypto"
@@ -8,7 +9,6 @@ dependencies {
     testCompile "org.apache.commons:commons-lang3:$versions.commonsLang"
     testImplementation "org.mockito:mockito-core:$versions.mockito"
     testImplementation "org.mockito:mockito-junit-jupiter:$versions.mockitoJunit"
-
 }
 
 sourceSets.main.java.srcDirs = ["${buildDir}/generated/", "src/main/java"]

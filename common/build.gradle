@@ -1,0 +1,18 @@
+group 'com.virgilsecurity'
+
+dependencies {
+    // Virgil
+    implementation "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom {
+                name = 'Virgil SDK'
+            }
+            artifactId = "common"
+        }
+    }
+}
