@@ -37,6 +37,7 @@ import com.virgilsecurity.keyknox.utils.base64Decode
 import com.virgilsecurity.sdk.crypto.VirgilCrypto
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKey
 import com.virgilsecurity.sdk.crypto.VirgilPublicKey
+import com.virgilsecurity.sdk.utils.StringUtils
 
 class TestConfig {
     companion object {
@@ -68,6 +69,15 @@ class TestConfig {
                 System.getProperty("API_PUBLIC_KEY_ID")
             else
                 System.getenv("API_PUBLIC_KEY_ID")
+        }
+        val keyknoxServiceAddress: String by lazy {
+            if (System.getProperty("KEYKNOX_SERVICE_ADDRESS") != null)
+                System.getProperty("KEYKNOX_SERVICE_ADDRESS")
+            else if (!StringUtils.isBlank(System.getenv("KEYKNOX_SERVICE_ADDRESS"))) {
+                System.getenv("KEYKNOX_SERVICE_ADDRESS")
+            } else {
+                "https://api.virgilsecurity.com"
+            }
         }
     }
 }

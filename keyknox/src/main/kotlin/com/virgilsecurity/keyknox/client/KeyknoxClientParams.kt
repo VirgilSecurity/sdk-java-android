@@ -40,7 +40,7 @@ package com.virgilsecurity.keyknox.client
  * @param root root.
  * @param path path.
  */
-class KeyknoxGetKeysParams @JvmOverloads constructor(
+class KeyknoxGetKeysParams constructor(
     val identity: String?,
     val root: String?,
     val path: String?
@@ -54,7 +54,7 @@ class KeyknoxGetKeysParams @JvmOverloads constructor(
  * @param path path.
  * @param key key.
  */
-class KeyknoxDeleteRecipientParams @JvmOverloads constructor(
+class KeyknoxDeleteRecipientParams constructor(
     val identity: String,
     val root: String,
     val path: String,
@@ -68,7 +68,7 @@ class KeyknoxDeleteRecipientParams @JvmOverloads constructor(
  * @param path path.
  * @param key key.
  */
-class KeyknoxResetParams @JvmOverloads constructor(
+class KeyknoxResetParams constructor(
     val root: String?,
     val path: String?,
     val key: String?
@@ -82,7 +82,7 @@ class KeyknoxResetParams @JvmOverloads constructor(
  * @param path path.
  * @param key key.
  */
-class KeyknoxPullParams @JvmOverloads constructor(
+class KeyknoxPullParams constructor(
     val identity: String,
     val root: String,
     val path: String,
@@ -97,7 +97,7 @@ class KeyknoxPullParams @JvmOverloads constructor(
  * @param path path.
  * @param key key.
  */
-class KeyknoxPushParams @JvmOverloads constructor(
+class KeyknoxPushParams constructor(
     val identities: Collection<String>,
     val root: String,
     val path: String,

@@ -36,8 +36,7 @@ package com.virgilsecurity.keyknox.storage
 import com.virgilsecurity.keyknox.cloud.CloudKeyStorage
 import com.virgilsecurity.keyknox.cloud.CloudKeyStorageProtocol
 import com.virgilsecurity.keyknox.exception.*
-import com.virgilsecurity.sdk.crypto.PrivateKey
-import com.virgilsecurity.sdk.crypto.PublicKey
+import com.virgilsecurity.sdk.crypto.VirgilCrypto
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKey
 import com.virgilsecurity.sdk.crypto.VirgilPublicKey
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider
@@ -80,15 +79,17 @@ class SyncKeyStorage {
     /**
      * @param identity User's identity to separate keys in Keychain.
      * @param accessTokenProvider AccessTokenProvider implementation.
+     * @param crypto Crypto
      * @param publicKeys Public keys used for encryption and signature verification.
      * @param privateKey Private key used for decryption and signature generation.
      */
     constructor(identity: String,
                 accessTokenProvider: AccessTokenProvider,
+                crypto: VirgilCrypto,
                 publicKeys: List<VirgilPublicKey>,
                 privateKey: VirgilPrivateKey) {
         this.identity = identity
-        this.cloudKeyStorage = CloudKeyStorage(accessTokenProvider = accessTokenProvider,
+        this.cloudKeyStorage = CloudKeyStorage(accessTokenProvider = accessTokenProvider, crypto = crypto,
                                                publicKeys = publicKeys,
                                                privateKey = privateKey)
         this.keyStorage = KeyStorageWrapper(identity, DefaultKeyStorage())

@@ -69,8 +69,7 @@ public class AccessTokenProviderTest {
   public void caching_jwt_provider_renew_test() throws InterruptedException {
     CachingJwtProvider jwtProvider = initCachingJwtProvider();
 
-    TokenContext tokenContext = new TokenContext(TOKEN_OPERATION, TOKEN_FORCE_RELOAD,
-        TOKEN_SERVICE);
+    TokenContext tokenContext = new TokenContext(TOKEN_SERVICE, TOKEN_OPERATION, TOKEN_FORCE_RELOAD);
 
     AccessToken token1 = jwtProvider.getToken(tokenContext);
     assertNotNull(token1);
@@ -91,8 +90,7 @@ public class AccessTokenProviderTest {
   @Test
   public void caching_jwt_provider_renew_test_concurrent() throws InterruptedException {
     final CachingJwtProvider jwtProvider = initCachingJwtProvider();
-    final TokenContext tokenContext = new TokenContext(TOKEN_OPERATION, TOKEN_FORCE_RELOAD,
-        TOKEN_SERVICE);
+    final TokenContext tokenContext = new TokenContext(TOKEN_SERVICE, TOKEN_OPERATION, TOKEN_FORCE_RELOAD);
     ExecutorService exec = Executors.newFixedThreadPool(16);
 
     for (int i = 0; i < 10000; i++) {
@@ -151,7 +149,7 @@ public class AccessTokenProviderTest {
       }
     });
 
-    final TokenContext tokenContext = new TokenContext(TOKEN_OPERATION, TOKEN_FORCE_RELOAD, TOKEN_SERVICE);
+    final TokenContext tokenContext = new TokenContext(TOKEN_SERVICE, TOKEN_OPERATION, TOKEN_FORCE_RELOAD);
 
     ExecutorService exec = Executors.newFixedThreadPool(6);
 

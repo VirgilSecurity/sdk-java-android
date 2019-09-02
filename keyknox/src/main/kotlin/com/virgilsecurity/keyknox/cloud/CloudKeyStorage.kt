@@ -58,10 +58,10 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
     val keyknoxManager: KeyknoxManager
 
     // Public keys used for encryption and signature verification
-    private val publicKeys: List<VirgilPublicKey>
+    var publicKeys: List<VirgilPublicKey>
 
     // Private key used for decryption and signing
-    private val privateKey: VirgilPrivateKey
+    var privateKey: VirgilPrivateKey
 
     private var cache: MutableMap<String, CloudEntry> = ConcurrentHashMap()
     private var decryptedKeyknoxData: DecryptedKeyknoxValue? = null
@@ -269,14 +269,19 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
                 return
             }
 
+            val tmpPublicKeys = newPublicKeys ?: this.publicKeys
+            val tmpPrivateKeys = newPrivateKey ?: this.privateKey
+
             val response = this.keyknoxManager.pushValue(
                 data = decryptedKeyknoxData.value,
                 previousHash = decryptedKeyknoxData.keyknoxHash,
-                publicKeys = this.publicKeys,
-                privateKey = this.privateKey
+                publicKeys = tmpPublicKeys,
+                privateKey = tmpPrivateKeys
             )
             cacheEntries(cloudEntrySerializer.deserializeEntries(response.value))
             this.decryptedKeyknoxData = response
+            this.publicKeys = tmpPublicKeys
+            this.privateKey = tmpPrivateKeys
         }
     }
 

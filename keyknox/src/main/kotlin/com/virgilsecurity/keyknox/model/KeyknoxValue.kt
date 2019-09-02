@@ -49,6 +49,7 @@ open class KeyknoxValue {
     val identities: Collection<String>
     val meta: ByteArray
     val value: ByteArray
+    val version: String?
     val keyknoxHash: ByteArray
 
     constructor(keyknoxData: KeyknoxDataV2, keyknoxHash: ByteArray) : this(
@@ -59,6 +60,7 @@ open class KeyknoxValue {
         keyknoxData.identities,
         keyknoxData.meta,
         keyknoxData.value,
+        keyknoxData.version,
         keyknoxHash
     )
 
@@ -70,6 +72,7 @@ open class KeyknoxValue {
         setOf(identity),
         keyknoxData.meta,
         keyknoxData.value,
+        keyknoxData.version,
         keyknoxHash
     )
 
@@ -81,6 +84,7 @@ open class KeyknoxValue {
         identities: Collection<String>,
         meta: ByteArray,
         value: ByteArray,
+        version: String?,
         keyknoxHash: ByteArray
     ) {
         this.root = root
@@ -90,6 +94,7 @@ open class KeyknoxValue {
         this.identities = identities
         this.meta = meta
         this.value = value
+        this.version = version
         this.keyknoxHash = keyknoxHash
     }
 
@@ -137,8 +142,9 @@ class DecryptedKeyknoxValue : KeyknoxValue {
         identities: Collection<String>,
         meta: ByteArray,
         value: ByteArray,
+        version: String?,
         keyknoxHash: ByteArray
-    ) : super(root, path, key, owner, identities, meta, value, keyknoxHash)
+    ) : super(root, path, key, owner, identities, meta, value, version, keyknoxHash)
 
     constructor(keyknoxData: KeyknoxDataV2, keyknoxHash: ByteArray) : super(
         keyknoxData = keyknoxData,
@@ -166,8 +172,9 @@ class EncryptedKeyknoxValue : KeyknoxValue {
         identities: Collection<String>,
         meta: ByteArray,
         value: ByteArray,
+        version: String?,
         keyknoxHash: ByteArray
-    ) : super(root, path, key, owner, identities, meta, value, keyknoxHash)
+    ) : super(root, path, key, owner, identities, meta, value, version, keyknoxHash)
 
     constructor(keyknoxData: KeyknoxDataV2, keyknoxHash: ByteArray) : super(
         keyknoxData = keyknoxData,

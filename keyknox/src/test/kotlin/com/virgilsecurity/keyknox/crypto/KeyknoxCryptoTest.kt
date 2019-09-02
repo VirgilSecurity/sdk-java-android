@@ -33,6 +33,7 @@
 
 package com.virgilsecurity.keyknox.crypto
 
+import com.virgilsecurity.keyknox.client.KeyknoxClient
 import com.virgilsecurity.keyknox.exception.SignerNotFoundException
 import com.virgilsecurity.keyknox.model.EncryptedKeyknoxValue
 import com.virgilsecurity.sdk.crypto.VirgilCrypto
@@ -94,20 +95,32 @@ class KeyknoxCryptoTest {
     @Test
     @Throws(CryptoException::class)
     fun decrypt_emptyEncryptedKeyknoxValue() {
-        val encryptedKeyknoxValue = EncryptedKeyknoxValue(meta = null, value = null,
-                version = UUID.randomUUID().toString(),
-                keyknoxHash = UUID.randomUUID().toString().toByteArray(StandardCharsets.UTF_8))
+        val encryptedKeyknoxValue = EncryptedKeyknoxValue(
+            root = KeyknoxClient.DEFAULT_ROOT,
+            path = KeyknoxClient.DEFAULT_PATH,
+            key = KeyknoxClient.DEFAULT_KEY,
+            owner = "owner",
+            identities = listOf(),
+            meta = ByteArray(0),
+            value = ByteArray(0),
+            version = UUID.randomUUID().toString(),
+            keyknoxHash = UUID.randomUUID().toString().toByteArray(StandardCharsets.UTF_8)
+        )
 
-        val decryptedKeyknoxValue = this.crypto.decrypt(encryptedKeyknoxValue,
-                privateKey, publicKeys)
+        val decryptedKeyknoxValue = this.crypto.decrypt(
+            encryptedKeyknoxValue,
+            privateKey, publicKeys
+        )
         assertNotNull(decryptedKeyknoxValue)
         assertNotNull(decryptedKeyknoxValue.meta)
-        assertTrue(decryptedKeyknoxValue.meta!!.isEmpty())
+        assertTrue(decryptedKeyknoxValue.meta.isEmpty())
         assertNotNull(decryptedKeyknoxValue.value)
-        assertTrue(decryptedKeyknoxValue.value!!.isEmpty())
+        assertTrue(decryptedKeyknoxValue.value.isEmpty())
         assertEquals(encryptedKeyknoxValue.version, decryptedKeyknoxValue.version)
-        assertArrayEquals(encryptedKeyknoxValue.keyknoxHash,
-                decryptedKeyknoxValue.keyknoxHash)
+        assertArrayEquals(
+            encryptedKeyknoxValue.keyknoxHash,
+            decryptedKeyknoxValue.keyknoxHash
+        )
     }
 
     @Test
@@ -134,8 +147,10 @@ class KeyknoxCryptoTest {
         val keys = ArrayList(publicKeys)
         keys.add(publicKey)
 
-        val decryptedKeyknoxValue = this.crypto.decrypt(encryptedKeyknoxValue,
-                privateKey, keys)
+        val decryptedKeyknoxValue = this.crypto.decrypt(
+            encryptedKeyknoxValue,
+            privateKey, keys
+        )
         assertNotNull(decryptedKeyknoxValue)
         assertNotNull(decryptedKeyknoxValue.value)
         assertArrayEquals(TEST_DATA, decryptedKeyknoxValue.value)
@@ -147,7 +162,17 @@ class KeyknoxCryptoTest {
         val keys = ArrayList(this.publicKeys)
         keys.add(this.publicKey)
         val result = this.crypto.encrypt(TEST_DATA, privateKey, keys)
-        return EncryptedKeyknoxValue(meta = result.first, value = result.second, version = "1.0")
+        return EncryptedKeyknoxValue(
+            root = KeyknoxClient.DEFAULT_ROOT,
+            path = KeyknoxClient.DEFAULT_PATH,
+            key = KeyknoxClient.DEFAULT_KEY,
+            owner = "owner",
+            identities = listOf(),
+            meta = result.first,
+            value = result.second,
+            version = "1.0",
+            keyknoxHash = ByteArray(0)
+        )
     }
 
     companion object {

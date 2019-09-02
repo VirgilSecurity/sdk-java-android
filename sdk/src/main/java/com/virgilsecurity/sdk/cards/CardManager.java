@@ -402,7 +402,7 @@ public class CardManager {
    */
   public Card getCard(String cardId) throws CryptoException, VirgilServiceException {
     AccessToken token = accessTokenProvider
-        .getToken(new TokenContext(TOKEN_CONTEXT_OPERATION_GET, false, TOKEN_CONTEXT_SERVICE));
+        .getToken(new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_GET));
     Tuple<RawSignedModel, Boolean> response;
 
     try { // Hell is here (:
@@ -413,7 +413,7 @@ public class CardManager {
           && retryOnUnauthorized) {
         LOGGER.fine("Token is expired, trying to reload...");
         token = accessTokenProvider
-            .getToken(new TokenContext(TOKEN_CONTEXT_OPERATION_GET, true, TOKEN_CONTEXT_SERVICE));
+            .getToken(new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_GET, true));
         try {
           response = cardClient.getCard(cardId, token.stringRepresentation());
         } catch (VirgilServiceException exceptionInner) {
@@ -578,8 +578,7 @@ public class CardManager {
   public Card publishCard(VirgilPrivateKey privateKey, VirgilPublicKey publicKey)
       throws CryptoException, VirgilServiceException {
 
-    TokenContext tokenContext = new TokenContext(TOKEN_CONTEXT_OPERATION_PUBLISH, false,
-        TOKEN_CONTEXT_SERVICE);
+    TokenContext tokenContext = new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_PUBLISH);
 
     AccessToken token = accessTokenProvider.getToken(tokenContext);
 
@@ -610,8 +609,7 @@ public class CardManager {
   public Card publishCard(VirgilPrivateKey privateKey, VirgilPublicKey publicKey, String identity)
       throws CryptoException, VirgilServiceException {
 
-    TokenContext tokenContext = new TokenContext(TOKEN_CONTEXT_OPERATION_PUBLISH, false,
-        TOKEN_CONTEXT_SERVICE);
+    TokenContext tokenContext = new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_PUBLISH);
 
     AccessToken token = accessTokenProvider.getToken(tokenContext);
 
@@ -643,8 +641,7 @@ public class CardManager {
   public Card publishCard(VirgilPrivateKey privateKey, VirgilPublicKey publicKey, String identity,
                           Map<String, String> additionalData) throws CryptoException, VirgilServiceException {
 
-    TokenContext tokenContext = new TokenContext(TOKEN_CONTEXT_OPERATION_PUBLISH, false,
-        TOKEN_CONTEXT_SERVICE);
+    TokenContext tokenContext = new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_PUBLISH);
 
     AccessToken token = accessTokenProvider.getToken(tokenContext);
 
@@ -677,8 +674,7 @@ public class CardManager {
   public Card publishCard(VirgilPrivateKey privateKey, VirgilPublicKey publicKey, String identity,
                           String previousCardId) throws CryptoException, VirgilServiceException {
 
-    TokenContext tokenContext = new TokenContext(TOKEN_CONTEXT_OPERATION_PUBLISH, false,
-        TOKEN_CONTEXT_SERVICE);
+    TokenContext tokenContext = new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_PUBLISH);
 
     AccessToken token = accessTokenProvider.getToken(tokenContext);
 
@@ -713,8 +709,7 @@ public class CardManager {
                           String previousCardId, Map<String, String> additionalData)
       throws CryptoException, VirgilServiceException {
 
-    TokenContext tokenContext = new TokenContext(TOKEN_CONTEXT_OPERATION_PUBLISH, false,
-        TOKEN_CONTEXT_SERVICE);
+    TokenContext tokenContext = new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_PUBLISH);
 
     AccessToken token = accessTokenProvider.getToken(tokenContext);
 
@@ -743,8 +738,7 @@ public class CardManager {
   public Card publishCard(RawSignedModel cardModel) throws CryptoException, VirgilServiceException {
     Validator.checkNullAgrument(cardModel, "CardManager -> 'cardModel' should not be null");
 
-    TokenContext tokenContext = new TokenContext(TOKEN_CONTEXT_OPERATION_PUBLISH, false,
-        TOKEN_CONTEXT_SERVICE);
+    TokenContext tokenContext = new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_PUBLISH);
 
     AccessToken token = accessTokenProvider.getToken(tokenContext);
 
@@ -782,9 +776,7 @@ public class CardManager {
       throw new IllegalArgumentException("'cardId' should not be empty");
     }
 
-    TokenContext tokenContext = new TokenContext(TOKEN_CONTEXT_OPERATION_DELETE,
-        false,
-        TOKEN_CONTEXT_SERVICE);
+    TokenContext tokenContext = new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_DELETE);
 
     AccessToken token = accessTokenProvider.getToken(tokenContext);
 
@@ -904,7 +896,7 @@ public class CardManager {
    */
   public List<Card> searchCards(String identity) throws CryptoException, VirgilServiceException {
     AccessToken token = accessTokenProvider
-        .getToken(new TokenContext(TOKEN_CONTEXT_OPERATION_SEARCH, false, TOKEN_CONTEXT_SERVICE));
+        .getToken(new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_SEARCH));
 
     List<RawSignedModel> cardModels;
     try {
@@ -915,7 +907,7 @@ public class CardManager {
           && retryOnUnauthorized) {
         LOGGER.fine("Token is expired, trying to reload...");
         token = accessTokenProvider.getToken(
-            new TokenContext(TOKEN_CONTEXT_OPERATION_SEARCH, true, TOKEN_CONTEXT_SERVICE));
+            new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_SEARCH, true));
         try {
           cardModels = cardClient.searchCards(identity, token.stringRepresentation());
         } catch (VirgilServiceException exceptionInner) {
@@ -961,7 +953,7 @@ public class CardManager {
   public List<Card> searchCards(Collection<String> identities)
       throws CryptoException, VirgilServiceException {
     AccessToken token = accessTokenProvider
-        .getToken(new TokenContext(TOKEN_CONTEXT_OPERATION_SEARCH, false, TOKEN_CONTEXT_SERVICE));
+        .getToken(new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_SEARCH));
 
     List<RawSignedModel> cardModels;
     try {
@@ -972,7 +964,7 @@ public class CardManager {
           && retryOnUnauthorized) {
         LOGGER.fine("Token is expired, trying to reload...");
         token = accessTokenProvider.getToken(
-            new TokenContext(TOKEN_CONTEXT_OPERATION_SEARCH, true, TOKEN_CONTEXT_SERVICE));
+            new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_SEARCH, true));
         try {
           cardModels = cardClient.searchCards(identities, token.stringRepresentation());
         } catch (VirgilServiceException exceptionInner) {
@@ -1010,9 +1002,9 @@ public class CardManager {
    * @throws CryptoException
    * @throws VirgilServiceException
    */
-  public List<Card> getOutdated(Collection<String> cardIds) throws CryptoException, VirgilServiceException {
+  public List<String> getOutdated(Collection<String> cardIds) throws CryptoException, VirgilServiceException {
     AccessToken token = accessTokenProvider
-            .getToken(new TokenContext(TOKEN_CONTEXT_OPERATION_GET_OUTDATED, false, TOKEN_CONTEXT_SERVICE));
+            .getToken(new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_GET_OUTDATED));
 
     List<String> outdatedCards;
     try {
@@ -1023,7 +1015,7 @@ public class CardManager {
               && retryOnUnauthorized) {
         LOGGER.fine("Token is expired, trying to reload...");
         token = accessTokenProvider.getToken(
-                new TokenContext(TOKEN_CONTEXT_OPERATION_GET_OUTDATED, true, TOKEN_CONTEXT_SERVICE));
+                new TokenContext(TOKEN_CONTEXT_SERVICE, TOKEN_CONTEXT_OPERATION_GET_OUTDATED, true));
         try {
           outdatedCards = cardClient.getOutdated(cardIds, token.stringRepresentation());
         } catch (VirgilServiceException exceptionInner) {
@@ -1041,6 +1033,8 @@ public class CardManager {
         throw exceptionOuter;
       }
     }
+    return outdatedCards;
+  }
 
   /**
    * Sets if the card manager should retry request with new token on {@code unauthorized} http

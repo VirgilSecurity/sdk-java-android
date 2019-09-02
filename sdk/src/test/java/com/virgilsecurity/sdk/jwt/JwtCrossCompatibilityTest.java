@@ -92,8 +92,7 @@ public class JwtCrossCompatibilityTest {
     CallbackJwtProvider provider = new CallbackJwtProvider(callback);
 
     // Prepare contexts
-    TokenContext ctx = new TokenContext(fake.getIdentity(), TEST_OPERATION, false,
-        TOKEN_CONTEXT_SERVICE);
+    TokenContext ctx = new TokenContext(fake.getIdentity(), TOKEN_CONTEXT_SERVICE, TEST_OPERATION, false);
 
     // Set getTokenCallback to use JwtGenerator + call counter
     TimeSpan ttl = TimeSpan.fromTime(TOKEN_EXPIRE_IN_SECONDS, TimeUnit.SECONDS);
@@ -218,7 +217,7 @@ public class JwtCrossCompatibilityTest {
         generator.generateToken(this.fake.getIdentity()));
 
     // Prepare contexts
-    TokenContext ctx = new TokenContext(fake.getIdentity(), "stc_37", false, TOKEN_CONTEXT_SERVICE);
+    TokenContext ctx = new TokenContext(fake.getIdentity(), TOKEN_CONTEXT_SERVICE, "stc_37", false);
 
     assertFalse(((Jwt) tokenProvider.getToken(ctx)).isExpired(), "Token should not be expired");
 

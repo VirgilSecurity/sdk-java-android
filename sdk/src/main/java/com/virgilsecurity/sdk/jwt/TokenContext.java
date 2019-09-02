@@ -53,38 +53,43 @@ public class TokenContext {
    *                    method is called, otherwise {@code false}
    */
   public TokenContext(String operation, boolean forceReload) {
-    this.operation = operation;
-    this.forceReload = forceReload;
-
-    this.service = DEFAULT_SERVICE;
+    this(null, DEFAULT_SERVICE, operation, forceReload);
   }
 
   /**
    * Instantiates a new Token context.
    *
+   * @param service     requested service
+   * @param operation   the operation that is token used for
+   */
+  public TokenContext(String service, String operation) {
+    this(service, operation, false);
+  }
+
+  /**
+   * Instantiates a new Token context.
+   *
+   * @param service     requested service
    * @param operation   the operation that is token used for
    * @param forceReload {@code true} if token should be reloaded every time
    *                    {@link com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider#getToken(TokenContext)}
    *                    method is called, otherwise {@code false}
-   * @param service     requested service
    */
-  public TokenContext(String operation, boolean forceReload, String service) {
-    this.operation = operation;
-    this.forceReload = forceReload;
-    this.service = service;
+  public TokenContext(String service, String operation, boolean forceReload) {
+    this(null, service, operation, forceReload);
   }
 
   /**
    * Instantiates a new Token context.
    *
    * @param identity    the identity
+   * @param service     requested service
    * @param operation   the operation that is token used for
    * @param forceReload {@code true} if token should be reloaded every time
    *                    {@link com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider#getToken(TokenContext)}
    *                    method is called, otherwise {@code false}
-   * @param service     requested service
    */
-  public TokenContext(String identity, String operation, boolean forceReload, String service) {
+  public TokenContext(String identity, String service, String operation, boolean forceReload) {
     this.identity = identity;
     this.operation = operation;
     this.forceReload = forceReload;

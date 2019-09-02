@@ -33,17 +33,19 @@
 
 package com.virgilsecurity.keyknox.client
 
+import com.virgilsecurity.sdk.jwt.TokenContext
+import com.virgilsecurity.sdk.jwt.contract.AccessToken
 import java.net.URL
 
 interface HttpClientProtocol {
 
-    fun send(url: URL, method: Method, accessToken: String, body: Any? = null, headers: Map<String, String>? = null): Response
+    fun send(url: URL, method: Method, tokenContext: TokenContext, body: Any? = null, headers: Map<String, String>? = null): Response
 }
 
 enum class Method {
     GET, POST, PUT, DELETE
 }
 
-class Response(val body: String, val headers: Map<String, String>) {
+class Response(val body: String, val headers: Map<String, String>, val accessToken: AccessToken) {
 
 }

@@ -41,6 +41,8 @@ import com.virgilsecurity.keyknox.model.DecryptedKeyknoxValue
 import com.virgilsecurity.keyknox.model.EncryptedKeyknoxValue
 import com.virgilsecurity.keyknox.utils.base64Decode
 import com.virgilsecurity.keyknox.utils.base64Encode
+import com.virgilsecurity.sdk.jwt.TokenContext
+import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider
 import com.virgilsecurity.sdk.utils.ConvertionUtils
 import java.net.URL
 
@@ -48,30 +50,35 @@ import java.net.URL
  * KeyknoxClientProtocol implementation.
  */
 class KeyknoxClient @JvmOverloads constructor(
-    val serviceUrl: URL = URL("https://api.virgilsecurity.com"),
-    val httpClient: HttpClientProtocol = HttpClient()
+    val accessTokenProvider: AccessTokenProvider,
+    val serviceUrl: URL = URL("https://api.virgilsecurity.com")
 ) : KeyknoxClientProtocol {
 
-    override fun getKeys(params: KeyknoxGetKeysParams, token: String): Collection<String> {
+    val httpClient: HttpClientProtocol
+
+    init {
+        httpClient = HttpClient(this.accessTokenProvider)
+    }
+
+    override fun getKeys(params: KeyknoxGetKeysParams): Set<String> {
         val requestData = GetKeysData(params.root, params.path, params.identity)
         val body = ConvertionUtils.getGson().toJson(requestData)
         val url = URL(this.serviceUrl, "keyknox/v2/keys")
-        val response = this.httpClient.send(url, Method.POST, token, body)
+        val tokenContext = TokenContext("keyknox", "get")
+        val response = this.httpClient.send(url, Method.POST, tokenContext, body)
 
-        val listType = object : TypeToken<List<String>>() {}.type
-        val keys = ConvertionUtils.getGson().fromJson<List<String>>(response.body, listType)
+        val listType = object : TypeToken<Set<String>>() {}.type
+        val keys = ConvertionUtils.getGson().fromJson<Set<String>>(response.body, listType)
 
         return keys
     }
 
-    override fun deleteRecipient(
-        params: KeyknoxDeleteRecipientParams,
-        token: String
-    ): DecryptedKeyknoxValue {
+    override fun deleteRecipient(params: KeyknoxDeleteRecipientParams): DecryptedKeyknoxValue {
         val requestData = DeleteRecipientData(params.root, params.path, params.key, params.identity)
         val body = ConvertionUtils.getGson().toJson(requestData)
         val url = URL(this.serviceUrl, "keyknox/v2/reset")
-        val response = this.httpClient.send(url, Method.POST, token, body)
+        val tokenContext = TokenContext("keyknox", "delete")
+        val response = this.httpClient.send(url, Method.POST, tokenContext, body)
         val hashCode = extractKeyknoxHash(response)
         val keyknoxData =
             ConvertionUtils.getGson().fromJson(response.body, KeyknoxDataV2::class.java)
@@ -84,8 +91,7 @@ class KeyknoxClient @JvmOverloads constructor(
         params: KeyknoxPushParams?,
         meta: ByteArray,
         value: ByteArray,
-        previousHash: ByteArray?,
-        token: String
+        previousHash: ByteArray?
     ): EncryptedKeyknoxValue {
         val requestData = PushValueData(meta, value)
         val headers = hashMapOf<String, String>()
@@ -95,11 +101,10 @@ class KeyknoxClient @JvmOverloads constructor(
 
         val keyknoxValue: EncryptedKeyknoxValue
 
+        val tokenContext = TokenContext("keyknox", "put")
         if (params == null) {
             val url = URL(this.serviceUrl, "keyknox/v1")
-            val body = ConvertionUtils.getGson().toJson(requestData)
-
-            val response = this.httpClient.send(url, Method.PUT, token, body, headers)
+            val response = this.httpClient.send(url, Method.PUT, tokenContext, requestData, headers)
             keyknoxValue = extractEncryptedKeyknoxValueV1(response)
         } else {
             if (params.identities.isEmpty()) {
@@ -112,47 +117,44 @@ class KeyknoxClient @JvmOverloads constructor(
             requestData.identities = params.identities
 
             val url = URL(this.serviceUrl, "keyknox/v2/push")
-            val body = ConvertionUtils.getGson().toJson(requestData)
-
-            val response = this.httpClient.send(url, Method.PUT, token, body, headers)
+            val response = this.httpClient.send(url, Method.PUT, tokenContext, requestData, headers)
             keyknoxValue = extractEncryptedKeyknoxValueV2(response)
         }
 
         return keyknoxValue
     }
 
-    override fun pullValue(params: KeyknoxPullParams?, token: String): EncryptedKeyknoxValue {
+    override fun pullValue(params: KeyknoxPullParams?): EncryptedKeyknoxValue {
         val keyknoxValue: EncryptedKeyknoxValue
+        val tokenContext = TokenContext("keyknox", "get")
         if (params == null) {
             val url = URL(this.serviceUrl, "keyknox/v1")
-            val response = this.httpClient.send(url, Method.GET, token)
+            val response = this.httpClient.send(url, Method.GET, tokenContext)
             keyknoxValue = extractEncryptedKeyknoxValueV1(response)
         } else {
             val requestData = PullValueData(params.root, params.path, params.key, params.identity)
-            val body = ConvertionUtils.getGson().toJson(requestData)
             val url = URL(this.serviceUrl, "keyknox/v2/pull")
-            val response = this.httpClient.send(url, Method.POST, token, body)
+            val response = this.httpClient.send(url, Method.POST, tokenContext, requestData)
             keyknoxValue = extractEncryptedKeyknoxValueV2(response)
         }
         return keyknoxValue
     }
 
-    override fun resetValue(params: KeyknoxResetParams?, token: String): DecryptedKeyknoxValue {
+    override fun resetValue(params: KeyknoxResetParams?): DecryptedKeyknoxValue {
         var keyknoxValue: DecryptedKeyknoxValue
+        val tokenContext = TokenContext("keyknox", "delete")
         if (params == null) {
             val url = URL(this.serviceUrl, "keyknox/v1/reset")
-            val response = this.httpClient.send(url, Method.POST, token)
+            val response = this.httpClient.send(url, Method.POST, tokenContext)
             val hashCode = extractKeyknoxHash(response)
             val keyknoxData =
                 ConvertionUtils.getGson().fromJson(response.body, KeyknoxData::class.java)
-            //FIXME
-            val identity = ""
+            val identity = response.accessToken.identity
             keyknoxValue = DecryptedKeyknoxValue(keyknoxData, hashCode, identity)
         } else {
             val requestData = ResetValueData(params.root, params.path, params.key)
-            val body = ConvertionUtils.getGson().toJson(requestData)
             val url = URL(this.serviceUrl, "keyknox/v2/reset")
-            val response = this.httpClient.send(url, Method.POST, token, body)
+            val response = this.httpClient.send(url, Method.POST, tokenContext, requestData)
             val hashCode = extractKeyknoxHash(response)
             val keyknoxData =
                 ConvertionUtils.getGson().fromJson(response.body, KeyknoxDataV2::class.java)
@@ -174,8 +176,7 @@ class KeyknoxClient @JvmOverloads constructor(
     private fun extractEncryptedKeyknoxValueV1(response: Response): EncryptedKeyknoxValue {
         val hashCode = extractKeyknoxHash(response)
         val keyknoxData = ConvertionUtils.getGson().fromJson(response.body, KeyknoxData::class.java)
-        //FIXME
-        val identity = ""
+        val identity = response.accessToken.identity
         return EncryptedKeyknoxValue(keyknoxData, hashCode, identity)
     }
 

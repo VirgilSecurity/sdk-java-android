@@ -75,7 +75,7 @@ dependencies {
 task androidJavadocs(type: Javadoc, dependsOn: 'assembleRelease') {
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
     android.libraryVariants.all { variant ->
-        owner.classpath += variant.javaCompile.classpath
+        owner.classpath += variant.javaCompileProvider.get().classpath
     }
     source = android.sourceSets.main.java.srcDirs
     exclude '**/R.html', '**/R.*.html', '**/index.html'

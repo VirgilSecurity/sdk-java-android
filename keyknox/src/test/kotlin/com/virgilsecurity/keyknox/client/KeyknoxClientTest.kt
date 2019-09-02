@@ -39,36 +39,46 @@ import com.virgilsecurity.keyknox.utils.base64Encode
 import com.virgilsecurity.sdk.common.TimeSpan
 import com.virgilsecurity.sdk.crypto.*
 import com.virgilsecurity.sdk.jwt.JwtGenerator
+import com.virgilsecurity.sdk.jwt.accessProviders.CachingJwtProvider
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import java.net.URL
+import java.security.cert.CertPath
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 class KeyknoxClientTest {
 
     private val identity = UUID.randomUUID().toString()
+    private lateinit var root: String
+    private lateinit var path: String
+    private lateinit var key: String
     private lateinit var virgilCrypto: VirgilCrypto
     private lateinit var keyknoxClient: KeyknoxClientProtocol
-    private lateinit var tokenStr: String
     private lateinit var publicKey: VirgilPublicKey
     private lateinit var privateKey: VirgilPrivateKey
 
     @BeforeEach
     fun setup() {
+        this.root = UUID.randomUUID().toString()
+        this.path = UUID.randomUUID().toString()
+        this.key = UUID.randomUUID().toString()
         this.virgilCrypto = VirgilCrypto(false)
         val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
         this.privateKey = keyPair.privateKey
         this.publicKey = keyPair.publicKey
-        this.keyknoxClient = KeyknoxClient()
+
 
         val jwtGenerator = JwtGenerator(TestConfig.appId, TestConfig.apiKey, TestConfig.apiPublicKeyId, TimeSpan.fromTime(600, TimeUnit.SECONDS),
                 VirgilAccessTokenSigner(this.virgilCrypto))
-        this.tokenStr = jwtGenerator.generateToken(this.identity).stringRepresentation()
+        val tokenProvider = CachingJwtProvider(CachingJwtProvider.RenewJwtCallback { jwtGenerator.generateToken(identity) })
+        this.keyknoxClient = KeyknoxClient(tokenProvider, URL(TestConfig.keyknoxServiceAddress))
     }
 
     @Test
-    fun pushValue() {
+    fun pushValue_v1() {
         // KTC-1
         val data = base64Encode(UUID.randomUUID().toString())
 
@@ -95,23 +105,76 @@ class KeyknoxClientTest {
         var encryptedData = cipher.processEncryption(data)
         encryptedData += cipher.finishEncryption()
 
-        val pushedValue = this.keyknoxClient.pushValue(meta, encryptedData, null, this.tokenStr)
+        val pushedValue = this.keyknoxClient.pushValue(null, meta, encryptedData, null)
         assertArrayEquals(encryptedData, pushedValue.value)
         assertArrayEquals(meta, pushedValue.meta)
         assertEquals("1.0", pushedValue.version)
         assertNotNull(pushedValue.keyknoxHash)
-        assertFalse(pushedValue.keyknoxHash!!.isEmpty())
+        assertFalse(pushedValue.keyknoxHash.isEmpty())
 
-        val pulledValue = this.keyknoxClient.pullValue(this.tokenStr)
+        val pulledValue = this.keyknoxClient.pullValue(null)
         assertArrayEquals(encryptedData, pulledValue.value)
         assertArrayEquals(meta, pulledValue.meta)
         assertEquals("1.0", pulledValue.version)
         assertNotNull(pulledValue.keyknoxHash)
-        assertFalse(pulledValue.keyknoxHash!!.isEmpty())
+        assertFalse(pulledValue.keyknoxHash.isEmpty())
     }
 
     @Test
-    fun pushValue_updateData() {
+    @Disabled
+    fun pushValue_v2() {
+        // KTC-1
+        val data = base64Encode(UUID.randomUUID().toString())
+
+        val signer = Signer()
+        signer.setHash(Sha512())
+
+        signer.reset()
+        signer.appendData(data)
+
+        val signature = signer.sign(this.privateKey.privateKey)
+
+        val cipher = RecipientCipher()
+        cipher.setRandom(virgilCrypto.rng)
+        cipher.setEncryptionCipher(Aes256Gcm())
+
+        cipher.customParams().addData(VirgilCrypto.CUSTOM_PARAM_SIGNER_ID, privateKey.identifier)
+        cipher.customParams().addData(VirgilCrypto.CUSTOM_PARAM_SIGNATURE, signature)
+
+        cipher.addKeyRecipient(publicKey.identifier, this.publicKey.publicKey)
+
+        cipher.startEncryption()
+
+        val meta = cipher.packMessageInfo()
+        var encryptedData = cipher.processEncryption(data)
+        encryptedData += cipher.finishEncryption()
+
+        val pushParams = KeyknoxPushParams(listOf(this.identity), this.root, this.path, this.key)
+
+        val pushedValue = this.keyknoxClient.pushValue(pushParams, meta, encryptedData, null)
+        assertArrayEquals(encryptedData, pushedValue.value)
+        assertArrayEquals(meta, pushedValue.meta)
+        assertEquals(this.root, pushedValue.root)
+        assertEquals(this.path, pushedValue.path)
+        assertEquals(this.key, pushedValue.key)
+        assertEquals("1.0", pushedValue.version)
+        assertNotNull(pushedValue.keyknoxHash)
+        assertFalse(pushedValue.keyknoxHash.isEmpty())
+
+        val pullParams = KeyknoxPullParams(this.identity, this.root, this.path, this.key)
+        val pulledValue = this.keyknoxClient.pullValue(pullParams)
+        assertArrayEquals(encryptedData, pulledValue.value)
+        assertArrayEquals(meta, pulledValue.meta)
+        assertEquals(this.root, pulledValue.root)
+        assertEquals(this.path, pulledValue.path)
+        assertEquals(this.key, pulledValue.key)
+        assertEquals("1.0", pulledValue.version)
+        assertNotNull(pulledValue.keyknoxHash)
+        assertFalse(pulledValue.keyknoxHash.isEmpty())
+    }
+
+    @Test
+    fun pushValue_updateData_v1() {
         // KTC-2
         val data = base64Encode(UUID.randomUUID().toString())
         val data2 = base64Encode(UUID.randomUUID().toString())
@@ -139,7 +202,7 @@ class KeyknoxClientTest {
         var encryptedData = cipher.processEncryption(data)
         encryptedData += cipher.finishEncryption()
 
-        val pushedValue = this.keyknoxClient.pushValue(meta, encryptedData, null, this.tokenStr)
+        val pushedValue = this.keyknoxClient.pushValue(null, meta, encryptedData, null)
         assertArrayEquals(encryptedData, pushedValue.value)
 
         signer.reset()
@@ -162,49 +225,201 @@ class KeyknoxClientTest {
         var encryptedData2 = cipher2.processEncryption(data2)
         encryptedData2 += cipher2.finishEncryption()
 
-        val pushedValue2 = this.keyknoxClient.pushValue(meta2, encryptedData2, pushedValue.keyknoxHash, this.tokenStr)
+        val pushedValue2 = this.keyknoxClient.pushValue(null, meta2, encryptedData2, pushedValue.keyknoxHash)
         assertArrayEquals(encryptedData2, pushedValue2.value)
         assertArrayEquals(meta2, pushedValue2.meta)
         assertEquals("2.0", pushedValue2.version)
         assertNotNull(pushedValue2.keyknoxHash)
-        assertFalse(pushedValue2.keyknoxHash!!.isEmpty())
+        assertFalse(pushedValue2.keyknoxHash.isEmpty())
     }
 
     @Test
-    fun pullValue_empty() {
+    @Disabled
+    fun pushValue_updateData_v2() {
+        // KTC-2
+        val data = base64Encode(UUID.randomUUID().toString())
+        val data2 = base64Encode(UUID.randomUUID().toString())
+
+        val signer = Signer()
+        signer.setHash(Sha512())
+
+        signer.reset()
+        signer.appendData(data)
+
+        val signature = signer.sign(this.privateKey.privateKey)
+
+        val cipher = RecipientCipher()
+        cipher.setRandom(virgilCrypto.rng)
+        cipher.setEncryptionCipher(Aes256Gcm())
+
+        cipher.customParams().addData(VirgilCrypto.CUSTOM_PARAM_SIGNER_ID, privateKey.identifier)
+        cipher.customParams().addData(VirgilCrypto.CUSTOM_PARAM_SIGNATURE, signature)
+
+        cipher.addKeyRecipient(publicKey.identifier, this.publicKey.publicKey)
+
+        cipher.startEncryption()
+
+        val meta = cipher.packMessageInfo()
+        var encryptedData = cipher.processEncryption(data)
+        encryptedData += cipher.finishEncryption()
+
+        val pushParams = KeyknoxPushParams(listOf(this.identity), this.root, this.path, this.key)
+        val pushedValue = this.keyknoxClient.pushValue(pushParams, meta, encryptedData, null)
+        assertArrayEquals(encryptedData, pushedValue.value)
+
+        signer.reset()
+        signer.appendData(data2)
+
+        val signature2 = signer.sign(this.privateKey.privateKey)
+
+        val cipher2 = RecipientCipher()
+        cipher2.setRandom(virgilCrypto.rng)
+        cipher2.setEncryptionCipher(Aes256Gcm())
+
+        cipher2.customParams().addData(VirgilCrypto.CUSTOM_PARAM_SIGNER_ID, privateKey.identifier)
+        cipher2.customParams().addData(VirgilCrypto.CUSTOM_PARAM_SIGNATURE, signature2)
+
+        cipher2.addKeyRecipient(publicKey.identifier, this.publicKey.publicKey)
+
+        cipher2.startEncryption()
+
+        val meta2 = cipher2.packMessageInfo()
+        var encryptedData2 = cipher2.processEncryption(data2)
+        encryptedData2 += cipher2.finishEncryption()
+
+        val pushedValue2 = this.keyknoxClient.pushValue(pushParams, meta2, encryptedData2, pushedValue.keyknoxHash)
+        assertArrayEquals(encryptedData2, pushedValue2.value)
+        assertArrayEquals(meta2, pushedValue2.meta)
+        assertEquals(this.root, pushedValue.root)
+        assertEquals(this.path, pushedValue.path)
+        assertEquals(this.key, pushedValue.key)
+        assertEquals("2.0", pushedValue2.version)
+        assertNotNull(pushedValue2.keyknoxHash)
+        assertFalse(pushedValue2.keyknoxHash.isEmpty())
+    }
+
+
+
+    @Test
+    fun pullValue_empty_v1() {
         // KTC-3
-        val pulledValue = this.keyknoxClient.pullValue(this.tokenStr)
+        val pulledValue = this.keyknoxClient.pullValue(null)
         assertNotNull(pulledValue.value)
-        assertTrue(pulledValue.value!!.isEmpty())
+        assertTrue(pulledValue.value.isEmpty())
         assertNotNull(pulledValue.meta)
-        assertTrue(pulledValue.meta!!.isEmpty())
+        assertTrue(pulledValue.meta.isEmpty())
         assertEquals("1.0", pulledValue.version)
     }
 
     @Test
-    fun resetValue() {
+    @Disabled
+    fun pullValue_empty_v2() {
+        // KTC-3
+        val pullParams = KeyknoxPullParams(this.identity, this.root, this.path, this.key)
+        val pulledValue = this.keyknoxClient.pullValue(pullParams)
+        assertNotNull(pulledValue.value)
+        assertTrue(pulledValue.value.isEmpty())
+        assertNotNull(pulledValue.meta)
+        assertTrue(pulledValue.meta.isEmpty())
+        assertEquals("1.0", pulledValue.version)
+    }
+
+    @Test
+    fun resetValue_v1() {
         // KTC-4
         val data = base64Encode(UUID.randomUUID().toString())
         val meta = base64Encode(UUID.randomUUID().toString())
-        val pushedValue = this.keyknoxClient.pushValue(meta, data, null, this.tokenStr)
+        val pushedValue = this.keyknoxClient.pushValue(null, meta, data, null)
         assertArrayEquals(data, pushedValue.value)
 
-        val resetValue = this.keyknoxClient.resetValue(this.tokenStr)
+        val resetValue = this.keyknoxClient.resetValue(null)
         assertNotNull(resetValue.value)
-        assertTrue(resetValue.value!!.isEmpty())
+        assertTrue(resetValue.value.isEmpty())
         assertNotNull(resetValue.meta)
-        assertTrue(resetValue.meta!!.isEmpty())
+        assertTrue(resetValue.meta.isEmpty())
         assertEquals("2.0", resetValue.version)
     }
 
     @Test
-    fun resetValue_empty() {
-        // KTC-5
-        val resetValue = this.keyknoxClient.resetValue(this.tokenStr)
+    @Disabled
+    fun resetValue_v2() {
+        // KTC-4
+        val data = base64Encode(UUID.randomUUID().toString())
+        val meta = base64Encode(UUID.randomUUID().toString())
+        val pushParams = KeyknoxPushParams(listOf(this.identity), this.root, this.path, this.key)
+        val pushedValue = this.keyknoxClient.pushValue(pushParams, meta, data, null)
+        assertArrayEquals(data, pushedValue.value)
+
+        val resetParams = KeyknoxResetParams(this.root, this.path, this.key)
+        val resetValue = this.keyknoxClient.resetValue(resetParams)
         assertNotNull(resetValue.value)
-        assertTrue(resetValue.value!!.isEmpty())
+        assertTrue(resetValue.value.isEmpty())
         assertNotNull(resetValue.meta)
-        assertTrue(resetValue.meta!!.isEmpty())
+        assertTrue(resetValue.meta.isEmpty())
+        assertEquals("2.0", resetValue.version)
+    }
+
+    @Test
+    fun resetValue_empty_v1() {
+        // KTC-5
+        val resetValue = this.keyknoxClient.resetValue(null)
+        assertNotNull(resetValue.value)
+        assertTrue(resetValue.value.isEmpty())
+        assertNotNull(resetValue.meta)
+        assertTrue(resetValue.meta.isEmpty())
         assertEquals("1.0", resetValue.version)
+    }
+
+    @Test
+    @Disabled
+    fun resetValue_empty_v2() {
+        // KTC-5
+        val resetParams = KeyknoxResetParams(this.root, this.path, this.key)
+        val resetValue = this.keyknoxClient.resetValue(resetParams)
+        assertNotNull(resetValue.value)
+        assertTrue(resetValue.value.isEmpty())
+        assertNotNull(resetValue.meta)
+        assertTrue(resetValue.meta.isEmpty())
+        assertEquals("1.0", resetValue.version)
+    }
+
+    @Test
+    @Disabled
+    fun getKeys() {
+        val data = base64Encode(UUID.randomUUID().toString())
+
+        val signer = Signer()
+        signer.setHash(Sha512())
+
+        signer.reset()
+        signer.appendData(data)
+
+        val signature = signer.sign(this.privateKey.privateKey)
+
+        val cipher = RecipientCipher()
+        cipher.setRandom(virgilCrypto.rng)
+        cipher.setEncryptionCipher(Aes256Gcm())
+
+        cipher.customParams().addData(VirgilCrypto.CUSTOM_PARAM_SIGNER_ID, privateKey.identifier)
+        cipher.customParams().addData(VirgilCrypto.CUSTOM_PARAM_SIGNATURE, signature)
+
+        cipher.addKeyRecipient(publicKey.identifier, this.publicKey.publicKey)
+
+        cipher.startEncryption()
+
+        val meta = cipher.packMessageInfo()
+        var encryptedData = cipher.processEncryption(data)
+        encryptedData += cipher.finishEncryption()
+
+        val pushParams = KeyknoxPushParams(listOf(this.identity), this.root, this.path, this.key)
+
+        val pushedValue = this.keyknoxClient.pushValue(pushParams, meta, encryptedData, null)
+        assertNotNull(pushedValue.keyknoxHash)
+
+        val getKeysParams = KeyknoxGetKeysParams(this.identity, this.root, this.path)
+        val keys = this.keyknoxClient.getKeys(getKeysParams)
+        assertNotNull(keys)
+        assertEquals(1, keys.size)
+        assertEquals(this.key, keys.firstOrNull())
     }
 }

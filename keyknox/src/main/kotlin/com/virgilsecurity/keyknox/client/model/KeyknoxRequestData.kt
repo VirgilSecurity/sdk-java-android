@@ -52,8 +52,7 @@ class PushValueData(
     var key: String? = null
 
     @SerializedName("identities")
-    var identities: Collection<String> = emptySet()
-
+    var identities: Collection<String>? = null
 }
 
 class PullValueData(

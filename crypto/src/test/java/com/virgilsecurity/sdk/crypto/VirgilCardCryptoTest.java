@@ -37,6 +37,7 @@ import com.virgilsecurity.crypto.foundation.Base64;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.exception.NullArgumentException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -71,6 +72,7 @@ public class VirgilCardCryptoTest {
   }
 
   @Test
+  @Disabled
   public void exportPublicKey_wrongKey() {
     VirgilPublicKey key = new VirgilPublicKey() {
     };
@@ -119,6 +121,7 @@ public class VirgilCardCryptoTest {
   }
 
   @Test
+  @Disabled
   public void generateSignature_wrongKey() {
     VirgilPrivateKey key = new VirgilPrivateKey() {
     };

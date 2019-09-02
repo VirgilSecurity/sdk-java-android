@@ -39,6 +39,8 @@ import com.virgilsecurity.keyknox.exception.KeyknoxServiceException
 import com.virgilsecurity.keyknox.utils.Loggable
 import com.virgilsecurity.keyknox.utils.Serializer
 import com.virgilsecurity.sdk.common.ErrorResponse
+import com.virgilsecurity.sdk.jwt.TokenContext
+import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider
 import com.virgilsecurity.sdk.utils.ConvertionUtils
 import com.virgilsecurity.sdk.utils.OsUtils
 import com.virgilsecurity.sdk.utils.StringUtils
@@ -51,20 +53,20 @@ import java.util.logging.Level
 class HttpClient : HttpClientProtocol, Loggable {
 
     private val virgilAgentHeader: String
+    private val accessTokenProvider: AccessTokenProvider
 
-    constructor() {
-        virgilAgentHeader =
-                "$VIRGIL_AGENT_PRODUCT;$VIRGIL_AGENT_FAMILY;${OsUtils.getOsAgentName()};${VersionVirgilAgent.VERSION}"
-    }
+    constructor(accessTokenProvider: AccessTokenProvider) : this(accessTokenProvider, VIRGIL_AGENT_PRODUCT, VersionVirgilAgent.VERSION)
 
-    constructor(product: String, version: String) {
+    constructor(accessTokenProvider: AccessTokenProvider, product: String, version: String) {
+        this.accessTokenProvider = accessTokenProvider
         virgilAgentHeader = "$product;$VIRGIL_AGENT_FAMILY;${OsUtils.getOsAgentName()};$version"
     }
 
-    override fun send(url: URL, method: Method, accessToken: String, body: Any?, headers: Map<String, String>?): Response {
+    override fun send(url: URL, method: Method, tokenContext: TokenContext, body: Any?, headers: Map<String, String>?): Response {
         try {
             logger().fine("${method.name} to $url")
-            val urlConnection = createConnection(url, method, accessToken)
+            val accessToken = accessTokenProvider.getToken(tokenContext)
+            val urlConnection = createConnection(url, method, accessToken.stringRepresentation())
             headers?.forEach { (key, value) ->
                 urlConnection.setRequestProperty(key, value)
             }
@@ -88,7 +90,7 @@ class HttpClient : HttpClientProtocol, Loggable {
                             val error = ConvertionUtils.getGson().fromJson(responseBody, ErrorResponse::class.java)
                             throw KeyknoxServiceException(urlConnection.responseCode, error.code, error.message)
                         } else {
-                            throw KeyknoxServiceException(urlConnection.responseCode)
+                            throw KeyknoxServiceException(urlConnection.responseCode, -1, urlConnection.responseMessage)
                         }
                     }
                 } else {
@@ -101,7 +103,7 @@ class HttpClient : HttpClientProtocol, Loggable {
                                 headerFields[key.toLowerCase()] = value.first()
                             }
                         }
-                        return Response(responseBody, headerFields)
+                        return Response(responseBody, headerFields, accessToken)
                     }
                 }
             } finally {
@@ -112,7 +114,6 @@ class HttpClient : HttpClientProtocol, Loggable {
             logger().log(Level.SEVERE, "Connection error", e)
             throw KeyknoxServiceException(-1)
         }
-
     }
 
     private fun createConnection(url: URL, method: Method, accessToken: String): HttpURLConnection {

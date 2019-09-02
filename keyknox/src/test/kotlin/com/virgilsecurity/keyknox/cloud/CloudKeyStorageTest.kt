@@ -86,11 +86,10 @@ class CloudKeyStorageTest {
                 VirgilAccessTokenSigner(this.virgilCrypto))
         this.provider = CachingJwtProvider(CachingJwtProvider.RenewJwtCallback { jwtGenerator.generateToken(identity) })
 
-        this.keyknoxClient = KeyknoxClient()
-        this.keyknoxManager = KeyknoxManager(accessTokenProvider = provider, keyknoxClient = this.keyknoxClient, crypto = this.keyknoxCrypto,
-                privateKey = this.privateKey, publicKeys = this.publicKeys, retryOnUnauthorized = false)
+        this.keyknoxClient = KeyknoxClient(this.provider)
+        this.keyknoxManager = KeyknoxManager(this.keyknoxClient, this.keyknoxCrypto)
 
-        this.keyStorage = CloudKeyStorage(this.keyknoxManager)
+        this.keyStorage = CloudKeyStorage(this.keyknoxManager, this.publicKeys, this.privateKey)
     }
 
     @Test
@@ -583,7 +582,7 @@ class CloudKeyStorageTest {
         this.keyStorage.deleteAllEntries()
         assertTrue(this.keyStorage.retrieveAllEntries().isEmpty())
     }
-
+/*
     @Test
     fun serializeEntries() {
         // KTC-17
@@ -659,5 +658,5 @@ class CloudKeyStorageTest {
         assertNotNull(entries)
         assertTrue(entries.isEmpty())
     }
-
+*/
 }

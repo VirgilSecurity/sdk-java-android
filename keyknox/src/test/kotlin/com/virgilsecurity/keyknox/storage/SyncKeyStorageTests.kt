@@ -38,7 +38,6 @@ import com.virgilsecurity.keyknox.TestConfig
 import com.virgilsecurity.keyknox.client.KeyknoxClient
 import com.virgilsecurity.keyknox.cloud.CloudKeyStorage
 import com.virgilsecurity.keyknox.cloud.CloudKeyStorageProtocol
-import com.virgilsecurity.keyknox.crypto.KeyknoxCrypto
 import com.virgilsecurity.keyknox.exception.CloudEntryNotFoundWhileUpdatingException
 import com.virgilsecurity.keyknox.exception.CloudStorageOutOfSyncException
 import com.virgilsecurity.keyknox.exception.DecryptionFailedException
@@ -78,30 +77,50 @@ class SyncKeyStorageTests {
         this.privateKey = keyPair.privateKey
         this.publicKey = keyPair.publicKey
 
-        val jwtGenerator = JwtGenerator(TestConfig.appId, TestConfig.apiKey, TestConfig.apiPublicKeyId, TimeSpan.fromTime(100, TimeUnit.SECONDS),
-                VirgilAccessTokenSigner(this.virgilCrypto))
-        val provider = CachingJwtProvider(CachingJwtProvider.RenewJwtCallback { jwtGenerator.generateToken(identity) })
-        val keyknoxClient = KeyknoxClient()
-        this.keyknoxManager = KeyknoxManager(accessTokenProvider = provider, keyknoxClient = keyknoxClient, crypto = KeyknoxCrypto(),
-                privateKey = this.privateKey, publicKeys = arrayListOf(this.publicKey), retryOnUnauthorized = false)
+        val jwtGenerator = JwtGenerator(
+            TestConfig.appId,
+            TestConfig.apiKey,
+            TestConfig.apiPublicKeyId,
+            TimeSpan.fromTime(100, TimeUnit.SECONDS),
+            VirgilAccessTokenSigner(this.virgilCrypto)
+        )
+        val provider = CachingJwtProvider(CachingJwtProvider.RenewJwtCallback {
+            jwtGenerator.generateToken(identity)
+        })
+        val keyknoxClient = KeyknoxClient(provider)
+        this.keyknoxManager = KeyknoxManager(keyknoxClient)
 
-        this.cloudKeyStorage = CloudKeyStorage(this.keyknoxManager)
+        this.cloudKeyStorage =
+            CloudKeyStorage(this.keyknoxManager, listOf(this.publicKey), this.privateKey)
         this.cloudKeyStorage.retrieveCloudEntries()
 
-        val cloudKeyStorage = CloudKeyStorage(this.keyknoxManager)
-        this.keyStorage = DefaultKeyStorage(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString())
+        val cloudKeyStorage =
+            CloudKeyStorage(this.keyknoxManager, listOf(this.publicKey), this.privateKey)
+        this.keyStorage =
+            DefaultKeyStorage(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString())
         this.keychainStorageWrapper = KeyStorageWrapper(this.identity, this.keyStorage)
-        this.syncKeyStorage = SyncKeyStorage(identity = this.identity, keyStorage = this.keyStorage, cloudKeyStorage = cloudKeyStorage)
+        this.syncKeyStorage = SyncKeyStorage(
+            identity = this.identity,
+            keyStorage = this.keyStorage,
+            cloudKeyStorage = cloudKeyStorage
+        )
     }
 
     @Test
     fun init() {
-        val jwtGenerator = JwtGenerator(TestConfig.appId, TestConfig.apiKey, TestConfig.apiPublicKeyId, TimeSpan.fromTime(100, TimeUnit.SECONDS),
-                VirgilAccessTokenSigner(this.virgilCrypto))
+        val jwtGenerator = JwtGenerator(
+            TestConfig.appId,
+            TestConfig.apiKey,
+            TestConfig.apiPublicKeyId,
+            TimeSpan.fromTime(100, TimeUnit.SECONDS),
+            VirgilAccessTokenSigner(this.virgilCrypto)
+        )
 
         // Setup Access Token provider to provide access token for Virgil services
         // Check https://github.com/VirgilSecurity/virgil-sdk-java-android
-        val accessTokenProvider = CachingJwtProvider(CachingJwtProvider.RenewJwtCallback { jwtGenerator.generateToken(identity) })
+        val accessTokenProvider = CachingJwtProvider(CachingJwtProvider.RenewJwtCallback {
+            jwtGenerator.generateToken(identity)
+        })
 
         // Download public keys of users that should have access to data from Virgil Cards service
         // Check https://github.com/VirgilSecurity/virgil-sdk-java-android
@@ -110,8 +129,13 @@ class SyncKeyStorageTests {
         // Load private key from Keychain
         val privateKey = this.privateKey
 
-        val syncKeyStorage = SyncKeyStorage(identity = "Alice", accessTokenProvider = accessTokenProvider,
-                publicKeys = publicKeys, privateKey = privateKey)
+        val syncKeyStorage = SyncKeyStorage(
+            identity = "Alice",
+            accessTokenProvider = accessTokenProvider,
+            crypto = this.virgilCrypto,
+            publicKeys = publicKeys,
+            privateKey = privateKey
+        )
 
         syncKeyStorage.sync()
         assertTrue(syncKeyStorage.retrieveAll().isEmpty())
@@ -285,23 +309,30 @@ class SyncKeyStorageTests {
     @Test
     fun updateRecipients() {
         // KTC-33
+        this.syncKeyStorage.sync()
+
         val name = UUID.randomUUID().toString()
         val data = ConvertionUtils.toBytes(UUID.randomUUID().toString())
-
-        val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
-        val newPublicKeys = arrayListOf(keyPair.publicKey, this.virgilCrypto.generateKeyPair(KeyType.ED25519).publicKey)
-        val newPrivateKey = keyPair.privateKey
-
-        this.syncKeyStorage.sync()
         this.syncKeyStorage.store(name, data)
 
+        val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+        val newPublicKeys = arrayListOf(
+            keyPair.publicKey,
+            this.virgilCrypto.generateKeyPair(KeyType.ED25519).publicKey
+        )
+        val newPrivateKey = keyPair.privateKey
         this.syncKeyStorage.updateRecipients(newPublicKeys, newPrivateKey)
 
-        val pubIds = keyknoxManager.publicKeys.map {
-            (it as VirgilPublicKey).identifier
+        val cloudKeyStorage = this.syncKeyStorage.cloudKeyStorage as CloudKeyStorage
+        val pubIds = cloudKeyStorage.publicKeys.map {
+            it.identifier
         }
+        assertEquals(newPublicKeys.size, pubIds.size)
         assertEquals(newPublicKeys.map { it.identifier }, pubIds)
-        assertEquals(newPrivateKey.identifier, (keyknoxManager.privateKey as VirgilPrivateKey).identifier)
+        assertEquals(
+            newPrivateKey.identifier,
+            (cloudKeyStorage.privateKey as VirgilPrivateKey).identifier
+        )
 
         val keychainEntry2 = this.syncKeyStorage.retrieve(name)
         assertEquals(name, keychainEntry2.name)
@@ -326,8 +357,12 @@ class SyncKeyStorageTests {
         this.syncKeyStorage.sync()
 
         assertTrue(this.keychainStorageWrapper.retrieveAll().isEmpty())
-        this.syncKeyStorage.store(arrayListOf(this.keyStorage.createEntry(name1, data1),
-                this.keyStorage.createEntry(name2, data2)))
+        this.syncKeyStorage.store(
+            arrayListOf(
+                this.keyStorage.createEntry(name1, data1),
+                this.keyStorage.createEntry(name2, data2)
+            )
+        )
 
         this.cloudKeyStorage.retrieveCloudEntries()
 
@@ -363,8 +398,12 @@ class SyncKeyStorageTests {
         this.syncKeyStorage.sync()
         assertTrue(this.keychainStorageWrapper.retrieveAll().isEmpty())
 
-        this.syncKeyStorage.store(arrayListOf(this.keyStorage.createEntry(name1, data1),
-                this.keyStorage.createEntry(name2, data2), this.keyStorage.createEntry(name3, data3)))
+        this.syncKeyStorage.store(
+            arrayListOf(
+                this.keyStorage.createEntry(name1, data1),
+                this.keyStorage.createEntry(name2, data2), this.keyStorage.createEntry(name3, data3)
+            )
+        )
         this.syncKeyStorage.delete(arrayListOf(name1, name2))
 
         this.cloudKeyStorage.retrieveCloudEntries()
@@ -397,8 +436,12 @@ class SyncKeyStorageTests {
         val fakeData2 = ConvertionUtils.toBytes(UUID.randomUUID().toString())
 
         this.syncKeyStorage.sync()
-        this.syncKeyStorage.store(arrayListOf(this.keyStorage.createEntry(name1, data1),
-                this.keyStorage.createEntry(name2, data2)))
+        this.syncKeyStorage.store(
+            arrayListOf(
+                this.keyStorage.createEntry(name1, data1),
+                this.keyStorage.createEntry(name2, data2)
+            )
+        )
 
         val fakeCloudEntry = CloudEntry("name1", fakeData, Date(), Date())
 
@@ -429,8 +472,12 @@ class SyncKeyStorageTests {
         val data2 = ConvertionUtils.toBytes(UUID.randomUUID().toString())
 
         this.syncKeyStorage.sync()
-        this.syncKeyStorage.store(arrayListOf(this.keyStorage.createEntry(name1, data1),
-                this.keyStorage.createEntry(name2, data2)))
+        this.syncKeyStorage.store(
+            arrayListOf(
+                this.keyStorage.createEntry(name1, data1),
+                this.keyStorage.createEntry(name2, data2)
+            )
+        )
 
         this.syncKeyStorage.deleteAll()
         assertTrue(this.cloudKeyStorage.retrieveAllEntries().isEmpty())
@@ -518,14 +565,25 @@ class SyncKeyStorageTests {
         val privateKey2 = keyPair2.privateKey
         val publicKey2 = keyPair2.publicKey
 
-        val jwtGenerator = JwtGenerator(TestConfig.appId, TestConfig.apiKey, TestConfig.apiPublicKeyId, TimeSpan.fromTime(100, TimeUnit.SECONDS),
-                VirgilAccessTokenSigner(this.virgilCrypto))
-        val provider = CachingJwtProvider(CachingJwtProvider.RenewJwtCallback { jwtGenerator.generateToken(identity) })
-        var keyknoxManager = KeyknoxManager(accessTokenProvider = provider, keyknoxClient = KeyknoxClient(), crypto = KeyknoxCrypto(),
-                privateKey = privateKey2, publicKeys = arrayListOf(publicKey2), retryOnUnauthorized = false)
+        val jwtGenerator = JwtGenerator(
+            TestConfig.appId,
+            TestConfig.apiKey,
+            TestConfig.apiPublicKeyId,
+            TimeSpan.fromTime(100, TimeUnit.SECONDS),
+            VirgilAccessTokenSigner(this.virgilCrypto)
+        )
+        val provider = CachingJwtProvider(CachingJwtProvider.RenewJwtCallback {
+            jwtGenerator.generateToken(identity)
+        })
+        var keyknoxManager = KeyknoxManager(KeyknoxClient(provider))
 
-        val keyStorage = DefaultKeyStorage(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString())
-        var syncKeyStorage2 = SyncKeyStorage(identity = this.identity, keyStorage = keyStorage, cloudKeyStorage = CloudKeyStorage(keyknoxManager))
+        val keyStorage =
+            DefaultKeyStorage(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString())
+        var syncKeyStorage2 = SyncKeyStorage(
+            identity = this.identity,
+            keyStorage = keyStorage,
+            cloudKeyStorage = CloudKeyStorage(keyknoxManager, listOf(publicKey2), privateKey2)
+        )
 
         val name = UUID.randomUUID().toString()
         val data = virgilCrypto.exportPublicKey(publicKey2)
@@ -548,9 +606,16 @@ class SyncKeyStorageTests {
         }
 
         // Reinit syncKeyStorage2
-        keyknoxManager = KeyknoxManager(accessTokenProvider = provider, keyknoxClient = KeyknoxClient(), crypto = KeyknoxCrypto(),
-                privateKey = privateKey2, publicKeys = arrayListOf(this.publicKey, publicKey2), retryOnUnauthorized = false)
-        syncKeyStorage2 = SyncKeyStorage(identity = this.identity, keyStorage = keyStorage, cloudKeyStorage = CloudKeyStorage(keyknoxManager))
+        keyknoxManager = KeyknoxManager(KeyknoxClient(provider))
+        syncKeyStorage2 = SyncKeyStorage(
+            identity = this.identity,
+            keyStorage = keyStorage,
+            cloudKeyStorage = CloudKeyStorage(
+                keyknoxManager,
+                arrayListOf(this.publicKey, publicKey2),
+                privateKey2
+            )
+        )
 
         syncKeyStorage2.sync()
         assertEquals(1, syncKeyStorage2.retrieveAll().size)

@@ -57,6 +57,10 @@ class KeyknoxManager(
 ) {
 
     constructor(
+        keyknoxClient: KeyknoxClientProtocol
+    ) : this(keyknoxClient, KeyknoxCrypto(VirgilCrypto()))
+
+    constructor(
         accessTokenProvider: AccessTokenProvider,
         crypto: VirgilCrypto
     ) : this(KeyknoxClient(accessTokenProvider), KeyknoxCrypto(crypto))

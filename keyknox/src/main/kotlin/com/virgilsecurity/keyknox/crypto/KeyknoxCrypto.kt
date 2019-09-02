@@ -49,6 +49,8 @@ import java.util.*
 
 class KeyknoxCrypto(private val crypto: VirgilCrypto) : KeyknoxCryptoProtocol {
 
+    constructor(): this(VirgilCrypto())
+
     @Throws(CryptoException::class, IllegalArgumentException::class)
     override fun encrypt(data: ByteArray,
                          privateKey: VirgilPrivateKey,
@@ -98,6 +100,7 @@ class KeyknoxCrypto(private val crypto: VirgilCrypto) : KeyknoxCryptoProtocol {
                 identities = encryptedKeyknoxValue.identities,
                 meta = ByteArray(0),
                 value = ByteArray(0),
+                version = encryptedKeyknoxValue.version,
                 keyknoxHash = encryptedKeyknoxValue.keyknoxHash
             )
         }
@@ -153,6 +156,7 @@ class KeyknoxCrypto(private val crypto: VirgilCrypto) : KeyknoxCryptoProtocol {
             identities = encryptedKeyknoxValue.identities,
             meta = meta,
             value = decryptedData,
+            version = encryptedKeyknoxValue.version,
             keyknoxHash = encryptedKeyknoxValue.keyknoxHash)
     }
 }
