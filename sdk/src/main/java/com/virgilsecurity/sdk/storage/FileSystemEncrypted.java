@@ -41,7 +41,6 @@ import java.io.*;
 import java.nio.file.InvalidPathException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * FileSystemEncrypted class. Intended for storing data as plain files. Optionally can encrypt stored files.
@@ -139,7 +138,7 @@ public class FileSystemEncrypted {
     }
 
     /**
-     * Write data.
+     * Write data. Will overwrite existing data, to avoid this please, use {@link #exists(String)} method first.
      *
      * @param data Data to write.
      * @param name File name.
@@ -154,6 +153,10 @@ public class FileSystemEncrypted {
      * @return Data.
      */
     public Data read(String name, String subdir) throws IOException, CryptoException {
+        if (name == null) {
+            throw new NullArgumentException("name");
+        }
+
         File file;
         if (subdir != null) {
             file = new File(this.rootPath + File.separator + subdir, name);
@@ -209,14 +212,17 @@ public class FileSystemEncrypted {
         }
 
         Set<String> fileNames;
-        if (directory.exists() || directory.isDirectory()) {
-            fileNames = new HashSet<>();
-            //noinspection ConstantConditions
-            for (File file : directory.listFiles()) {
-                fileNames.add(file.getName());
-            }
-        } else {
-            throw new InvalidPathException(directory.getPath(), "Cannot list files in directory: \'" + subdir + "\'");
+        if (!directory.exists()) {
+            throw new InvalidPathException(directory.getPath(), "Directory: \'" + subdir + "\' doesn\'t exist.");
+        }
+        if (!directory.isDirectory()) {
+            throw new InvalidPathException(directory.getPath(), "Isn\'t a directory: \'" + subdir + "\'");
+        }
+
+        fileNames = new HashSet<>();
+        //noinspection ConstantConditions
+        for (File file : directory.listFiles()) {
+            fileNames.add(file.getName());
         }
 
 
@@ -239,6 +245,10 @@ public class FileSystemEncrypted {
      * @param subdir Subdirectory.
      */
     public boolean delete(String name, String subdir) {
+        if (name == null) {
+            throw new NullArgumentException("name");
+        }
+
         File file;
         if (subdir != null) {
             file = new File(this.rootPath + File.separator + subdir, name);
@@ -254,8 +264,8 @@ public class FileSystemEncrypted {
      *
      * @param name File name.
      */
-    public void delete(String name) {
-        delete(name, null);
+    public boolean delete(String name) {
+        return delete(name, null);
     }
 
     /**
@@ -263,7 +273,7 @@ public class FileSystemEncrypted {
      *
      * @param subdir Subdirectory.
      */
-    public boolean deleteSubDir(String subdir) {
+    public boolean deleteSubdir(String subdir) {
         File directory;
         if (subdir != null) {
             directory = new File(this.rootPath + File.separator + subdir);
@@ -273,4 +283,57 @@ public class FileSystemEncrypted {
 
         return directory.delete();
     } // TODO add tests
+
+    /**
+     * Checks whether file exists.
+     *
+     * @param name   Name of file.
+     * @param subdir Subdirectory.
+     * @return {@code true} if file exists, otherwise {@code false}.
+     */
+    public boolean exists(String name, String subdir) throws IOException {
+        if (name == null) {
+            throw new NullArgumentException("name");
+        }
+
+        File file;
+        if (subdir != null) {
+            file = new File(this.rootPath + File.separator + subdir, name);
+        } else {
+            file = new File(this.rootPath, name);
+        }
+
+        if (file.isDirectory()) {
+            throw new IOException("Specified file is a directory. Please, use \'existsSubdir\' method instead.");
+        }
+        return file.exists();
+    }
+
+    /**
+     * Checks whether file exists.
+     *
+     * @param name Name of file.
+     * @return {@code true} if file exists, otherwise {@code false}.
+     */
+    public boolean exists(String name) throws IOException {
+        return exists(name, null);
+    }
+
+    /**
+     * Checks whether subdirectory exists.
+     *
+     * @param subdir Name of subdirectory.
+     * @return {@code true} if subdirectory exists, otherwise {@code false}.
+     */
+    public boolean existsSubdir(String subdir) throws IOException {
+        if (subdir == null) {
+            throw new NullArgumentException("subdir");
+        }
+
+        File file = new File(this.rootPath, subdir);
+        if (!file.isDirectory()) {
+            throw new IOException("Specified directory is a file. Please, use \'exists\' method instead.");
+        }
+        return file.exists();
+    }
 }

@@ -37,6 +37,7 @@ import com.virgilsecurity.crypto.foundation.Base64;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 /**
  * Data class that represents binary data with convenient transformations to/from Base64 string.
@@ -51,6 +52,10 @@ public class Data {
      * @param data
      */
     public Data(byte[] data) {
+        if (data == null) {
+            throw new IllegalArgumentException("\'data\' cannot be null");
+        }
+
         this.data = data;
     }
 
@@ -60,6 +65,10 @@ public class Data {
      * @return
      */
     public static Data fromBase64String(String base64) {
+        if (base64 == null) {
+            throw new IllegalArgumentException("\'base64\' cannot be null");
+        }
+
         return new Data(Base64.decode(base64.getBytes(StandardCharsets.UTF_8)));
     }
 
@@ -70,6 +79,13 @@ public class Data {
      * @return
      */
     public static Data fromBase64String(String base64, Charset charset) {
+        if (base64 == null) {
+            throw new IllegalArgumentException("\'base64\' cannot be null");
+        }
+        if (charset == null) {
+            throw new IllegalArgumentException("\'charset\' cannot be null");
+        }
+
         return new Data(Base64.decode(base64.getBytes(charset)));
     }
 
@@ -87,6 +103,10 @@ public class Data {
      * @return
      */
     public String toBase64String(Charset charset) {
+        if (charset == null) {
+            throw new IllegalArgumentException("\'charset\' cannot be null");
+        }
+
         return new String(Base64.encode(data), charset);
     }
 
@@ -96,5 +116,18 @@ public class Data {
      */
     public byte[] getData() {
         return data;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Data data1 = (Data) o;
+        return Arrays.equals(data, data1.data);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(data);
     }
 }
