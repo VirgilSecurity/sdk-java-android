@@ -31,22 +31,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.common.callback;
+package com.virgilsecurity.common.callback
 
 /**
  * Interface that is intended to signal if some asynchronous process is completed successfully
  * or not.
  */
-public interface OnCompleteListener {
+interface OnCompleteListener {
 
     /**
      * This method will be called if asynchronous process is completed successfully.
      */
-    void onSuccess();
+    fun onSuccess()
 
     /**
      * This method will be called if asynchronous process is failed and provide [throwable]
      * cause.
      */
-    void onError(Throwable throwable);
+    fun onError(throwable: Throwable)
 }

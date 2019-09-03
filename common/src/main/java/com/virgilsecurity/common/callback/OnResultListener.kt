@@ -31,23 +31,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.common.callback;
+package com.virgilsecurity.common.callback
 
 /**
  * Interface that is intended to return *<T>* type result if some asynchronous process is
  * completed successfully, otherwise error will be returned.
- */
-interface OnResultListener<T> {
+</T> */
+internal interface OnResultListener<T> {
 
     /**
      * This method will be called if asynchronous process is completed successfully and
      * provide *<T>* type [result].
-     */
-    void onSuccess(T result);
+    </T> */
+    fun onSuccess(result: T)
 
     /**
      * This method will be called if asynchronous process is failed and provide [throwable]
      * cause.
      */
-    void onError(Throwable throwable);
+    fun onError(throwable: Throwable)
 }
