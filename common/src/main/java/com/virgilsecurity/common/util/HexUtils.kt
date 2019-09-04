@@ -30,28 +30,9 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
+@file:JvmName("HexUtils")
 package com.virgilsecurity.common.util
 
-import com.google.gson.Gson
-import com.virgilsecurity.common.model.Data
-import java.nio.charset.Charset
-import java.nio.charset.StandardCharsets
 
-/**
- * SerializeUtils class.
- */
-class SerializeUtils {
 
-    companion object {
-        private val gson: Gson by lazy { Gson() }
-
-        @JvmStatic @JvmOverloads
-        fun serialize(clazz: Any, charset: Charset = StandardCharsets.UTF_8) =
-            Data(gson.toJson(clazz).toByteArray(charset))
-
-        @JvmStatic @JvmOverloads
-        fun <T> deserialize(data: Data, clazz: Class<T>, charset: Charset = StandardCharsets.UTF_8) =
-            gson.fromJson(String(data.data, charset), clazz)
-    }
-}
+fun ByteArray.toHexString() = joinToString("") { "%02x".format(it) }

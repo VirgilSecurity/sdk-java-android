@@ -79,7 +79,7 @@ class Data(val data: ByteArray) { // TODO Consider another name for parameter, s
         /**
          * This function de-serializes provided [base64] String to [Data] object. String must be UTF_8 encoded.
          */
-        fun fromBase64String(base64: String?): Data {
+        @JvmStatic fun fromBase64String(base64: String?): Data {
             requireNotNull(base64) { "\'base64\' cannot be null" }
 
             return Data(Base64.decode(base64.toByteArray(StandardCharsets.UTF_8)))
@@ -89,7 +89,7 @@ class Data(val data: ByteArray) { // TODO Consider another name for parameter, s
          * This function de-serializes provided [base64] String to [Data] object. Provided [charset] defines which
          * encoding in provided [base64] String is used.
          */
-        fun fromBase64String(base64: String?, charset: Charset?): Data {
+        @JvmStatic fun fromBase64String(base64: String?, charset: Charset?): Data {
             requireNotNull(base64) { "\'base64\' cannot be null" }
             requireNotNull(charset) { "\'charset\' cannot be null" }
 
