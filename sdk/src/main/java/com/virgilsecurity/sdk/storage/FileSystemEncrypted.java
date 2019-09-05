@@ -269,7 +269,7 @@ public class FileSystemEncrypted {
     }
 
     /**
-     * Delete subdirectory. Can delete subdirectory only if it is empty.
+     * Delete subdirectory.
      *
      * @param subdir Subdirectory.
      */
@@ -278,10 +278,17 @@ public class FileSystemEncrypted {
         if (subdir != null) {
             directory = new File(this.rootPath + File.separator + subdir);
         } else {
-            throw new NullArgumentException("subdir");
+            directory = new File(this.rootPath);
         }
 
-        return directory.delete();
+        return deleteDirectoryRecursively(directory);
+    }
+
+    /**
+     * Delete all in root directory.
+     */
+    public boolean delete() {
+        return deleteSubdir(null);
     } // TODO add tests
 
     /**
@@ -335,5 +342,15 @@ public class FileSystemEncrypted {
             throw new IOException("Specified directory is a file. Please, use \'exists\' method instead.");
         }
         return file.exists();
+    }
+
+    private boolean deleteDirectoryRecursively(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectoryRecursively(file);
+            }
+        }
+        return directoryToBeDeleted.delete();
     }
 }

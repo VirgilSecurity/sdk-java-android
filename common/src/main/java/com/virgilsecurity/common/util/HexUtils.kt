@@ -33,6 +33,8 @@
 @file:JvmName("HexUtils")
 package com.virgilsecurity.common.util
 
-
+import com.virgilsecurity.common.model.Data
 
 fun ByteArray.toHexString() = joinToString("") { "%02x".format(it) }
+
+fun Data.toHexString() = data.joinToString("") { "%02x".format(it) }
