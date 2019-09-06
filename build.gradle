@@ -51,7 +51,7 @@ buildscript {
             androidx          : '1.1.1',
 
             // Kotlin
-            kotlinVersion     : '1.3.41',
+            kotlinVersion     : '1.3.50',
 
             // Tests
             testsRunner       : '1.0.2',

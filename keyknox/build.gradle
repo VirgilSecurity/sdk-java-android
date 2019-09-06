@@ -1,6 +1,4 @@
 apply plugin: 'kotlin'
-//apply plugin: 'org.junit.platform.gradle.plugin'
-//apply plugin: 'org.jetbrains.dokka'
 
 dependencies {
     // Virgil
@@ -49,4 +47,15 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom {
+                name = 'Kyknox Java/Android SDK'
+            }
+            artifactId = "keyknox"
+        }
+    }
+}
 
