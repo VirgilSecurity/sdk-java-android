@@ -85,7 +85,7 @@
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
 
-    <version.crypto>0.10.0</version.crypto>
+    <version.crypto>0.10.1</version.crypto>
     <version.gson>2.8.5</version.gson>
     <version.android>4.1.1.4</version.android>
     <version.commons-lang>2.6</version.commons-lang>
