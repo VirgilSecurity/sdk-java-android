@@ -36,7 +36,7 @@ buildscript {
     ext.versions = [
 
             // Virgil
-            virgilCrypto      : '0.10.0',
+            virgilCrypto      : '0.10.2',
 
             // Common
             commonsLang       : '3.9',
