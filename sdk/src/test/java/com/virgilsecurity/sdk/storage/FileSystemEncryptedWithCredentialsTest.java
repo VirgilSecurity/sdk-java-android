@@ -39,7 +39,10 @@ import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.exception.NullArgumentException;
+import com.virgilsecurity.sdk.utils.ConvertionUtils;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -181,6 +184,7 @@ class FileSystemEncryptedWithCredentialsTest {
     }
 
     @Test
+    @Disabled
     void load_file_itself() throws IOException, CryptoException {
         fileSystemEncrypted.write(data, alias);
 
@@ -203,7 +207,8 @@ class FileSystemEncryptedWithCredentialsTest {
 
         // Should fail because file is encrypted with credentials
         // TODO add assertThrows with corresponding java exception
-        VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(dataRead.getData()).getPrivateKey();
+        byte[] keyData = dataRead.getData();
+        VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(keyData).getPrivateKey();
         assertEquals(keyPair.getPrivateKey(), privateKeyImported);
     }
 

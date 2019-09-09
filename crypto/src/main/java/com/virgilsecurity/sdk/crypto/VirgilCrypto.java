@@ -422,6 +422,7 @@ public class VirgilCrypto {
    */
   public byte[] decrypt(byte[] data, VirgilPrivateKey privateKey) throws DecryptionException {
     try (RecipientCipher cipher = new RecipientCipher()) {
+      cipher.setRandom(this.rng);
 
       cipher.startDecryptionWithKey(privateKey.getIdentifier(), privateKey.getPrivateKey(),
           new byte[0]);
@@ -450,6 +451,7 @@ public class VirgilCrypto {
   public void decrypt(InputStream inputStream, OutputStream outputStream,
                       VirgilPrivateKey privateKey) throws DecryptionException {
     try (RecipientCipher cipher = new RecipientCipher()) {
+      cipher.setRandom(this.rng);
       cipher.startDecryptionWithKey(privateKey.getIdentifier(), privateKey.getPrivateKey(),
           new byte[0]);
 
@@ -507,6 +509,7 @@ public class VirgilCrypto {
   public byte[] decryptThenVerify(byte[] data, VirgilPrivateKey privateKey,
                                   List<VirgilPublicKey> signersPublicKeys) throws CryptoException {
     try (RecipientCipher cipher = new RecipientCipher()) {
+      cipher.setRandom(this.rng);
       cipher.startDecryptionWithKey(privateKey.getIdentifier(), privateKey.getPrivateKey(),
           new byte[0]);
 
@@ -788,9 +791,14 @@ public class VirgilCrypto {
       serializer.setupDefaults();
 
       KeyAlg keyAlg = KeyAlgFactory.createFromKey(privateKey.getPrivateKey(), this.rng);
-      RawPrivateKey rawPrivateKey = keyAlg.exportPrivateKey(privateKey.getPrivateKey());
-
-      return serializer.serializePrivateKey(rawPrivateKey);
+      try (RawPrivateKey rawPrivateKey = keyAlg.exportPrivateKey(privateKey.getPrivateKey())) {
+        return serializer.serializePrivateKey(rawPrivateKey);
+      }
+      finally {
+        if (keyAlg instanceof AutoCloseable) {
+          ((AutoCloseable) keyAlg).close();
+        }
+      }
     } catch (Exception e) {
       throw new CryptoException(e);
     }
@@ -996,17 +1004,22 @@ public class VirgilCrypto {
       serializer.setupDefaults();
 
       KeyAlg keyAlg = KeyAlgFactory.createFromKey(publicKey, this.rng);
-      RawPublicKey rawPublicKey = keyAlg.exportPublicKey(publicKey);
-
-      byte[] publicKeyDer = serializer.serializePublicKey(rawPublicKey);
-      byte[] hash;
-      if (useSHA256Fingerprints) {
-        hash = computeHash(publicKeyDer, HashAlgorithm.SHA256);
-      } else {
-        hash = computeHash(publicKeyDer, HashAlgorithm.SHA512);
-        hash = Arrays.copyOfRange(hash, 0, 8);
+      try (RawPublicKey rawPublicKey = keyAlg.exportPublicKey(publicKey)) {
+        byte[] publicKeyDer = serializer.serializePublicKey(rawPublicKey);
+        byte[] hash;
+        if (useSHA256Fingerprints) {
+          hash = computeHash(publicKeyDer, HashAlgorithm.SHA256);
+        } else {
+          hash = computeHash(publicKeyDer, HashAlgorithm.SHA512);
+          hash = Arrays.copyOfRange(hash, 0, 8);
+        }
+        return hash;
       }
-      return hash;
+      finally {
+        if (keyAlg instanceof AutoCloseable) {
+          ((AutoCloseable) keyAlg).close();
+        }
+      }
     } catch (Exception e) {
       // This should never happen
       throw new CryptoException(e);

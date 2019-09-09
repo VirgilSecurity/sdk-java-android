@@ -39,17 +39,34 @@ import com.virgilsecurity.sdk.crypto.exceptions.DecryptionException;
 import com.virgilsecurity.sdk.crypto.exceptions.SigningException;
 import com.virgilsecurity.sdk.crypto.exceptions.VirgilException;
 import com.virgilsecurity.sdk.exception.NullArgumentException;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link VirgilCrypto}.
@@ -126,6 +143,7 @@ public class VirgilCryptoTest {
     byte[] encrypted = crypto.encrypt(TEXT.getBytes(), recipients);
     for (VirgilPrivateKey privateKey : privateKeys) {
       byte[] decrypted = crypto.decrypt(encrypted, privateKey);
+
       assertArrayEquals(TEXT.getBytes(), decrypted);
     }
   }
@@ -404,4 +422,36 @@ public class VirgilCryptoTest {
 
     assertFalse(valid);
   }
+
+  @CryptoTest
+  @Disabled
+  public void encrypt_decrypt_benchmark(VirgilCrypto crypto) throws CryptoException {
+    KeyType keyType = crypto.getDefaultKeyType();
+    System.out.println("Key type: " + keyType);
+    List<VirgilPublicKey> recipients = new ArrayList<>();
+    VirgilKeyPair keyPair = crypto.generateKeyPair();
+    recipients.add(keyPair.getPublicKey());
+
+    // Encrypt
+    long startEnc = System.nanoTime();
+    byte[] encrypted = crypto.encrypt(TEXT.getBytes(), recipients);
+    long endEnc = System.nanoTime();
+    System.out.println(String.format("Encrypt: %f ms", (endEnc - startEnc) / 1e6));
+
+    // Decrypt
+    long startDec = System.nanoTime();
+    crypto.decrypt(encrypted, keyPair.getPrivateKey());
+    long endDec = System.nanoTime();
+    System.out.println(String.format("Decrypt: %f ms", (endDec - startDec) / 1e6));
+  }
+
+  @CryptoTest
+  public void generateKeyPair_exportPrivateKey_in_cycle(VirgilCrypto crypto) throws CryptoException {
+    for (int i = 0; i < 1000; i++) {
+      VirgilKeyPair kp = crypto.generateKeyPair(KeyType.SECP256R1);
+      byte[] privateKeyData = crypto.exportPrivateKey(kp.getPrivateKey());
+      assertNotNull(privateKeyData);
+    }
+  }
+
 }
