@@ -31,23 +31,43 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.common.callback
+package com.virgilsecurity.common.model
+
+import com.virgilsecurity.common.callback.OnResultListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
- * Interface that is intended to return *<T>* type result if some asynchronous process is
- * completed successfully, otherwise error will be returned.
-</T> */
-interface OnResultListener<T> {
+ * Result's class intent is to give possibility to call an operation that returns result in Success or Error in case of
+ * error *synchronously* or *asynchronously*.
+ */
+interface Result<T> {
 
     /**
-     * This method will be called if asynchronous process is completed successfully and
-     * provide *<T>* type [result].
-    </T> */
-    fun onSuccess(result: T)
-
-    /**
-     * This method will be called if asynchronous process is failed and provide [throwable]
-     * cause.
+     * Call this method to get result *synchronously*.
      */
-    fun onError(throwable: Throwable)
+    fun get(): T
+
+    /**
+     * Call this method to get result *asynchronously*. You'll get the result of an operation in the
+     * [onResultListener]. Provided [scope] will be used to execute operation.
+     */
+    fun addCallback(onResultListener: OnResultListener<T>, scope: CoroutineScope = GlobalScope) {
+        scope.launch {
+            try {
+                val result = get()
+                onResultListener.onSuccess(result)
+            } catch (throwable: Throwable) {
+                onResultListener.onError(throwable)
+            }
+        }
+    }
+
+    /**
+     * Call this method to get result *asynchronously*. You'll get the result of an operation in the
+     * [onResultListener].
+     */
+    fun addCallback(onResultListener: OnResultListener<T>) =
+            addCallback(onResultListener, GlobalScope)
 }

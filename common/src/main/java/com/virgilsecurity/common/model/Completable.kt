@@ -31,23 +31,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.common.callback
+package com.virgilsecurity.common.model
+
+import com.virgilsecurity.common.callback.OnCompleteListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
- * Interface that is intended to return *<T>* type result if some asynchronous process is
- * completed successfully, otherwise error will be returned.
-</T> */
-interface OnResultListener<T> {
+ * Completable's class intent is to give possibility to call a completable operation that got only Success or Error
+ * without actual result *synchronously* or *asynchronously*.
+ */
+interface Completable {
 
     /**
-     * This method will be called if asynchronous process is completed successfully and
-     * provide *<T>* type [result].
-    </T> */
-    fun onSuccess(result: T)
-
-    /**
-     * This method will be called if asynchronous process is failed and provide [throwable]
-     * cause.
+     * Call this method to complete operation *synchronously*.
      */
-    fun onError(throwable: Throwable)
+    fun execute()
+
+    /**
+     * Call this method to complete operation *asynchronously*. You'll get the completion status in the
+     * [onCompleteListener]. Provided [scope] will be used to execute operation.
+     */
+    fun addCallback(onCompleteListener: OnCompleteListener, scope: CoroutineScope = GlobalScope) {
+        scope.launch {
+            try {
+                execute()
+                onCompleteListener.onSuccess()
+            } catch (throwable: Throwable) {
+                onCompleteListener.onError(throwable)
+            }
+        }
+    }
+
+    /**
+     * Call this method to complete operation *asynchronously*. You'll get the completion status in the
+     * [onCompleteListener].
+     */
+    fun addCallback(onCompleteListener: OnCompleteListener) =
+            addCallback(onCompleteListener, GlobalScope)
+
 }
