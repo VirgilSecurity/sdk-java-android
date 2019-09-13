@@ -49,15 +49,23 @@ import java.net.URL
 /**
  * KeyknoxClientProtocol implementation.
  */
-class KeyknoxClient @JvmOverloads constructor(
-    val accessTokenProvider: AccessTokenProvider,
-    val serviceUrl: URL = URL("https://api.virgilsecurity.com")
-) : KeyknoxClientProtocol {
+class KeyknoxClient : KeyknoxClientProtocol {
 
-    val httpClient: HttpClientProtocol
+    val serviceUrl: URL
+    val httpClient: HttpClient
 
-    init {
-        httpClient = HttpClient(this.accessTokenProvider)
+    @JvmOverloads constructor(accessTokenProvider: AccessTokenProvider,
+                serviceUrl: URL = URL("https://api.virgilsecurity.com")) {
+        this.serviceUrl = serviceUrl
+        this.httpClient = HttpClient(accessTokenProvider)
+    }
+
+    @JvmOverloads constructor(
+        httpClient: HttpClient,
+        serviceUrl: URL = URL("https://api.virgilsecurity.com")
+    ) {
+        this.serviceUrl = serviceUrl
+        this.httpClient = httpClient
     }
 
     override fun getKeys(params: KeyknoxGetKeysParams): Set<String> {
