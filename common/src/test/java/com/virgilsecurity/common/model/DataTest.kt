@@ -31,45 +31,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.keyknox.utils
+package com.virgilsecurity.common.model
 
-import com.virgilsecurity.common.util.Base64
-import com.virgilsecurity.sdk.utils.ConvertionUtils
-import java.util.*
-import java.util.logging.Logger
+import com.virgilsecurity.common.util.toHexString
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import java.nio.charset.StandardCharsets
+import kotlin.experimental.and
 
-inline fun base64Encode(array: ByteArray) = Base64.encode(array)
+class DataTest {
 
-inline fun base64Encode(string: String) = ConvertionUtils.toBase64Bytes(string)
+    private val TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    private val DATA = TEXT.toByteArray(StandardCharsets.UTF_8)
+    private val BASE64_DATA = java.util.Base64.getEncoder().encode(DATA)
+    private val BASE64_TEXT = java.util.Base64.getEncoder().encodeToString(DATA)
+    private lateinit var data: Data
 
-inline fun base64Decode(array: ByteArray) = ConvertionUtils.base64ToString(array)
+    @BeforeEach
+    fun setup() {
+        this.data = Data(DATA)
+    }
 
-inline fun base64Decode(string: String) = Base64.decode(string)
+    @Test
+    fun fromBase64String() {
+        assertArrayEquals(DATA, Data.fromBase64String(BASE64_TEXT).data)
+    }
 
-fun ClosedRange<Int>.random() =
-        Random().nextInt((endInclusive + 1) - start) + start
+    @Test
+    fun toBase64String() {
+        assertEquals(BASE64_TEXT, data.toBase64String())
+    }
 
-/**
- * Return logger for Java class, if companion object fix the name.
- */
-fun <R : Any> R.logger(): Lazy<Logger> {
-    return lazy { Logger.getLogger(unwrapCompanionClass(this.javaClass).name) }
-}
+    @Test
+    fun toHexString() {
+        assertEquals(bytesToHex(DATA), data.toHexString())
+    }
 
-/**
- * Unwrap companion class to enclosing class given a Java Class.
- */
-fun <T : Any> unwrapCompanionClass(ofClass: Class<T>): Class<*> {
-    return ofClass.enclosingClass?.takeIf {
-        ofClass.enclosingClass.kotlin.java == ofClass
-    } ?: ofClass
-}
-
-/**
- * Marker interface and related extension (remove extension for Any.logger() in favour of this).
- */
-interface Loggable {
-    public fun logger(): Logger {
-        return Logger.getLogger(unwrapCompanionClass(this.javaClass).name)
+    private val hexArray = "0123456789ABCDEF".toLowerCase().toCharArray()
+    fun bytesToHex(bytes: ByteArray): String {
+        val hexChars = CharArray(bytes.size * 2)
+        for (j in bytes.indices) {
+            val v = (bytes[j] and 0xFF.toByte()).toInt()
+            hexChars[j * 2] = hexArray[v ushr 4]
+            hexChars[j * 2 + 1] = hexArray[v and 0x0F]
+        }
+        return String(hexChars)
     }
 }

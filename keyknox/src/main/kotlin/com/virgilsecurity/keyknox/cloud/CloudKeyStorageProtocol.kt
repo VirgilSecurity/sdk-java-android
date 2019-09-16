@@ -77,7 +77,7 @@ interface CloudKeyStorageProtocol {
      *
      * @return all entries
      */
-    fun retrieveAllEntries(): List<CloudEntry>
+    fun retrieveAll(): List<CloudEntry>
 
     /**
      * Retrieve entry loaded from Cloud.
@@ -86,7 +86,7 @@ interface CloudKeyStorageProtocol {
      *
      * @return CloudEntry
      */
-    fun retrieveEntry(name: String): CloudEntry
+    fun retrieve(name: String): CloudEntry
 
     /**
      * Check if entry exists in list of loaded from Cloud entries.
@@ -95,26 +95,26 @@ interface CloudKeyStorageProtocol {
      *
      * @return true if entry exists, false - otherwise
      */
-    fun existsEntry(name: String): Boolean
+    fun exists(name: String): Boolean
 
     /**
      * Deletes entry from Cloud.
      *
      * @param name name
      */
-    fun deleteEntry(name: String)
+    fun delete(name: String)
 
     /**
      * Deletes entries from Cloud.
      *
      * @param names names of entries to delete
      */
-    fun deleteEntries(names: List<String>)
+    fun delete(names: List<String>)
 
     /**
      * Deletes all entries from Cloud.
      */
-    fun deleteAllEntries()
+    fun deleteAll()
 
     /**
      * Retrieves entries from Cloud.

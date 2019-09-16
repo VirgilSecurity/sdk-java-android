@@ -2,13 +2,9 @@ apply plugin: 'kotlin'
 group 'com.virgilsecurity'
 
 dependencies {
-    // Virgil
-    implementation "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"
-
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$versions.kotlinVersion"
     compileOnly "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines"
-
 
     // Gson
     implementation "com.google.code.gson:gson:$versions.gson"

@@ -107,7 +107,7 @@ class SyncKeyStorage {
             throw KeychainEntryNotFoundWhileUpdatingException()
         }
         try {
-            this.cloudKeyStorage.existsEntry(name)
+            this.cloudKeyStorage.exists(name)
         } catch (e: Exception) {
             throw CloudEntryNotFoundWhileUpdatingException()
         }
@@ -139,7 +139,7 @@ class SyncKeyStorage {
             }
         }
 
-        this.cloudKeyStorage.deleteEntries(names)
+        this.cloudKeyStorage.delete(names)
 
         names.forEach { name ->
             this.keyStorage.delete(name)
@@ -187,7 +187,7 @@ class SyncKeyStorage {
             if (this.keyStorage.exists(keyEntry.name)) {
                 throw KeychainEntryAlreadyExistsWhileStoringException(keyEntry.name)
             }
-            if (this.cloudKeyStorage.existsEntry(keyEntry.name)) {
+            if (this.cloudKeyStorage.exists(keyEntry.name)) {
                 throw CloudEntryAlreadyExistsWhileStoringException(keyEntry.name)
             }
         }
@@ -226,7 +226,7 @@ class SyncKeyStorage {
         val keychainEntries = this.keyStorage.retrieveAll().filter {
             this.keychainUtils.filterKeyknoxKeychainEntry(it)
         }
-        val cloudEntries = this.cloudKeyStorage.retrieveAllEntries()
+        val cloudEntries = this.cloudKeyStorage.retrieveAll()
 
         val keychainSet = keychainEntries.map { it.name }
         val cloudSet = cloudEntries.map { it.name }
@@ -274,7 +274,7 @@ class SyncKeyStorage {
      * Deletes all entries in both Keychain and Keyknox Cloud.
      */
     fun deleteAll() {
-        this.cloudKeyStorage.deleteAllEntries()
+        this.cloudKeyStorage.deleteAll()
 
         val entriesToDelete = this.keyStorage.retrieveAll()
                 .filter { this.keychainUtils.filterKeyknoxKeychainEntry(it) }
@@ -291,7 +291,7 @@ class SyncKeyStorage {
 
     private fun syncStoreEntries(entriesToStore: List<String>) {
         entriesToStore.forEach { name ->
-            val cloudEntry = this.cloudKeyStorage.retrieveEntry(name)
+            val cloudEntry = this.cloudKeyStorage.retrieve(name)
 
             val meta = this.keychainUtils.createMetaForKeychain(cloudEntry)
             this.keyStorage.store(cloudEntry.name, cloudEntry.data, meta)
@@ -303,7 +303,7 @@ class SyncKeyStorage {
         entriesToCompare.forEach { name ->
             val keychainEntry = keychainEntries.firstOrNull { name == it.name }
                     ?: throw KeychainEntryNotFoundWhileComparingException()
-            val cloudEntry = this.cloudKeyStorage.retrieveEntry(name)
+            val cloudEntry = this.cloudKeyStorage.retrieve(name)
             val keychainDate = this.keychainUtils.extractModificationDate(keychainEntry)
 
             if (keychainDate.second < cloudEntry.modificationDate) {

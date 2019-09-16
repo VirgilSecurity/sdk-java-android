@@ -196,7 +196,7 @@ class SyncKeyStorageTests {
         assertNotNull(loadedEntry3)
         assertArrayEquals(keyEntries[1].value, loadedEntry3.value)
 
-        this.cloudKeyStorage.deleteEntry(keyEntries[0].name)
+        this.cloudKeyStorage.delete(keyEntries[0].name)
         this.syncKeyStorage.sync()
 
         val keychainEntries5 = this.keychainStorageWrapper.retrieveAll()
@@ -213,7 +213,7 @@ class SyncKeyStorageTests {
         assertEquals(keyEntries[1].name, keychainEntries6[0].name)
         assertArrayEquals(data, keychainEntries6[0].value)
 
-        this.cloudKeyStorage.deleteAllEntries()
+        this.cloudKeyStorage.deleteAll()
         this.syncKeyStorage.sync()
         assertTrue(this.keychainStorageWrapper.retrieveAll().isEmpty())
     }
@@ -232,8 +232,8 @@ class SyncKeyStorageTests {
 
         this.cloudKeyStorage.retrieveCloudEntries()
 
-        val entry = this.cloudKeyStorage.retrieveEntry(name)
-        assertEquals(1, this.cloudKeyStorage.retrieveAllEntries().size)
+        val entry = this.cloudKeyStorage.retrieve(name)
+        assertEquals(1, this.cloudKeyStorage.retrieveAll().size)
         assertEquals(name, entry.name)
         assertArrayEquals(data, entry.data)
 
@@ -264,17 +264,17 @@ class SyncKeyStorageTests {
         this.syncKeyStorage.store(name2, data2)
 
         this.cloudKeyStorage.retrieveCloudEntries()
-        assertEquals(2, this.cloudKeyStorage.retrieveAllEntries().size)
+        assertEquals(2, this.cloudKeyStorage.retrieveAll().size)
         assertEquals(2, this.keychainStorageWrapper.retrieveAll().size)
 
         this.syncKeyStorage.delete(name1)
 
         this.cloudKeyStorage.retrieveCloudEntries()
-        assertEquals(1, this.cloudKeyStorage.retrieveAllEntries().size)
+        assertEquals(1, this.cloudKeyStorage.retrieveAll().size)
         assertEquals(1, this.keychainStorageWrapper.retrieveAll().size)
 
         assertNotNull(this.keychainStorageWrapper.retrieve(name2))
-        assertNotNull(this.cloudKeyStorage.retrieveEntry(name2))
+        assertNotNull(this.cloudKeyStorage.retrieve(name2))
     }
 
     @Test
@@ -292,7 +292,7 @@ class SyncKeyStorageTests {
         this.syncKeyStorage.update(name, data2)
 
         this.cloudKeyStorage.retrieveCloudEntries()
-        assertEquals(1, this.cloudKeyStorage.retrieveAllEntries().size)
+        assertEquals(1, this.cloudKeyStorage.retrieveAll().size)
         assertEquals(1, this.keychainStorageWrapper.retrieveAll().size)
 
         val keychainEntry = this.keychainStorageWrapper.retrieve(name)
@@ -366,9 +366,9 @@ class SyncKeyStorageTests {
 
         this.cloudKeyStorage.retrieveCloudEntries()
 
-        val entry1 = this.cloudKeyStorage.retrieveEntry(name1)
-        val entry2 = this.cloudKeyStorage.retrieveEntry(name2)
-        assertEquals(2, this.cloudKeyStorage.retrieveAllEntries().size)
+        val entry1 = this.cloudKeyStorage.retrieve(name1)
+        val entry2 = this.cloudKeyStorage.retrieve(name2)
+        assertEquals(2, this.cloudKeyStorage.retrieveAll().size)
         assertEquals(name1, entry1.name)
         assertArrayEquals(data1, entry1.data)
         assertEquals(name2, entry2.name)
@@ -407,11 +407,11 @@ class SyncKeyStorageTests {
         this.syncKeyStorage.delete(arrayListOf(name1, name2))
 
         this.cloudKeyStorage.retrieveCloudEntries()
-        assertEquals(1, this.cloudKeyStorage.retrieveAllEntries().size)
+        assertEquals(1, this.cloudKeyStorage.retrieveAll().size)
         assertEquals(1, this.keychainStorageWrapper.retrieveAll().size)
         assertEquals(1, this.syncKeyStorage.retrieveAll().size)
 
-        val entry = this.cloudKeyStorage.retrieveEntry(name3)
+        val entry = this.cloudKeyStorage.retrieve(name3)
         assertEquals(name3, entry.name)
         assertArrayEquals(data3, entry.data)
 
@@ -480,7 +480,7 @@ class SyncKeyStorageTests {
         )
 
         this.syncKeyStorage.deleteAll()
-        assertTrue(this.cloudKeyStorage.retrieveAllEntries().isEmpty())
+        assertTrue(this.cloudKeyStorage.retrieveAll().isEmpty())
         assertTrue(this.keyStorage.names().isEmpty())
         assertTrue(this.syncKeyStorage.retrieveAll().isEmpty())
     }
@@ -490,7 +490,7 @@ class SyncKeyStorageTests {
         // KTC-38
         this.syncKeyStorage.sync()
         this.syncKeyStorage.deleteAll()
-        assertTrue(this.cloudKeyStorage.retrieveAllEntries().isEmpty())
+        assertTrue(this.cloudKeyStorage.retrieveAll().isEmpty())
         assertTrue(this.keyStorage.names().isEmpty())
         assertTrue(this.syncKeyStorage.retrieveAll().isEmpty())
     }

@@ -23,20 +23,16 @@ android {
 }
 
 dependencies {
-    implementation "com.android.support:appcompat-v7:$versions.appCompat"
-
     // Virgil
     api(project(":crypto")) {
-        exclude group: "com.virgilsecurity.crypto"
+        exclude group: 'com.virgilsecurity.crypto', module: 'common'
+        exclude group: 'com.virgilsecurity.crypto', module: 'foundation'
     }
-    implementation "com.virgilsecurity.crypto:common-android:$versions.virgilCrypto"
-    implementation "com.virgilsecurity.crypto:foundation-android:$versions.virgilCrypto"
+    api "com.virgilsecurity.crypto:foundation-android:$versions.virgilCrypto"
 
     // Tests
     testImplementation "junit:junit:$versions.junitAndroid"
     androidTestImplementation "com.android.support.test:runner:$versions.testsRunner"
-
-    androidTestImplementation "com.google.code.gson:gson:$versions.gson"
     androidTestImplementation "org.apache.commons:commons-lang3:$versions.commonsLang"
 }
 

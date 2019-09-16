@@ -59,13 +59,10 @@ android {
 dependencies {
     // Internal dependencies
     api project(":api")
-    implementation project(":crypto-android")
+    api project(":crypto-android")
 
     // Support
     implementation "com.android.support:appcompat-v7:$versions.appCompat"
-
-    // Gson
-    implementation "com.google.code.gson:gson:$versions.gson"
 
     // Tests
     testImplementation "junit:junit:$versions.junitAndroid"

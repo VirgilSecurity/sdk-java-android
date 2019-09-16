@@ -33,7 +33,7 @@
 
 package com.virgilsecurity.common.model
 
-import com.virgilsecurity.crypto.foundation.Base64
+import com.virgilsecurity.common.util.Base64
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -51,16 +51,7 @@ class Data(val data: ByteArray) { // TODO Consider another name for parameter, s
      * This function serializes current object to Base64 String format. String is UTF_8 encoded.
      */
     fun toBase64String(): String {
-        return String(Base64.encode(data), StandardCharsets.UTF_8)
-    }
-
-    /**
-     * This function serializes current object to Base64 String format. Provided [charset] is used for string encoding.
-     */
-    fun toBase64String(charset: Charset?): String {
-        requireNotNull(charset) { "\'charset\' cannot be null" }
-
-        return String(Base64.encode(data), charset)
+        return Base64.encode(data)
     }
 
     override fun equals(other: Any?): Boolean {

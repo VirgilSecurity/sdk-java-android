@@ -38,6 +38,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
+import com.virgilsecurity.common.util.Base64;
 import com.virgilsecurity.sdk.common.StringEncoding;
 
 import java.io.IOException;

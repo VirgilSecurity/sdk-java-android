@@ -3,12 +3,11 @@ dependencies {
     api "com.google.code.gson:gson:$versions.gson"
 
     // Virgil
-    implementation "com.virgilsecurity.crypto:common:$versions.virgilCrypto"
-    implementation "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"
+    api "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"
 
     // Tests
     testImplementation "org.junit.jupiter:junit-jupiter:$versions.junit"
-    testCompile "org.apache.commons:commons-lang3:$versions.commonsLang"
+    testImplementation "org.apache.commons:commons-lang3:$versions.commonsLang"
 }
 
 publishing {

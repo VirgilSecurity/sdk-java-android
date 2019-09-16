@@ -40,6 +40,7 @@ import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.exception.NullArgumentException;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
+import com.virgilsecurity.sdk.utils.StreamUtils;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -194,11 +195,7 @@ class FileSystemEncryptedWithCredentialsTest {
         try (FileInputStream is = new FileInputStream(fileToRead);
              ByteArrayOutputStream os = new ByteArrayOutputStream()) {
 
-            byte[] buffer = new byte[4096];
-            int n;
-            while (-1 != (n = is.read(buffer))) {
-                os.write(buffer, 0, n);
-            }
+            StreamUtils.copyStream(is, os);
 
             byte[] data = os.toByteArray();
 

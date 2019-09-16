@@ -2,16 +2,10 @@ apply plugin: 'kotlin'
 
 dependencies {
     // Virgil
-    implementation project(":crypto")
-    implementation project(":sdk")
-    implementation "com.virgilsecurity.crypto:common:$versions.virgilCrypto"
-    implementation "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"
+    api project(":sdk")
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$versions.kotlinVersion"
-
-    // Gson
-    implementation "com.google.code.gson:gson:$versions.gson"
 
     // Tests
     testImplementation "org.junit.jupiter:junit-jupiter-api:$versions.junit"

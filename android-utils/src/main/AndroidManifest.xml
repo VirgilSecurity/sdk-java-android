@@ -31,4 +31,7 @@
   ~ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.virgilsecurity.sdk.androidutils"/>
+          package="com.virgilsecurity.sdk.androidutils">
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+</manifest>

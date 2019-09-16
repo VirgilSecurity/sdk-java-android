@@ -203,7 +203,7 @@ public class CardManager {
    *
    * @return The string.
    */
-  public String exportCardAsJson(Card card) {
+  public static String exportCardAsJson(Card card) {
     return ConvertionUtils.serializeToJson(card.getRawCard());
   }
 
@@ -214,7 +214,7 @@ public class CardManager {
    *
    * @return The raw signed model.
    */
-  public RawSignedModel exportCardAsRawModel(Card card) {
+  public static RawSignedModel exportCardAsRawModel(Card card) {
     return card.getRawCard();
   }
 
@@ -225,7 +225,7 @@ public class CardManager {
    *
    * @return Base64 String from exported card.
    */
-  public String exportCardAsString(Card card) {
+  public static String exportCardAsString(Card card) {
     return ConvertionUtils.toBase64String(ConvertionUtils.serializeToJson(card.getRawCard()));
   }
 

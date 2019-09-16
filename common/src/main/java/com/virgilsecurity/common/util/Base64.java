@@ -31,7 +31,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.sdk.utils;
+package com.virgilsecurity.common.util;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * This is utils class which implements Base64 encoding/decoding functionality.
@@ -142,6 +144,26 @@ public class Base64 {
    */
   public static byte[] decode(String base64String) {
     return decode(base64String.toCharArray());
+  }
+
+  /**
+   * Decode Base64 bytes to byte array.
+   *
+   * @param base64Bytes the byte array to be converted
+   * @return the byte array
+   */
+  public static byte[] decode(byte[] base64Bytes) {
+    return decode(new String(base64Bytes, StandardCharsets.UTF_8));
+  }
+
+  /**
+   * Encode String to Base64 string.
+   *
+   * @param string the string to be converted
+   * @return the base64 string
+   */
+  public static String encode(String string) {
+    return encode(string.getBytes(StandardCharsets.UTF_8));
   }
 
   /**

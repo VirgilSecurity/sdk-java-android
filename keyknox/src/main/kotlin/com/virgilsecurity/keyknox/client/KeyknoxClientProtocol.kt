@@ -70,7 +70,7 @@ interface KeyknoxClientProtocol {
      *
      * @return EncryptedKeyknoxValue
      */
-    fun pushValue(params: KeyknoxPushParams?, meta: ByteArray, value: ByteArray, previousHash: ByteArray?): EncryptedKeyknoxValue
+    fun pushValue(params: KeyknoxPushParams? = null, meta: ByteArray, value: ByteArray, previousHash: ByteArray?): EncryptedKeyknoxValue
 
     /**
      * Pulls values from Keyknox service.
@@ -80,7 +80,7 @@ interface KeyknoxClientProtocol {
      *
      * @return EncryptedKeyknoxValue
      */
-    fun pullValue(params: KeyknoxPullParams?): EncryptedKeyknoxValue
+    fun pullValue(params: KeyknoxPullParams? = null): EncryptedKeyknoxValue
 
     /**
      * Resets Keyknox value (makes it empty). Also increments version.
@@ -90,6 +90,6 @@ interface KeyknoxClientProtocol {
      *
      * @return DecryptedKeyknoxValue
      */
-    fun resetValue(params: KeyknoxResetParams?): DecryptedKeyknoxValue
+    fun resetValue(params: KeyknoxResetParams? = null): DecryptedKeyknoxValue
 
 }

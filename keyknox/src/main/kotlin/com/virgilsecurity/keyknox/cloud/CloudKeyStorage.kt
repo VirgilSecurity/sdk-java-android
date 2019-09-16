@@ -185,7 +185,7 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
         }
     }
 
-    override fun retrieveAllEntries(): List<CloudEntry> {
+    override fun retrieveAll(): List<CloudEntry> {
         if (!storageWasSynced) {
             throw CloudStorageOutOfSyncException()
         }
@@ -198,7 +198,7 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
         }
     }
 
-    override fun retrieveEntry(name: String): CloudEntry {
+    override fun retrieve(name: String): CloudEntry {
         if (!storageWasSynced) {
             throw CloudStorageOutOfSyncException()
         }
@@ -206,7 +206,7 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
         return this.cache[name] ?: throw EntryNotFoundException(name)
     }
 
-    override fun existsEntry(name: String): Boolean {
+    override fun exists(name: String): Boolean {
         if (!storageWasSynced) {
             throw CloudStorageOutOfSyncException()
         }
@@ -214,11 +214,11 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
         return this.cache.containsKey(name)
     }
 
-    override fun deleteEntry(name: String) {
-        deleteEntries(listOf(name))
+    override fun delete(name: String) {
+        delete(listOf(name))
     }
 
-    override fun deleteEntries(names: List<String>) {
+    override fun delete(names: List<String>) {
         if (!storageWasSynced) {
             throw CloudStorageOutOfSyncException()
         }
@@ -243,7 +243,7 @@ open class CloudKeyStorage : CloudKeyStorageProtocol {
         }
     }
 
-    override fun deleteAllEntries() {
+    override fun deleteAll() {
         synchronized(this.cache) {
             val response = this.keyknoxManager.resetValue()
             cacheEntries(cloudEntrySerializer.deserializeEntries(response.value), true)
