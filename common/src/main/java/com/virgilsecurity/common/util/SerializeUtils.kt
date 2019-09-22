@@ -34,9 +34,11 @@
 package com.virgilsecurity.common.util
 
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.virgilsecurity.common.model.Data
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
+
 
 /**
  * SerializeUtils class.
@@ -53,5 +55,9 @@ class SerializeUtils {
         @JvmStatic @JvmOverloads
         fun <T> deserialize(data: Data, clazz: Class<T>, charset: Charset = StandardCharsets.UTF_8) =
             gson.fromJson(String(data.data, charset), clazz)
+
+        @JvmStatic @JvmOverloads
+        fun <T> deserialize(data: Data, type: TypeToken<T>, charset: Charset = StandardCharsets.UTF_8) =
+            gson.fromJson(String(data.data, charset), type.type) as T
     }
 }

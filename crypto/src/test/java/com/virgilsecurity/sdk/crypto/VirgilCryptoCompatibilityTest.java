@@ -39,6 +39,7 @@ import com.google.gson.JsonParser;
 import com.virgilsecurity.crypto.foundation.Base64;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -52,8 +53,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link VirgilCrypto} which tests cross-platform compatibility.
@@ -116,6 +116,26 @@ public class VirgilCryptoCompatibilityTest {
     byte[] decryptedData = crypto.decrypt(cipherData, privateKey);
 
     assertArrayEquals(originalData, decryptedData);
+  }
+
+  @CryptoTest
+  public void sign_then_encrypt_decrypt_then_verify(VirgilCrypto crypto) throws CryptoException {
+    String text = "text to encrypt";
+    byte[] textData = "text to encrypt".getBytes();
+    VirgilKeyPair keyPair = crypto.generateKeyPair();
+    VirgilKeyPair keyPairTwo = crypto.generateKeyPair();
+
+    List<VirgilPublicKey> publicKeys = new ArrayList<>();
+    publicKeys.add(keyPair.getPublicKey());
+    publicKeys.add(keyPairTwo.getPublicKey());
+
+    byte[] encrypted = crypto.signThenEncrypt(textData, keyPair.getPrivateKey(), publicKeys);
+    assertNotNull(encrypted);
+
+    byte[] decrypted = crypto.decryptThenVerify(encrypted, keyPairTwo.getPrivateKey(), keyPair.getPublicKey());
+    String decryptedText = new String(decrypted);
+
+    assertEquals(text, decryptedText);
   }
 
   @CryptoTest
