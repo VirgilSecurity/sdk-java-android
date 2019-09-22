@@ -42,10 +42,8 @@ import com.virgilsecurity.sdk.jwt.JwtGenerator
 import com.virgilsecurity.sdk.jwt.accessProviders.CachingJwtProvider
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.net.URL
-import java.security.cert.CertPath
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -414,5 +412,54 @@ class KeyknoxClientTest {
         assertNotNull(keys)
         assertEquals(1, keys.size)
         assertEquals(this.key, keys.firstOrNull())
+    }
+
+    @Test
+    fun deleteRecipient() {
+        val data = base64Encode(UUID.randomUUID().toString())
+
+        val signer = Signer()
+        signer.setHash(Sha512())
+
+        signer.reset()
+        signer.appendData(data)
+
+        val signature = signer.sign(this.privateKey.privateKey)
+
+        val cipher = RecipientCipher()
+        cipher.setRandom(virgilCrypto.rng)
+        cipher.setEncryptionCipher(Aes256Gcm())
+
+        cipher.customParams().addData(VirgilCrypto.CUSTOM_PARAM_SIGNER_ID, privateKey.identifier)
+        cipher.customParams().addData(VirgilCrypto.CUSTOM_PARAM_SIGNATURE, signature)
+
+        cipher.addKeyRecipient(publicKey.identifier, this.publicKey.publicKey)
+
+        cipher.startEncryption()
+
+        val meta = cipher.packMessageInfo()
+        var encryptedData = cipher.processEncryption(data)
+        encryptedData += cipher.finishEncryption()
+
+        val pushParams = KeyknoxPushParams(listOf(this.identity), this.root, this.path, this.key)
+
+        val pushedValue = this.keyknoxClient.pushValue(pushParams, meta, encryptedData, null)
+        assertNotNull(pushedValue)
+
+        val pullParams = KeyknoxPullParams(this.identity, this.root, this.path, this.key)
+        val pulledValue = this.keyknoxClient.pullValue(pullParams)
+        assertNotNull(pulledValue)
+
+        val deleteParams = KeyknoxDeleteRecipientParams(this.identity, this.root, this.path, this.key)
+        val deletedValue = this.keyknoxClient.deleteRecipient(deleteParams)
+        assertNotNull(deletedValue)
+        assertTrue(deletedValue.identities.isEmpty())
+        assertEquals(this.root, deletedValue.root)
+        assertEquals(this.path, deletedValue.path)
+        assertEquals(this.key, deletedValue.key)
+
+        val pulledValue2 = this.keyknoxClient.pullValue(pullParams)
+        assertNotNull(pulledValue2)
+        assertTrue(pulledValue2.identities.isEmpty())
     }
 }

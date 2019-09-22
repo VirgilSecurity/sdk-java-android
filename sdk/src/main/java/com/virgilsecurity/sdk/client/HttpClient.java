@@ -136,7 +136,7 @@ public class HttpClient {
           LOGGER.warning("Void is unacceptable type");
           return null;
         } else {
-          LOGGER.info("Trying to extract response body...");
+          LOGGER.fine("Trying to extract response body...");
           try (InputStream instream = new BufferedInputStream(urlConnection.getInputStream())) {
             String body = ConvertionUtils.toString(instream);
             T obj = ConvertionUtils.getGson().fromJson(body, clazz);

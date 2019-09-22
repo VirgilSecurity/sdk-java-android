@@ -82,10 +82,9 @@ class KeyknoxClient : KeyknoxClientProtocol {
 
     override fun deleteRecipient(params: KeyknoxDeleteRecipientParams): DecryptedKeyknoxValue {
         val requestData = DeleteRecipientData(params.root, params.path, params.key, params.identity)
-        val body = ConvertionUtils.getGson().toJson(requestData)
         val url = URL(this.serviceUrl, "keyknox/v2/reset")
         val tokenContext = TokenContext("keyknox", "delete")
-        val response = this.httpClient.send(url, Method.POST, tokenContext, body)
+        val response = this.httpClient.send(url, Method.POST, tokenContext, requestData)
         val hashCode = extractKeyknoxHash(response)
         val keyknoxData =
             ConvertionUtils.getGson().fromJson(response.body, KeyknoxDataV2::class.java)
