@@ -76,7 +76,7 @@ public class AndroidStorageTest {
         tmpDir = new File(InstrumentationRegistry.getContext().getFilesDir().getAbsolutePath()
                 + File.separator + UUID.randomUUID().toString());
         keyStoreAlias = UUID.randomUUID().toString();
-        storage = new AndroidKeyStorage.Builder(keyStoreAlias).isAuthenticationRequired(true)
+        storage = new AndroidKeyStorage.Builder(keyStoreAlias).isAuthenticationRequired(false)
                 .onPath(tmpDir.getAbsolutePath()).build();
 
         VirgilKeyPair keyPair = crypto.generateKeyPair();

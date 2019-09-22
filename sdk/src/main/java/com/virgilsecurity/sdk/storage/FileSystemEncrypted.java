@@ -36,17 +36,25 @@ package com.virgilsecurity.sdk.storage;
 import com.virgilsecurity.common.model.Data;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.exception.NullArgumentException;
+import com.virgilsecurity.sdk.storage.exceptions.CreateDirectoryException;
+import com.virgilsecurity.sdk.storage.exceptions.DirectoryNotExistsException;
+import com.virgilsecurity.sdk.storage.exceptions.FileSystemException;
+import com.virgilsecurity.sdk.storage.exceptions.NotADirectoryException;
+import com.virgilsecurity.sdk.storage.exceptions.NotAFileException;
 
 import java.io.*;
-import java.nio.file.InvalidPathException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * FileSystemEncrypted class. Intended for storing data as plain files. Optionally can encrypt stored files.
  */
-public class FileSystemEncrypted {
+public class FileSystemEncrypted implements FileSystem {
 
+    private static final Logger LOGGER = Logger.getLogger(FileSystemEncrypted.class.getName());
     private static final int CHUNK_SIZE = 4096;
 
     private String rootPath;
@@ -60,7 +68,7 @@ public class FileSystemEncrypted {
      *                    with provided credentials. Otherwise if {@code credentials} is {@code null} files are stored
      *                    without encryption.
      */
-    public FileSystemEncrypted(String rootPath, FileSystemEncryptedCredentials credentials) {
+    public FileSystemEncrypted(String rootPath, FileSystemEncryptedCredentials credentials) throws FileSystemException {
         if (rootPath == null) {
             throw new NullArgumentException("rootPath");
         }
@@ -76,24 +84,22 @@ public class FileSystemEncrypted {
      *
      * @param rootPath Root path for storing files.
      */
-    public FileSystemEncrypted(String rootPath) {
-        this.rootPath = rootPath;
-
-        initFileSystem();
+    public FileSystemEncrypted(String rootPath) throws FileSystemException {
+        this(rootPath, null);
     }
 
-    private void initFileSystem() {
+    private void initFileSystem() throws FileSystemException {
         File dir = new File(this.rootPath);
 
         if (dir.exists()) {
             if (!dir.isDirectory()) {
-                throw new InvalidPathException(this.rootPath, "Is not a directory");
+                throw new NotADirectoryException(this.rootPath + " is not a directory");
             }
         } else {
             boolean created = dir.mkdirs();
 
             if (!created) {
-                throw new IllegalStateException("Cannot create directory: \'" + rootPath + "\'");
+                throw new CreateDirectoryException("Cannot create directory: \'" + rootPath + "\'");
             }
         }
     }
@@ -102,25 +108,25 @@ public class FileSystemEncrypted {
      * Write data.
      *
      * @param data   Data to write.
-     * @param name   File name.
-     * @param subdir Subdirectory.
+     * @param filename   File name.
+     * @param path Subdirectory.
      */
-    public void write(Data data, String name, String subdir) throws IOException, CryptoException {
+    public void write(Data data, String filename, String path) throws IOException, CryptoException {
         File file;
-        if (subdir != null) {
-            File subdirectory = new File(this.rootPath + File.separator + subdir);
+        if (path != null) {
+            File subdirectory = new File(this.rootPath + File.separator + path);
             if (subdirectory.exists() && subdirectory.isDirectory()) {
-                file = new File(this.rootPath + File.separator + subdir, name);
+                file = new File(this.rootPath + File.separator + path, filename);
             } else {
                 boolean created = subdirectory.mkdirs();
                 if (!created) {
-                    throw new IllegalStateException("Cannot create directory: \'" + subdir + "\'");
+                    throw new CreateDirectoryException("Cannot create directory: \'" + path + "\'");
                 }
 
-                file = new File(this.rootPath + File.separator + subdir, name);
+                file = new File(this.rootPath + File.separator + path, filename);
             }
         } else {
-            file = new File(this.rootPath, name);
+            file = new File(this.rootPath, filename);
         }
 
         byte[] dataToWrite;
@@ -141,27 +147,27 @@ public class FileSystemEncrypted {
      * Write data. Will overwrite existing data, to avoid this please, use {@link #exists(String)} method first.
      *
      * @param data Data to write.
-     * @param name File name.
+     * @param filename File name.
      */
-    public void write(Data data, String name) throws IOException, CryptoException {
-        write(data, name, null);
+    public void write(Data data, String filename) throws IOException, CryptoException {
+        write(data, filename, null);
     }
 
     /**
-     * @param name   File name.
-     * @param subdir Subdirectory.
+     * @param filename   File name.
+     * @param path Subdirectory.
      * @return Data.
      */
-    public Data read(String name, String subdir) throws IOException, CryptoException {
-        if (name == null) {
-            throw new NullArgumentException("name");
+    public Data read(String filename, String path) throws IOException, CryptoException {
+        if (filename == null) {
+            throw new NullArgumentException("filename");
         }
 
         File file;
-        if (subdir != null) {
-            file = new File(this.rootPath + File.separator + subdir, name);
+        if (path != null) {
+            file = new File(this.rootPath + File.separator + path, filename);
         } else {
-            file = new File(this.rootPath, name);
+            file = new File(this.rootPath, filename);
         }
 
         try (FileInputStream is = new FileInputStream(file);
@@ -190,39 +196,44 @@ public class FileSystemEncrypted {
     /**
      * Read data.
      *
-     * @param name File name.
-     * @return Data. // TODO add throws to descriptions
+     * @param filename File name.
+     * @return Data.
+     *
+     * @throws IOException
+     * @throws CryptoException
      */
-    public Data read(String name) throws IOException, CryptoException {
-        return read(name, null);
+    public Data read(String filename) throws IOException, CryptoException {
+        return read(filename, null);
     }
 
     /**
      * Returns file names in subdirectory.
      *
-     * @param subdir Subdirectory.
+     * @param path Subdirectory.
      * @return File names in subdirectory.
      */
-    public Set<String> listFileNames(String subdir) {
+    public Set<String> listFiles(String path) throws DirectoryNotExistsException, NotADirectoryException {
         File directory;
-        if (subdir != null) {
-            directory = new File(this.rootPath + File.separator + subdir);
+        if (path != null) {
+            directory = new File(this.rootPath + File.separator + path);
         } else {
             directory = new File(this.rootPath);
         }
 
         Set<String> fileNames;
         if (!directory.exists()) {
-            throw new InvalidPathException(directory.getPath(), "Directory: \'" + subdir + "\' doesn\'t exist.");
+            throw new DirectoryNotExistsException("Directory: \'" + path + "\' doesn\'t exist.");
         }
         if (!directory.isDirectory()) {
-            throw new InvalidPathException(directory.getPath(), "Isn\'t a directory: \'" + subdir + "\'");
+            throw new NotADirectoryException(path + " is not a directory:");
         }
 
         fileNames = new HashSet<>();
         //noinspection ConstantConditions
         for (File file : directory.listFiles()) {
-            fileNames.add(file.getName());
+            if (file.isFile()) {
+                fileNames.add(file.getName());
+            }
         }
 
 
@@ -234,26 +245,33 @@ public class FileSystemEncrypted {
      *
      * @return File names.
      */
-    public Set<String> listFileNames() {
-        return listFileNames(null);
+    public Set<String> listFiles() {
+        try {
+            return listFiles(null);
+        }
+        catch (FileSystemException e) {
+            // This should never happen.
+            LOGGER.log(Level.SEVERE, "Can't list file in the root directory", e);
+        }
+        return Collections.emptySet();
     }
 
     /**
      * Delete data file.
      *
-     * @param name   File name.
-     * @param subdir Subdirectory.
+     * @param filename   File name.
+     * @param path Path to a directory with a file.
      */
-    public boolean delete(String name, String subdir) {
-        if (name == null) {
-            throw new NullArgumentException("name");
+    public boolean delete(String filename, String path) throws NotAFileException {
+        if (filename == null) {
+            throw new NullArgumentException("filename");
         }
 
         File file;
-        if (subdir != null) {
-            file = new File(this.rootPath + File.separator + subdir, name);
+        if (path != null) {
+            file = new File(this.rootPath + File.separator + path, filename);
         } else {
-            file = new File(this.rootPath, name);
+            file = new File(this.rootPath, filename);
         }
 
         return file.delete();
@@ -262,21 +280,21 @@ public class FileSystemEncrypted {
     /**
      * Delete data file.
      *
-     * @param name File name.
+     * @param filename File name.
      */
-    public boolean delete(String name) {
-        return delete(name, null);
+    public boolean delete(String filename) throws NotAFileException {
+        return delete(filename, null);
     }
 
     /**
      * Delete subdirectory.
      *
-     * @param subdir Subdirectory.
+     * @param path Subdirectory.
      */
-    public boolean deleteSubdir(String subdir) {
+    public boolean deleteDirectory(String path) throws NotADirectoryException {
         File directory;
-        if (subdir != null) {
-            directory = new File(this.rootPath + File.separator + subdir);
+        if (path != null) {
+            directory = new File(this.rootPath + File.separator + path);
         } else {
             directory = new File(this.rootPath);
         }
@@ -287,61 +305,69 @@ public class FileSystemEncrypted {
     /**
      * Delete all in root directory.
      */
-    public boolean delete() {
-        return deleteSubdir(null);
+    public boolean delete() throws FileSystemException {
+        return deleteDirectory(null);
     } // TODO add tests
 
     /**
      * Checks whether file exists.
      *
-     * @param name   Name of file.
-     * @param subdir Subdirectory.
+     * @param filename   Name of file.
+     * @param path Subdirectory.
      * @return {@code true} if file exists, otherwise {@code false}.
      */
-    public boolean exists(String name, String subdir) throws IOException {
-        if (name == null) {
-            throw new NullArgumentException("name");
+    public boolean exists(String filename, String path) throws NotAFileException {
+        if (filename == null) {
+            throw new NullArgumentException("filename");
         }
 
         File file;
-        if (subdir != null) {
-            file = new File(this.rootPath + File.separator + subdir, name);
+        if (path != null) {
+            file = new File(this.rootPath + File.separator + path, filename);
         } else {
-            file = new File(this.rootPath, name);
+            file = new File(this.rootPath, filename);
+        }
+
+        if (!file.exists()) {
+            return false;
         }
 
         if (file.isDirectory()) {
-            throw new IOException("Specified file is a directory. Please, use \'existsSubdir\' method instead.");
+            throw new NotAFileException("Specified file is a directory. Please, use \'directoryExists\' method instead.");
         }
-        return file.exists();
+        return true;
     }
 
     /**
      * Checks whether file exists.
      *
-     * @param name Name of file.
+     * @param filename Name of file.
      * @return {@code true} if file exists, otherwise {@code false}.
      */
-    public boolean exists(String name) throws IOException {
-        return exists(name, null);
+    public boolean exists(String filename) throws NotAFileException {
+        return exists(filename, null);
     }
 
     /**
      * Checks whether subdirectory exists.
      *
-     * @param subdir Name of subdirectory.
+     * @param path Name of subdirectory.
      * @return {@code true} if subdirectory exists, otherwise {@code false}.
      */
-    public boolean existsSubdir(String subdir) throws IOException {
-        if (subdir == null) {
-            throw new NullArgumentException("subdir");
+    public boolean directoryExists(String path) throws NotADirectoryException {
+        if (path == null) {
+            throw new NullArgumentException("path");
         }
 
-        File file = new File(this.rootPath, subdir);
-        if (!file.isDirectory()) {
-            throw new IOException("Specified directory is a file. Please, use \'exists\' method instead.");
+        File file = new File(this.rootPath, path);
+        if (!file.exists()) {
+            return false;
         }
-        return file.exists();
+
+        if (!file.isDirectory()) {
+            throw new NotADirectoryException("Specified directory is a file. Please, use \'exists\' method instead.");
+        }
+        return true;
     }
 
     private boolean deleteDirectoryRecursively(File directoryToBeDeleted) {
