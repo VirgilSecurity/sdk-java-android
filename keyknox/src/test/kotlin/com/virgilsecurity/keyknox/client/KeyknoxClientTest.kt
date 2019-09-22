@@ -121,7 +121,6 @@ class KeyknoxClientTest {
     }
 
     @Test
-    @Disabled
     fun pushValue_v2() {
         // KTC-1
         val data = base64Encode(UUID.randomUUID().toString())
@@ -157,7 +156,6 @@ class KeyknoxClientTest {
         assertEquals(this.root, pushedValue.root)
         assertEquals(this.path, pushedValue.path)
         assertEquals(this.key, pushedValue.key)
-        assertEquals("1.0", pushedValue.version)
         assertNotNull(pushedValue.keyknoxHash)
         assertFalse(pushedValue.keyknoxHash.isEmpty())
 
@@ -168,7 +166,7 @@ class KeyknoxClientTest {
         assertEquals(this.root, pulledValue.root)
         assertEquals(this.path, pulledValue.path)
         assertEquals(this.key, pulledValue.key)
-        assertEquals("1.0", pulledValue.version)
+        assertNull(pulledValue.version)
         assertNotNull(pulledValue.keyknoxHash)
         assertFalse(pulledValue.keyknoxHash.isEmpty())
     }
@@ -234,7 +232,6 @@ class KeyknoxClientTest {
     }
 
     @Test
-    @Disabled
     fun pushValue_updateData_v2() {
         // KTC-2
         val data = base64Encode(UUID.randomUUID().toString())
@@ -293,7 +290,7 @@ class KeyknoxClientTest {
         assertEquals(this.root, pushedValue.root)
         assertEquals(this.path, pushedValue.path)
         assertEquals(this.key, pushedValue.key)
-        assertEquals("2.0", pushedValue2.version)
+        assertNull(pushedValue2.version)
         assertNotNull(pushedValue2.keyknoxHash)
         assertFalse(pushedValue2.keyknoxHash.isEmpty())
     }
@@ -312,7 +309,6 @@ class KeyknoxClientTest {
     }
 
     @Test
-    @Disabled
     fun pullValue_empty_v2() {
         // KTC-3
         val pullParams = KeyknoxPullParams(this.identity, this.root, this.path, this.key)
@@ -321,7 +317,7 @@ class KeyknoxClientTest {
         assertTrue(pulledValue.value.isEmpty())
         assertNotNull(pulledValue.meta)
         assertTrue(pulledValue.meta.isEmpty())
-        assertEquals("1.0", pulledValue.version)
+        assertNull(pulledValue.version)
     }
 
     @Test
@@ -341,7 +337,6 @@ class KeyknoxClientTest {
     }
 
     @Test
-    @Disabled
     fun resetValue_v2() {
         // KTC-4
         val data = base64Encode(UUID.randomUUID().toString())
@@ -356,7 +351,7 @@ class KeyknoxClientTest {
         assertTrue(resetValue.value.isEmpty())
         assertNotNull(resetValue.meta)
         assertTrue(resetValue.meta.isEmpty())
-        assertEquals("2.0", resetValue.version)
+        assertNull(resetValue.version)
     }
 
     @Test
@@ -371,7 +366,6 @@ class KeyknoxClientTest {
     }
 
     @Test
-    @Disabled
     fun resetValue_empty_v2() {
         // KTC-5
         val resetParams = KeyknoxResetParams(this.root, this.path, this.key)
@@ -380,11 +374,10 @@ class KeyknoxClientTest {
         assertTrue(resetValue.value.isEmpty())
         assertNotNull(resetValue.meta)
         assertTrue(resetValue.meta.isEmpty())
-        assertEquals("1.0", resetValue.version)
+        assertNull(resetValue.version)
     }
 
     @Test
-    @Disabled
     fun getKeys() {
         val data = base64Encode(UUID.randomUUID().toString())
 

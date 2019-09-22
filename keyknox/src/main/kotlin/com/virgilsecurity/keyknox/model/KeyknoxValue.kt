@@ -49,7 +49,7 @@ open class KeyknoxValue {
     val identities: Collection<String>
     val meta: ByteArray
     val value: ByteArray
-    val version: String?
+    @Deprecated("Version is deprecated") val version: String?
     val keyknoxHash: ByteArray
 
     constructor(keyknoxData: KeyknoxDataV2, keyknoxHash: ByteArray) : this(

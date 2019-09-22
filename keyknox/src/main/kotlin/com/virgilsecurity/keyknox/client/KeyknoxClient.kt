@@ -70,10 +70,9 @@ class KeyknoxClient : KeyknoxClientProtocol {
 
     override fun getKeys(params: KeyknoxGetKeysParams): Set<String> {
         val requestData = GetKeysData(params.root, params.path, params.identity)
-        val body = ConvertionUtils.getGson().toJson(requestData)
         val url = URL(this.serviceUrl, "keyknox/v2/keys")
         val tokenContext = TokenContext("keyknox", "get")
-        val response = this.httpClient.send(url, Method.POST, tokenContext, body)
+        val response = this.httpClient.send(url, Method.POST, tokenContext, requestData)
 
         val listType = object : TypeToken<Set<String>>() {}.type
         val keys = ConvertionUtils.getGson().fromJson<Set<String>>(response.body, listType)
@@ -125,7 +124,7 @@ class KeyknoxClient : KeyknoxClientProtocol {
             requestData.identities = params.identities
 
             val url = URL(this.serviceUrl, "keyknox/v2/push")
-            val response = this.httpClient.send(url, Method.PUT, tokenContext, requestData, headers)
+            val response = this.httpClient.send(url, Method.POST, tokenContext, requestData, headers)
             keyknoxValue = extractEncryptedKeyknoxValueV2(response)
         }
 
@@ -173,10 +172,7 @@ class KeyknoxClient : KeyknoxClientProtocol {
     }
 
     private fun extractKeyknoxHash(response: Response): ByteArray {
-        val hashStr = response.headers[VIRGIL_KEYKNOX_HASH_KEY]
-        if (hashStr == null || hashStr.isBlank()) {
-            throw InvalidHashHeaderException()
-        }
+        val hashStr = response.headers[VIRGIL_KEYKNOX_HASH_KEY] ?: throw InvalidHashHeaderException()
         val hash = base64Decode(hashStr)
         return hash
     }
