@@ -135,6 +135,8 @@ subprojects {
     // Don't publish examples subproject
     if (it.name != 'examples') {
 
+        apply plugin: 'signing'
+
         if (!isAndroid) {
             task sourcesJar(type: Jar) {
                 from sourceSets.main.allJava
@@ -199,6 +201,10 @@ subprojects {
                 }
             }
         }
+
+        signing {
+            sign publishing.publications.mavenJava
+        }
     }
 
     checkstyle {
@@ -209,9 +215,5 @@ subprojects {
                 'checkstyle.javadoc.severity' : 'error'
         ]
         ignoreFailures true
-    }
-
-    signing {
-        sign publishing.publications.mavenJava
     }
 }
