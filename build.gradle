@@ -89,6 +89,7 @@ buildscript {
 
 plugins {
     id 'checkstyle'
+    id 'signing'
 }
 
 allprojects {
@@ -210,4 +211,7 @@ subprojects {
         ignoreFailures true
     }
 
+    signing {
+        sign publishing.publications.mavenJava
+    }
 }
