@@ -100,9 +100,7 @@ public class HttpClient {
    * @param token       authentication token.
    * @param inputStream data for the body of POST/PUT requests.
    * @param clazz       type of the return class.
-   *
    * @return the response that is parsed as a provided clazz argument.
-   *
    * @throws VirgilServiceException if any issue with request is happend.
    */
   public <T> T execute(URL url, String method, String token, InputStream inputStream,
@@ -122,7 +120,7 @@ public class HttpClient {
             if (!StringUtils.isBlank(body)) {
               ErrorResponse error = ConvertionUtils.getGson().fromJson(body, ErrorResponse.class);
               HttpError httpError = new HttpError(urlConnection.getResponseCode(),
-                                                  urlConnection.getResponseMessage());
+                  urlConnection.getResponseMessage());
               throw new VirgilCardServiceException(error.getCode(), error.getMessage(), httpError);
             } else {
               LOGGER.warning("Response error body is empty. Nothing to show");
@@ -133,12 +131,12 @@ public class HttpClient {
             return null;
           }
           throw new VirgilCardServiceException(urlConnection.getResponseCode(),
-                                               urlConnection.getResponseMessage());
+              urlConnection.getResponseMessage());
         } else if (clazz.isAssignableFrom(Void.class)) {
           LOGGER.warning("Void is unacceptable type");
           return null;
         } else {
-          LOGGER.info("Trying to extract response body...");
+          LOGGER.fine("Trying to extract response body...");
           try (InputStream instream = new BufferedInputStream(urlConnection.getInputStream())) {
             String body = ConvertionUtils.toString(instream);
             T obj = ConvertionUtils.getGson().fromJson(body, clazz);
@@ -164,9 +162,7 @@ public class HttpClient {
    *
    * @param url    The URL.
    * @param method The HTTP method.
-   *
    * @return The connection.
-   *
    * @throws IOException if connection couldn't be created.
    */
   private HttpURLConnection createConnection(URL url, String method, String token)

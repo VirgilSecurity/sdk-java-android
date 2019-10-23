@@ -37,7 +37,6 @@ package com.virgilsecurity.sdk.exception;
  * Thrown to indicate that an argument was <code>null</code> or empty and should not have been.
  *
  * @author Andrii Iakovenko
- *
  */
 public class EmptyArgumentException extends IllegalArgumentException {
 
@@ -46,8 +45,7 @@ public class EmptyArgumentException extends IllegalArgumentException {
   /**
    * Create a new instance of {@code NullArgumentException}.
    *
-   * @param argName
-   *          the name of the argument that was {@code null} or empty.
+   * @param argName the name of the argument that was {@code null} or empty.
    */
   public EmptyArgumentException(String argName) {
     super((argName == null ? "Argument" : argName) + " must not be empty.");

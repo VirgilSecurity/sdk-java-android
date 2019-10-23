@@ -37,15 +37,22 @@ package com.virgilsecurity.sdk.crypto;
  * Algorithms supported by Crypto.
  *
  * @author Andrii Iakovenko
- *
  */
 public enum HashAlgorithm {
-  /** SHA224 algorithm. */
+  /**
+   * SHA224 algorithm.
+   */
   SHA224,
-  /** SHA256 algorithm. */
+  /**
+   * SHA256 algorithm.
+   */
   SHA256,
-  /** SHA384 algorithm. */
+  /**
+   * SHA384 algorithm.
+   */
   SHA384,
-  /** SHA512 algorithm. */
+  /**
+   * SHA512 algorithm.
+   */
   SHA512
 }

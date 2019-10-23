@@ -61,8 +61,7 @@ public class RawCardContent {
   /**
    * Instantiate {@linkplain RawCardContent} from the provided string.
    *
-   * @param cardModel
-   *          json serialized to string
+   * @param cardModel json serialized to string
    * @return the raw card content
    */
   public static RawCardContent fromJson(String cardModel) {
@@ -72,8 +71,7 @@ public class RawCardContent {
   /**
    * Instantiate {@linkplain RawCardContent} from the provided base64 string.
    *
-   * @param cardModel
-   *          base64-encoded json serialized to string
+   * @param cardModel base64-encoded json serialized to string
    * @return the raw card content
    */
   public static RawCardContent fromString(String cardModel) {
@@ -83,9 +81,8 @@ public class RawCardContent {
 
   /**
    * Create new instance of {@link RawCardContent}.
-   * 
-   * @param snapshot
-   *          The raw card content snapshot.
+   *
+   * @param snapshot The raw card content snapshot.
    */
   public RawCardContent(byte[] snapshot) {
     RawCardContent content = ConvertionUtils.parseSnapshot(snapshot, RawCardContent.class);
@@ -99,12 +96,9 @@ public class RawCardContent {
   /**
    * Instantiates a new Raw card content.
    *
-   * @param identity
-   *          the identity
-   * @param publicKey
-   *          the public key
-   * @param createdAt
-   *          when the Card was created at
+   * @param identity  the identity
+   * @param publicKey the public key
+   * @param createdAt when the Card was created at
    */
   public RawCardContent(String identity, String publicKey, Date createdAt) {
     this(identity, publicKey, "5.0", createdAt);
@@ -113,14 +107,10 @@ public class RawCardContent {
   /**
    * Instantiates a new Raw card content.
    *
-   * @param identity
-   *          the identity
-   * @param publicKey
-   *          the public key
-   * @param version
-   *          the version of Card (ex. "5.0")
-   * @param createdAt
-   *          when the Card was created at
+   * @param identity  the identity
+   * @param publicKey the public key
+   * @param version   the version of Card (ex. "5.0")
+   * @param createdAt when the Card was created at
    */
   public RawCardContent(String identity, String publicKey, String version, Date createdAt) {
     this(identity, publicKey, version, createdAt, null);
@@ -129,19 +119,14 @@ public class RawCardContent {
   /**
    * Instantiates a new Raw card content.
    *
-   * @param identity
-   *          the identity
-   * @param publicKey
-   *          the public key
-   * @param version
-   *          the version of Card (ex. "5.0")
-   * @param createdAt
-   *          when the Card was created at
-   * @param previousCardId
-   *          the previous card id that is current Card used to override
+   * @param identity       the identity
+   * @param publicKey      the public key
+   * @param version        the version of Card (ex. "5.0")
+   * @param createdAt      when the Card was created at
+   * @param previousCardId the previous card id that is current Card used to override
    */
   public RawCardContent(String identity, String publicKey, String version, Date createdAt,
-      String previousCardId) {
+                        String previousCardId) {
     this.identity = identity;
     this.publicKey = publicKey;
     this.version = version;
@@ -224,8 +209,7 @@ public class RawCardContent {
   /**
    * Sets created at.
    *
-   * @param createdAt
-   *          in seconds (Unix time)
+   * @param createdAt in seconds (Unix time)
    */
   public void setCreatedAt(long createdAt) {
     this.createdAt = createdAt;
@@ -234,8 +218,7 @@ public class RawCardContent {
   /**
    * Sets created at date.
    *
-   * @param createdAt
-   *          the created at
+   * @param createdAt the created at
    */
   public void setCreatedAtDate(Date createdAt) {
     this.createdAt = createdAt.getTime() / 1000;
@@ -244,8 +227,7 @@ public class RawCardContent {
   /**
    * Sets identity.
    *
-   * @param identity
-   *          the identity
+   * @param identity the identity
    */
   public void setIdentity(String identity) {
     this.identity = identity;
@@ -254,8 +236,7 @@ public class RawCardContent {
   /**
    * Sets previous card id.
    *
-   * @param previousCardId
-   *          the previous card id
+   * @param previousCardId the previous card id
    */
   public void setPreviousCardId(String previousCardId) {
     this.previousCardId = previousCardId;
@@ -264,8 +245,7 @@ public class RawCardContent {
   /**
    * Sets public key.
    *
-   * @param publicKeyData
-   *          the public key data
+   * @param publicKeyData the public key data
    */
   public void setPublicKey(String publicKeyData) {
     this.publicKey = publicKeyData;
@@ -274,8 +254,7 @@ public class RawCardContent {
   /**
    * Sets version.
    *
-   * @param version
-   *          the version
+   * @param version the version
    */
   public void setVersion(String version) {
     this.version = version;
@@ -283,7 +262,7 @@ public class RawCardContent {
 
   /**
    * Take snapshot.
-   * 
+   *
    * @return The snapshot.
    */
   public byte[] snapshot() {

@@ -36,17 +36,15 @@ package com.virgilsecurity.sdk.utils;
 /**
  * This class provides Base64url encoding functionality. See
  * <a href="https://www.rfc-editor.org/rfc/pdfrfc/rfc7515.txt.pdf">Appendix C</a> for details.
- * 
- * @author Andrii Iakovenko
  *
+ * @author Andrii Iakovenko
  */
 public class Base64Url {
 
   /**
    * Decodes base64url string to base64.
    *
-   * @param value
-   *          base64url encoded string.
+   * @param value base64url encoded string.
    * @return decoded string.
    */
   public static String decode(String value) {
@@ -56,8 +54,7 @@ public class Base64Url {
   /**
    * Decodes base64url string to base64.
    *
-   * @param value
-   *          base64url encoded string.
+   * @param value base64url encoded string.
    * @return decoded string.
    */
   public static byte[] decodeToBytes(String value) {
@@ -84,9 +81,8 @@ public class Base64Url {
 
   /**
    * Encodes bytes to base64url string.
-   * 
-   * @param bytes
-   *          The bytes for encoding.
+   *
+   * @param bytes The bytes for encoding.
    * @return base64url encoded string.
    */
   public static String encode(byte[] bytes) {
@@ -97,8 +93,7 @@ public class Base64Url {
   /**
    * Encodes string to base64url.
    *
-   * @param value
-   *          The string for encoding.
+   * @param value The string for encoding.
    * @return base64url encoded string.
    */
   public static String encode(String value) {

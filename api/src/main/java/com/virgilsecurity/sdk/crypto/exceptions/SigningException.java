@@ -37,7 +37,6 @@ package com.virgilsecurity.sdk.crypto.exceptions;
  * Signals that an exception of some sort has occurred during verification.
  *
  * @author Andrii Iakovenko
- *
  */
 public class SigningException extends CryptoException {
 
@@ -45,17 +44,15 @@ public class SigningException extends CryptoException {
 
   /**
    * Create a new instance of {@linkplain SigningException}.
-   *
    */
   public SigningException() {
   }
 
   /**
    * Create new instance of {@linkplain SigningException}.
-   * 
-   * @param message
-   *          The detail message. The detail message is saved for later retrieval by the
-   *          {@link #getMessage()} method.
+   *
+   * @param message The detail message. The detail message is saved for later retrieval by the
+   *                {@link #getMessage()} method.
    */
   public SigningException(String message) {
     super(message);
@@ -64,10 +61,9 @@ public class SigningException extends CryptoException {
   /**
    * Create a new instance of {@linkplain SigningException}.
    *
-   * @param cause
-   *          The cause (which is saved for later retrieval by the {@link #getCause()} method). (A
-   *          {@code null} value is permitted, and indicates that the cause is nonexistent or
-   *          unknown.)
+   * @param cause The cause (which is saved for later retrieval by the {@link #getCause()} method). (A
+   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
+   *              unknown.)
    */
   public SigningException(Throwable cause) {
     super(cause);

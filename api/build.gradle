@@ -1,0 +1,11 @@
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom {
+                name = 'Virgil SDK - API'
+            }
+            artifactId = "api"
+        }
+    }
+}

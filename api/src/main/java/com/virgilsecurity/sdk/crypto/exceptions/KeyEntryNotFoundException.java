@@ -37,7 +37,6 @@ package com.virgilsecurity.sdk.crypto.exceptions;
  * The exception that is thrown when an key pair is not found.
  *
  * @author Andrii Iakovenko
- *
  */
 public class KeyEntryNotFoundException extends KeyStorageException {
 
@@ -45,7 +44,6 @@ public class KeyEntryNotFoundException extends KeyStorageException {
 
   /**
    * Create a new instance of {@code KeyEntryNotFoundException}.
-   *
    */
   public KeyEntryNotFoundException() {
   }

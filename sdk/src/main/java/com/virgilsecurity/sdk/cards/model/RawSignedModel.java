@@ -58,8 +58,7 @@ public class RawSignedModel {
   /**
    * Instantiate {@link RawSignedModel} from provided string.
    *
-   * @param cardModel
-   *          the card model
+   * @param cardModel the card model
    * @return the raw signed model
    */
   public static RawSignedModel fromJson(String cardModel) {
@@ -69,8 +68,7 @@ public class RawSignedModel {
   /**
    * Instantiate {@link RawSignedModel} from provided base64 string.
    *
-   * @param cardModel
-   *          the card model
+   * @param cardModel the card model
    * @return the raw signed model
    */
   public static RawSignedModel fromString(String cardModel) {
@@ -80,8 +78,7 @@ public class RawSignedModel {
   /**
    * Instantiates a new Raw signed model.
    *
-   * @param contentSnapshot
-   *          the content snapshot
+   * @param contentSnapshot the content snapshot
    */
   public RawSignedModel(byte[] contentSnapshot) {
     Validator.checkNullEmptyAgrument(contentSnapshot,
@@ -95,10 +92,8 @@ public class RawSignedModel {
   /**
    * Instantiates a new Raw signed model.
    *
-   * @param contentSnapshot
-   *          the content snapshot
-   * @param signatures
-   *          the list of signatures
+   * @param contentSnapshot the content snapshot
+   * @param signatures      the list of signatures
    */
   public RawSignedModel(byte[] contentSnapshot, List<RawSignature> signatures) {
     Validator.checkNullEmptyAgrument(contentSnapshot,
@@ -117,10 +112,8 @@ public class RawSignedModel {
 
   /**
    * Creates new instance of {@link RawSignedModel}.
-   * 
-   * @param base64EncodedModel
-   *          the Base64-encoded raw signed model.
    *
+   * @param base64EncodedModel the Base64-encoded raw signed model.
    * @deprecated use {@link RawSignedModel#fromString(String)} instead.
    */
   @Deprecated
@@ -135,8 +128,7 @@ public class RawSignedModel {
    * Add signature. The signature that is about to add must be unique (by signer). Max number of
    * signatures is up to 8.
    *
-   * @param rawSignature
-   *          the raw signature
+   * @param rawSignature the raw signature
    */
   public void addSignature(RawSignature rawSignature) {
     if (signatures.size() > 7) {
@@ -192,8 +184,7 @@ public class RawSignedModel {
   /**
    * Sets content snapshot.
    *
-   * @param contentSnapshot
-   *          the content snapshot
+   * @param contentSnapshot the content snapshot
    */
   public void setContentSnapshot(byte[] contentSnapshot) {
     this.contentSnapshot = contentSnapshot;
@@ -202,8 +193,7 @@ public class RawSignedModel {
   /**
    * Sets list of signatures.
    *
-   * @param signatures
-   *          the list of signatures
+   * @param signatures the list of signatures
    */
   public void setSignatures(List<RawSignature> signatures) {
     if (signatures.size() > 8) {
@@ -211,10 +201,10 @@ public class RawSignedModel {
           + signatures.size());
       throw new IllegalArgumentException(
           "RawSignedModel -> 'signatures' can hold up to 8 signatures only"); // TODO:
-                                                                              // 2/13/18
-                                                                              // add
-                                                                              // size
-                                                                              // test
+      // 2/13/18
+      // add
+      // size
+      // test
     }
 
     if (!isAllSignaturesUnique(signatures)) {
@@ -262,20 +252,26 @@ public class RawSignedModel {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
+    }
     RawSignedModel other = (RawSignedModel) obj;
-    if (!Arrays.equals(contentSnapshot, other.contentSnapshot))
+    if (!Arrays.equals(contentSnapshot, other.contentSnapshot)) {
       return false;
+    }
     if (signatures == null) {
-      if (other.signatures != null)
+      if (other.signatures != null) {
         return false;
-    } else if (!signatures.equals(other.signatures))
+      }
+    } else if (!signatures.equals(other.signatures)) {
       return false;
+    }
     return true;
   }
 

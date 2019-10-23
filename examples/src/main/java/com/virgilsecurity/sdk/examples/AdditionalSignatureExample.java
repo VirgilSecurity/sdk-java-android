@@ -33,8 +33,6 @@
 
 package com.virgilsecurity.sdk.examples;
 
-import java.util.Date;
-
 import com.virgilsecurity.sdk.cards.CardManager;
 import com.virgilsecurity.sdk.cards.CardManager.SignCallback;
 import com.virgilsecurity.sdk.cards.ModelSigner;
@@ -42,11 +40,7 @@ import com.virgilsecurity.sdk.cards.model.RawCardContent;
 import com.virgilsecurity.sdk.cards.model.RawSignedModel;
 import com.virgilsecurity.sdk.cards.validation.CardVerifier;
 import com.virgilsecurity.sdk.cards.validation.VirgilCardVerifier;
-import com.virgilsecurity.sdk.crypto.CardCrypto;
-import com.virgilsecurity.sdk.crypto.PrivateKey;
-import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
-import com.virgilsecurity.sdk.crypto.VirgilCrypto;
-import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
+import com.virgilsecurity.sdk.crypto.*;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.jwt.TokenContext;
 import com.virgilsecurity.sdk.jwt.accessProviders.CallbackJwtProvider;
@@ -54,14 +48,16 @@ import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
 import com.virgilsecurity.sdk.utils.Tuple;
 
+import java.security.PrivateKey;
+import java.util.Date;
+
 /**
  * @author Andrii Iakovenko
- *
  */
 public class AdditionalSignatureExample {
 
   // Your's server private key
-  private static PrivateKey PRIVATE_KEY;
+  private static VirgilPrivateKey PRIVATE_KEY;
 
   public static void main(String[] args) throws CryptoException {
     new AdditionalSignatureExample().run();
@@ -70,7 +66,7 @@ public class AdditionalSignatureExample {
 
   /**
    * Create new instance of {@link AdditionalSignatureExample}.
-   * 
+   *
    * @throws CryptoException
    */
   public AdditionalSignatureExample() throws CryptoException {
@@ -107,9 +103,9 @@ public class AdditionalSignatureExample {
 
   private String signCard(String rawCardStr) throws CryptoException {
     // Receive rawCardStr from a client
-    RawSignedModel rawCard = new RawSignedModel(rawCardStr);
+    RawSignedModel rawCard = RawSignedModel.fromString(rawCardStr);
 
-    CardCrypto cardCrypto = new VirgilCardCrypto();
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto();
     ModelSigner modelSigner = new ModelSigner(cardCrypto);
 
     // sign a user's card with a server's private key
@@ -123,25 +119,17 @@ public class AdditionalSignatureExample {
 
   @SuppressWarnings("unused")
   private void transmitCard() {
-    CardCrypto cardCrypto = new VirgilCardCrypto();
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto();
     AccessTokenProvider accessTokenProvider = new CallbackJwtProvider(
-        new CallbackJwtProvider.GetTokenCallback() {
-          @Override
-          public String onGetToken(TokenContext tokenContext) {
-            return "your token generation implementation";
-          }
-        });
+            tokenContext -> "your token generation implementation");
     CardVerifier cardVerifier = new VirgilCardVerifier(cardCrypto);
-    SignCallback signCallback = new SignCallback() {
+    SignCallback signCallback = rawCard -> {
+      String rawCardStr = rawCard.exportAsBase64String();
 
-      @Override
-      public RawSignedModel onSign(RawSignedModel rawCard) {
-        String rawCardStr = rawCard.exportAsBase64String();
+      // Send this string to server-side, where it will be signed
+      RawSignedModel signedRawCard = RawSignedModel.fromString(rawCardStr);
 
-        // Send this string to server-side, where it will be signed
-        RawSignedModel signedRawCard = new RawSignedModel(rawCardStr);
-        return signedRawCard;
-      }
+      return signedRawCard;
     };
 
     CardManager cardManager = new CardManager(cardCrypto, accessTokenProvider, cardVerifier,

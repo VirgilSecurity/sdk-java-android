@@ -33,14 +33,14 @@
 
 package com.virgilsecurity.sdk.common;
 
-import static org.junit.Assert.fail;
-
 import com.virgilsecurity.sdk.crypto.VirgilCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
 import com.virgilsecurity.sdk.crypto.VirgilPublicKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class PropertyManager {
 

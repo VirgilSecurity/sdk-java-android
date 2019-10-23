@@ -50,7 +50,6 @@ import java.util.Set;
 
 /**
  * @author Andrii Iakovenko
- *
  */
 public class DefaultKeyStorage implements KeyStorage {
 
@@ -65,7 +64,6 @@ public class DefaultKeyStorage implements KeyStorage {
 
   /**
    * Create a new instance of {@code VirgilKeyStorage}.
-   *
    */
   public DefaultKeyStorage() {
     StringBuilder path = new StringBuilder(System.getProperty("user.home"));
@@ -80,7 +78,6 @@ public class DefaultKeyStorage implements KeyStorage {
 
   /**
    * Create a new instance of {@code VirgilKeyStorage}.
-   *
    */
   public DefaultKeyStorage(String directoryName, String fileName) {
     this.directoryName = directoryName;
@@ -91,7 +88,7 @@ public class DefaultKeyStorage implements KeyStorage {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.crypto.KeyStore#delete(java.lang.String)
    */
   @Override
@@ -108,7 +105,7 @@ public class DefaultKeyStorage implements KeyStorage {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.crypto.KeyStore#exists(java.lang.String)
    */
   @Override
@@ -124,7 +121,7 @@ public class DefaultKeyStorage implements KeyStorage {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.crypto.KeyStore#load(java.lang.String)
    */
   @Override
@@ -142,7 +139,7 @@ public class DefaultKeyStorage implements KeyStorage {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.storage.KeyStorage#names()
    */
   @Override
@@ -153,7 +150,7 @@ public class DefaultKeyStorage implements KeyStorage {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.crypto.KeyStore#store(com.virgilsecurity.sdk. crypto.KeyEntry)
    */
   @Override
@@ -235,7 +232,7 @@ public class DefaultKeyStorage implements KeyStorage {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.storage.KeyStorage#createEntry(java.lang.String, byte[])
    */
   @Override

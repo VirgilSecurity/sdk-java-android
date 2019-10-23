@@ -33,14 +33,7 @@
 
 package com.virgilsecurity.sdk.utils;
 
-import com.virgilsecurity.crypto.foundation.CtrDrbg;
-import com.virgilsecurity.crypto.foundation.KeyAlg;
-import com.virgilsecurity.crypto.foundation.KeyAlgFactory;
-import com.virgilsecurity.crypto.foundation.KeyAsn1Serializer;
-import com.virgilsecurity.crypto.foundation.PrivateKey;
-import com.virgilsecurity.crypto.foundation.PublicKey;
-import com.virgilsecurity.crypto.foundation.RawPrivateKey;
-import com.virgilsecurity.crypto.foundation.RawPublicKey;
+import com.virgilsecurity.crypto.foundation.*;
 import com.virgilsecurity.sdk.cards.Card;
 import com.virgilsecurity.sdk.cards.CardSignature;
 import com.virgilsecurity.sdk.cards.SignerType;
@@ -51,35 +44,35 @@ import com.virgilsecurity.sdk.cards.model.RawSignedModel;
 import java.util.List;
 import java.util.Objects;
 
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestUtils {
 
   public static void assertCardContentsEquals(RawCardContent expectedCardContent,
-      RawCardContent actualCardContent) {
+                                              RawCardContent actualCardContent) {
     if (!cardContentsEqualsSelfSignOnly(expectedCardContent, actualCardContent)) {
-      Assert.fail("\nExpected card:\n" + expectedCardContent.toString() + "\n\nActual card:\n"
+      fail("\nExpected card:\n" + expectedCardContent.toString() + "\n\nActual card:\n"
           + actualCardContent.toString());
     }
   }
 
   public static void assertCardModelsEquals(RawSignedModel expectedCardModel,
-      RawSignedModel actualCardModel) {
+                                            RawSignedModel actualCardModel) {
     if (!cardModelsEqualsSelfSignOnly(expectedCardModel, actualCardModel)) {
-      Assert.fail("\nExpected card:\n" + expectedCardModel.toString() + "\n\nActual card:\n"
+      fail("\nExpected card:\n" + expectedCardModel.toString() + "\n\nActual card:\n"
           + actualCardModel.toString());
     }
   }
 
   public static void assertCardsEquals(Card expectedCard, Card actualCard) {
     if (!cardsEqualsSelfSignOnly(expectedCard, actualCard)) {
-      Assert.fail("\nExpected card:\n" + ConvertionUtils.getGson().toJson(expectedCard)
+      fail("\nExpected card:\n" + ConvertionUtils.getGson().toJson(expectedCard)
           + "\n\nActual card:\n" + ConvertionUtils.getGson().toJson(actualCard));
     }
   }
 
   public static boolean cardContentsEqualsSelfSignOnly(RawCardContent cardContentOne,
-      RawCardContent cardContentTwo) {
+                                                       RawCardContent cardContentTwo) {
     return Objects.equals(cardContentOne.getIdentity(), cardContentTwo.getIdentity())
         && Objects.equals(cardContentOne.getPublicKey(), cardContentTwo.getPublicKey())
         && Objects.equals(cardContentOne.getVersion(), cardContentTwo.getVersion())
@@ -88,7 +81,7 @@ public class TestUtils {
   }
 
   public static boolean cardModelsEqualsSelfSignOnly(RawSignedModel cardModelOne,
-      RawSignedModel cardModelTwo) {
+                                                     RawSignedModel cardModelTwo) {
     RawCardContent rawCardContentOne = ConvertionUtils
         .deserializeFromJson(new String(cardModelOne.getContentSnapshot()), RawCardContent.class);
     RawCardContent rawCardContentTwo = ConvertionUtils
@@ -118,7 +111,7 @@ public class TestUtils {
 
   public static byte[] exportPrivateKey(PrivateKey privateKey) {
     try (KeyAsn1Serializer serializer = new KeyAsn1Serializer();
-        CtrDrbg random = new CtrDrbg()) {
+         CtrDrbg random = new CtrDrbg()) {
       serializer.setupDefaults();
       random.setupDefaults();
 
@@ -128,10 +121,10 @@ public class TestUtils {
       return serializer.serializePrivateKey(rawPrivateKey);
     }
   }
-  
+
   public static byte[] exportPublicKey(PublicKey publicKey) {
     try (KeyAsn1Serializer serializer = new KeyAsn1Serializer();
-        CtrDrbg random = new CtrDrbg()) {
+         CtrDrbg random = new CtrDrbg()) {
       serializer.setupDefaults();
       random.setupDefaults();
 
@@ -143,7 +136,7 @@ public class TestUtils {
   }
 
   public static RawSignedModel getCardModelByIdentity(List<RawSignedModel> cardModels,
-      String identity) {
+                                                      String identity) {
     if (cardModels == null || cardModels.isEmpty()) {
       return null;
     }

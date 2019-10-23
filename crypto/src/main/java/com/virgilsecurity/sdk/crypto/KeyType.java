@@ -81,6 +81,11 @@ public enum KeyType {
     return algId;
   }
 
+  /**
+   * Get key len.
+   *
+   * @return Key length in bits if key of RSA, -1 otherwise.
+   */
   public int getRsaBitLen() {
     switch (this) {
       case RSA_2048:

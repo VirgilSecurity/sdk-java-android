@@ -62,9 +62,8 @@ public class CachingJwtProvider implements AccessTokenProvider {
      * <p>Implement the jwt renew mechanism.</p>
      * In this callback you should return valid JsonWebToken as base64 string in 2 or 3 parts
      * separated with dot ('.').
-     * 
-     * @param tokenContext
-     *          the tokenContext that is used to get token
+     *
+     * @param tokenContext the tokenContext that is used to get token
      * @return the renewed jwt
      */
     Jwt renewJwt(TokenContext tokenContext);
@@ -78,8 +77,7 @@ public class CachingJwtProvider implements AccessTokenProvider {
   /**
    * Instantiates a new Caching jwt provider.
    *
-   * @param renewJwtCallback
-   *          the renew jwt callback
+   * @param renewJwtCallback the renew jwt callback
    */
   public CachingJwtProvider(RenewJwtCallback renewJwtCallback) {
     this.renewJwtCallback = renewJwtCallback;
@@ -88,10 +86,8 @@ public class CachingJwtProvider implements AccessTokenProvider {
   /**
    * Instantiates a new Caching jwt provider.
    *
-   * @param renewJwtCallback
-   *          the renew jwt callback
-   * @param initialJwt
-   *          the initial jwt that will be used until expired
+   * @param renewJwtCallback the renew jwt callback
+   * @param initialJwt       the initial jwt that will be used until expired
    */
   public CachingJwtProvider(RenewJwtCallback renewJwtCallback, Jwt initialJwt) {
     this.renewJwtCallback = renewJwtCallback;

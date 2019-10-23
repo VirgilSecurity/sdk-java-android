@@ -53,11 +53,9 @@ public class CardSignature {
 
     /**
      * Create new instance of {@link CardSignatureBuilder}.
-     * 
-     * @param signer
-     *          the signer type
-     * @param signature
-     *          the signature
+     *
+     * @param signer    the signer type
+     * @param signature the signature
      */
     public CardSignatureBuilder(String signer, byte[] signature) {
       this.signer = signer;
@@ -82,8 +80,7 @@ public class CardSignature {
     /**
      * Sets extra fields. It's optional property.
      *
-     * @param extraFields
-     *          the extra fields
+     * @param extraFields the extra fields
      * @return the card signature builder
      */
     public CardSignatureBuilder extraFields(Map<String, String> extraFields) {
@@ -94,8 +91,7 @@ public class CardSignature {
     /**
      * Sets snapshot. It's optional property.
      *
-     * @param snapshot
-     *          the snapshot
+     * @param snapshot the snapshot
      * @return the card signature builder
      */
     public CardSignatureBuilder snapshot(byte[] snapshot) {
@@ -103,7 +99,7 @@ public class CardSignature {
       return this;
     }
   }
-  
+
   private String signer;
   private byte[] signature;
   private byte[] snapshot;

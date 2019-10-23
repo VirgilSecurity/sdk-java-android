@@ -33,14 +33,11 @@
 
 package com.virgilsecurity.sdk.examples;
 
-import java.util.Arrays;
-
 import com.virgilsecurity.sdk.cards.CardManager;
 import com.virgilsecurity.sdk.cards.validation.CardVerifier;
 import com.virgilsecurity.sdk.cards.validation.VerifierCredentials;
 import com.virgilsecurity.sdk.cards.validation.VirgilCardVerifier;
 import com.virgilsecurity.sdk.cards.validation.Whitelist;
-import com.virgilsecurity.sdk.crypto.CardCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
 import com.virgilsecurity.sdk.jwt.TokenContext;
 import com.virgilsecurity.sdk.jwt.accessProviders.CallbackJwtProvider;
@@ -48,23 +45,24 @@ import com.virgilsecurity.sdk.jwt.accessProviders.CallbackJwtProvider.GetTokenCa
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
 
+import java.util.Arrays;
+
 /**
  * @author Andrii Iakovenko
- *
  */
 public class SetupCardManagerExample {
 
   private static final String PUBLIC_KEY_STR = "Your public key as Base64 encoded string";
 
   public static void main(String[] args) {
-    CardCrypto cardCrypto = setupCrypto();
+    VirgilCardCrypto cardCrypto = setupCrypto();
     AccessTokenProvider accessTokenProvider = setupAccessTokenProvider();
     CardVerifier cardVerifier = setupCardVerifier(cardCrypto);
     CardManager cardManager = initializeCardManager(cardCrypto, accessTokenProvider, cardVerifier);
   }
 
-  private static CardManager initializeCardManager(CardCrypto cardCrypto,
-      AccessTokenProvider accessTokenProvider, CardVerifier cardVerifier) {
+  private static CardManager initializeCardManager(VirgilCardCrypto cardCrypto,
+                                                   AccessTokenProvider accessTokenProvider, CardVerifier cardVerifier) {
 
     CardManager cardManager = new CardManager(cardCrypto, accessTokenProvider, cardVerifier);
 
@@ -85,7 +83,7 @@ public class SetupCardManagerExample {
     return accessTokenProvider;
   }
 
-  private static CardVerifier setupCardVerifier(CardCrypto cardCrypto) {
+  private static CardVerifier setupCardVerifier(VirgilCardCrypto cardCrypto) {
     VerifierCredentials yourBackendVerifierCredenetials = new VerifierCredentials("YOUR_BACKEND",
         ConvertionUtils.base64ToBytes(PUBLIC_KEY_STR));
 
@@ -97,9 +95,9 @@ public class SetupCardManagerExample {
     return cardVerifier;
   }
 
-  private static CardCrypto setupCrypto() {
+  private static VirgilCardCrypto setupCrypto() {
     // Setup Crypto
-    CardCrypto cardCrypto = new VirgilCardCrypto();
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto();
 
     return cardCrypto;
   }

@@ -47,10 +47,8 @@ public final class TimeSpan {
   /**
    * Represents time span (interval) in specified time unit.
    *
-   * @param lifetime
-   *          in specified by second argument unit. Must be &gt;= 0.
-   * @param timeUnit
-   *          any {@link TimeUnit}.
+   * @param lifetime in specified by second argument unit. Must be &gt;= 0.
+   * @param timeUnit any {@link TimeUnit}.
    * @return TimeSpan instance with time span in specified unit.
    */
   public static TimeSpan fromTime(long lifetime, TimeUnit timeUnit) {
@@ -69,8 +67,7 @@ public final class TimeSpan {
   /**
    * If TimeSpan was cleared - time span will be added to zero (0) value.
    *
-   * @param increment
-   *          the milliseconds to be added to current time. Must be &gt;= 0.
+   * @param increment the milliseconds to be added to current time. Must be &gt;= 0.
    */
   public void add(long increment) {
     if (increment <= 0) {
@@ -91,8 +88,7 @@ public final class TimeSpan {
    * Decrease the expire interval. Cannot be less than zero (0). (Ex. timeSpan.add(2);
    * timeSpan.decrease(5); timeSpan.getSpan(); output value is zero (0))
    *
-   * @param decrement
-   *          to decrease the expire interval. Must be &gt;= 0.
+   * @param decrement to decrease the expire interval. Must be &gt;= 0.
    */
   public void decrease(long decrement) {
     if (decrement <= 0) {

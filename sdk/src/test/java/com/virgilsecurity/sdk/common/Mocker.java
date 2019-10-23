@@ -33,8 +33,6 @@
 
 package com.virgilsecurity.sdk.common;
 
-import static org.junit.Assert.fail;
-
 import com.virgilsecurity.sdk.cards.ModelSigner;
 import com.virgilsecurity.sdk.cards.model.RawCardContent;
 import com.virgilsecurity.sdk.cards.model.RawSignedModel;
@@ -44,8 +42,11 @@ import com.virgilsecurity.sdk.jwt.Jwt;
 import com.virgilsecurity.sdk.jwt.JwtGenerator;
 import com.virgilsecurity.sdk.jwt.JwtVerifier;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
+
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class Mocker extends PropertyManager {
 
@@ -61,7 +62,7 @@ public class Mocker extends PropertyManager {
 
   public Mocker() {
     this.crypto = new VirgilCrypto();
-    AccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner();
+    VirgilAccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner();
 
     VirgilPrivateKey privateKey = getApiPrivateKey();
     VirgilPrivateKey privateKeyFake = null;
@@ -205,7 +206,8 @@ public class Mocker extends PropertyManager {
   }
 
   private JwtGenerator initJwtGenerator(String appId, VirgilPrivateKey privateKey,
-      String apiPublicKeyIdentifier, TimeSpan timeSpan, AccessTokenSigner accessTokenSigner) {
+                                        String apiPublicKeyIdentifier, TimeSpan timeSpan,
+                                        VirgilAccessTokenSigner accessTokenSigner) {
     return new JwtGenerator(appId, privateKey, apiPublicKeyIdentifier, timeSpan, accessTokenSigner);
   }
 }

@@ -33,18 +33,10 @@
 
 package com.virgilsecurity.sdk.common;
 
-import static org.junit.Assert.fail;
-
-import com.virgilsecurity.sdk.crypto.CardCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
-import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
 
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Generator {
   private static final String IDENTITY = "TEST-java-v5-";
@@ -54,20 +46,14 @@ public class Generator {
 
   public static String cardId() {
     byte[] fingerprint = randomBytes(32);
-    CardCrypto crypto = new VirgilCardCrypto();
+    VirgilCardCrypto crypto = new VirgilCardCrypto();
 
-    try {
-      return ConvertionUtils.toString(Arrays.copyOfRange(crypto.computeSha512(fingerprint), 0, 32),
+    return ConvertionUtils.toString(Arrays.copyOfRange(crypto.computeSha512(fingerprint), 0, 32),
           StringEncoding.HEX);
-    } catch (CryptoException e) {
-      fail(e.getMessage());
-    }
-
-    return null;
   }
 
   public static String firstName() {
-    String[] names = new String[] { "Alice", "Bob", "Greg", "Jenny", "John", "Molly" };
+    String[] names = new String[] {"Alice", "Bob", "Greg", "Jenny", "John", "Molly"};
     return names[randomInt(5)];
   }
 
@@ -80,7 +66,7 @@ public class Generator {
   }
 
   public static String lastName() {
-    String[] names = new String[] { "Archer", "Slater", "Cook", "Fisher", "Hunter", "Glover" };
+    String[] names = new String[] {"Archer", "Slater", "Cook", "Fisher", "Hunter", "Glover"};
     return names[randomInt(5)];
   }
 

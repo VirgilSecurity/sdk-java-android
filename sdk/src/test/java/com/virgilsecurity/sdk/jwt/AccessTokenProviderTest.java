@@ -33,10 +33,6 @@
 
 package com.virgilsecurity.sdk.jwt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import com.virgilsecurity.sdk.common.Generator;
 import com.virgilsecurity.sdk.common.Mocker;
@@ -44,19 +40,19 @@ import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.jwt.accessProviders.CachingJwtProvider;
 import com.virgilsecurity.sdk.jwt.contract.AccessToken;
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link AccessTokenProvider}.
- * 
- * @author Danylo Oliinyk
  *
+ * @author Danylo Oliinyk
  */
 public class AccessTokenProviderTest {
   private static final long SEVEN_SECONDS_MILLIS = 7 * 1000; // 7 seconds
@@ -73,8 +69,7 @@ public class AccessTokenProviderTest {
   public void caching_jwt_provider_renew_test() throws InterruptedException {
     CachingJwtProvider jwtProvider = initCachingJwtProvider();
 
-    TokenContext tokenContext = new TokenContext(TOKEN_OPERATION, TOKEN_FORCE_RELOAD,
-        TOKEN_SERVICE);
+    TokenContext tokenContext = new TokenContext(TOKEN_SERVICE, TOKEN_OPERATION, TOKEN_FORCE_RELOAD);
 
     AccessToken token1 = jwtProvider.getToken(tokenContext);
     assertNotNull(token1);
@@ -95,8 +90,7 @@ public class AccessTokenProviderTest {
   @Test
   public void caching_jwt_provider_renew_test_concurrent() throws InterruptedException {
     final CachingJwtProvider jwtProvider = initCachingJwtProvider();
-    final TokenContext tokenContext = new TokenContext(TOKEN_OPERATION, TOKEN_FORCE_RELOAD,
-        TOKEN_SERVICE);
+    final TokenContext tokenContext = new TokenContext(TOKEN_SERVICE, TOKEN_OPERATION, TOKEN_FORCE_RELOAD);
     ExecutorService exec = Executors.newFixedThreadPool(16);
 
     for (int i = 0; i < 10000; i++) {
@@ -140,43 +134,43 @@ public class AccessTokenProviderTest {
 
   @Test
   public void caching_jwt_provider_thread_safe() throws InterruptedException {
-      final int[] counter = new int[1];
+    final int[] counter = new int[1];
 
-      final CachingJwtProvider jwtProvider = new CachingJwtProvider(new CachingJwtProvider.RenewJwtCallback() {
-          @Override
-          public Jwt renewJwt(TokenContext tokenContext) {
-              try {
-                  counter[0]++;
-                  return mocker.generateSevenSecondsAccessToken(FAKE_IDENTITY);
-              } catch (CryptoException e) {
-                  e.printStackTrace();
-                  throw new NullPointerException("Error generating token");
-              }
-          }
-      });
-
-      final TokenContext tokenContext = new TokenContext(TOKEN_OPERATION, TOKEN_FORCE_RELOAD, TOKEN_SERVICE);
-
-      ExecutorService exec = Executors.newFixedThreadPool(6);
-
-      for (int i = 0; i <= 5; i++) {
-          exec.execute(new Runnable() {
-              @Override
-              public void run() {
-                  System.out.println("Thread id: " + Thread.currentThread().getName());
-
-                  AccessToken token1 = jwtProvider.getToken(tokenContext);
-                  if (token1 == null) {
-                      throw new NullPointerException();
-                  }
-              }
-          });
+    final CachingJwtProvider jwtProvider = new CachingJwtProvider(new CachingJwtProvider.RenewJwtCallback() {
+      @Override
+      public Jwt renewJwt(TokenContext tokenContext) {
+        try {
+          counter[0]++;
+          return mocker.generateSevenSecondsAccessToken(FAKE_IDENTITY);
+        } catch (CryptoException e) {
+          e.printStackTrace();
+          throw new NullPointerException("Error generating token");
+        }
       }
+    });
 
-      exec.shutdown();
-      exec.awaitTermination(10, TimeUnit.SECONDS);
+    final TokenContext tokenContext = new TokenContext(TOKEN_SERVICE, TOKEN_OPERATION, TOKEN_FORCE_RELOAD);
 
-      assertEquals(1, counter[0]);
+    ExecutorService exec = Executors.newFixedThreadPool(6);
+
+    for (int i = 0; i <= 5; i++) {
+      exec.execute(new Runnable() {
+        @Override
+        public void run() {
+          System.out.println("Thread id: " + Thread.currentThread().getName());
+
+          AccessToken token1 = jwtProvider.getToken(tokenContext);
+          if (token1 == null) {
+            throw new NullPointerException();
+          }
+        }
+      });
+    }
+
+    exec.shutdown();
+    exec.awaitTermination(10, TimeUnit.SECONDS);
+
+    assertEquals(1, counter[0]);
   }
 
   @Test
@@ -184,18 +178,19 @@ public class AccessTokenProviderTest {
     final int[] counter = new int[1];
     final String identity = Generator.identity();
 
-    final JwtGenerator jwtGeneratorSevenSeconds =  mocker.getJwtGeneratorForSeconds(10);
+    final JwtGenerator jwtGeneratorSevenSeconds = mocker.getJwtGeneratorForSeconds(10);
     Jwt tokenInitial = jwtGeneratorSevenSeconds.generateToken(identity);
     CachingJwtProvider cachingJwtProvider = new CachingJwtProvider(new CachingJwtProvider.RenewJwtCallback() {
 
-      @Override public Jwt renewJwt(TokenContext tokenContext) {
-          try {
-              counter[0]++;
-              return jwtGeneratorSevenSeconds.generateToken(identity);
-          } catch (CryptoException e) {
-              e.printStackTrace();
-              return null;
-          }
+      @Override
+      public Jwt renewJwt(TokenContext tokenContext) {
+        try {
+          counter[0]++;
+          return jwtGeneratorSevenSeconds.generateToken(identity);
+        } catch (CryptoException e) {
+          e.printStackTrace();
+          return null;
+        }
       }
     }, tokenInitial);
 
@@ -215,7 +210,7 @@ public class AccessTokenProviderTest {
     assertEquals(1, counter[0]);
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     mocker = new Mocker();
   }

@@ -37,7 +37,6 @@ package com.virgilsecurity.sdk.client.exceptions;
  * This exception occurred when Virgil Card couldn't be found.
  *
  * @author Andrii Iakovenko
- *
  */
 public class VirgilCardIsNotFoundException extends VirgilClientException {
 

@@ -55,10 +55,8 @@ public class GeneratorJwtProvider implements AccessTokenProvider {
   /**
    * Instantiates a new Generator jwt provider.
    *
-   * @param jwtGenerator
-   *          the jwt generator
-   * @param defaultIdentity
-   *          the default identity
+   * @param jwtGenerator    the jwt generator
+   * @param defaultIdentity the default identity
    */
   public GeneratorJwtProvider(JwtGenerator jwtGenerator, String defaultIdentity) {
     Validator.checkNullAgrument(jwtGenerator,
@@ -73,15 +71,12 @@ public class GeneratorJwtProvider implements AccessTokenProvider {
   /**
    * Instantiates a new Generator jwt provider.
    *
-   * @param jwtGenerator
-   *          the jwt generator
-   * @param defaultIdentity
-   *          the default identity
-   * @param additionalData
-   *          the additional data
+   * @param jwtGenerator    the jwt generator
+   * @param defaultIdentity the default identity
+   * @param additionalData  the additional data
    */
   public GeneratorJwtProvider(JwtGenerator jwtGenerator, String defaultIdentity,
-      Map<String, String> additionalData) {
+                              Map<String, String> additionalData) {
     Validator.checkNullAgrument(jwtGenerator,
         "GeneratorJwtProvider -> 'jwtGenerator' should not be null");
     Validator.checkNullAgrument(defaultIdentity,
@@ -114,7 +109,7 @@ public class GeneratorJwtProvider implements AccessTokenProvider {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider#getToken(com.virgilsecurity.sdk.jwt.
    * TokenContext)
@@ -128,8 +123,7 @@ public class GeneratorJwtProvider implements AccessTokenProvider {
   /**
    * Sets additional data.
    *
-   * @param additionalData
-   *          the additional data
+   * @param additionalData the additional data
    */
   public void setAdditionalData(Map<String, String> additionalData) {
     this.additionalData = additionalData;

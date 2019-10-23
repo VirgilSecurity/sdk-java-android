@@ -53,7 +53,6 @@ public class JsonKeyEntry implements KeyEntry {
 
   /**
    * Create a new instance of {@code VirgilKeyEntry}.
-   *
    */
   public JsonKeyEntry() {
     meta = new HashMap<>();
@@ -62,10 +61,8 @@ public class JsonKeyEntry implements KeyEntry {
   /**
    * Create a new instance of {@code VirgilKeyEntry}.
    *
-   * @param name
-   *          The key name.
-   * @param value
-   *          The key value.
+   * @param name  The key name.
+   * @param value The key value.
    */
   public JsonKeyEntry(String name, byte[] value) {
     this();
@@ -75,7 +72,7 @@ public class JsonKeyEntry implements KeyEntry {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.crypto.KeyEntry#getMeta()
    */
   @Override
@@ -85,7 +82,7 @@ public class JsonKeyEntry implements KeyEntry {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.crypto.KeyEntry#getName()
    */
   @Override
@@ -95,7 +92,7 @@ public class JsonKeyEntry implements KeyEntry {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.storage.KeyEntry#getValue()
    */
   @Override
@@ -105,7 +102,7 @@ public class JsonKeyEntry implements KeyEntry {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.storage.KeyEntry#setMeta(java.util.Map)
    */
   @Override
@@ -115,7 +112,7 @@ public class JsonKeyEntry implements KeyEntry {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.crypto.KeyEntry#setName(java.lang.String)
    */
   @Override
@@ -125,7 +122,7 @@ public class JsonKeyEntry implements KeyEntry {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.storage.KeyEntry#setValue(byte[])
    */
   @Override

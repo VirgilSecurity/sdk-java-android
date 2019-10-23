@@ -33,13 +33,13 @@
 
 package com.virgilsecurity.sdk.storage;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import com.virgilsecurity.sdk.crypto.VirgilCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
+import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
+import com.virgilsecurity.sdk.crypto.exceptions.KeyEntryAlreadyExistsException;
+import com.virgilsecurity.sdk.crypto.exceptions.KeyEntryNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,27 +48,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.virgilsecurity.sdk.crypto.VirgilCrypto;
-import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
-import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.sdk.crypto.exceptions.KeyEntryAlreadyExistsException;
-import com.virgilsecurity.sdk.crypto.exceptions.KeyEntryNotFoundException;
-
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@code VirgilKeyStorage}.
  *
  * @author Andrii Iakovenko
- *
  * @see DefaultKeyStorageTest
- *
  */
 public class DefaultKeyStorageTest {
   /**
    * @author Andrii Iakovenko
-   *
    */
   private class TestKeyEntry implements KeyEntry {
     private String keyName;
@@ -81,7 +71,7 @@ public class DefaultKeyStorageTest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.virgilsecurity.sdk.crypto.KeyEntry#getMeta()
      */
     @Override
@@ -91,7 +81,7 @@ public class DefaultKeyStorageTest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.virgilsecurity.sdk.crypto.KeyEntry#getName()
      */
     @Override
@@ -101,7 +91,7 @@ public class DefaultKeyStorageTest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.virgilsecurity.sdk.storage.KeyEntry#getValue()
      */
     @Override
@@ -111,7 +101,7 @@ public class DefaultKeyStorageTest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.virgilsecurity.sdk.storage.KeyEntry#setMeta(java.util.Map)
      */
     @Override
@@ -121,7 +111,7 @@ public class DefaultKeyStorageTest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.virgilsecurity.sdk.crypto.KeyEntry#setName(java.lang.String)
      */
     @Override
@@ -131,7 +121,7 @@ public class DefaultKeyStorageTest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.virgilsecurity.sdk.storage.KeyEntry#setValue(byte[])
      */
     @Override
@@ -159,14 +149,18 @@ public class DefaultKeyStorageTest {
     assertFalse(storage.exists(alias));
   }
 
-  @Test(expected = KeyEntryNotFoundException.class)
+  @Test
   public void delete_nonExisting() {
-    storage.delete(alias);
+    assertThrows(KeyEntryNotFoundException.class, () -> {
+      storage.delete(alias);
+    });
   }
 
-  @Test(expected = KeyEntryNotFoundException.class)
+  @Test
   public void delete_nullName() {
-    storage.delete(null);
+    assertThrows(KeyEntryNotFoundException.class, () -> {
+      storage.delete(null);
+    });
   }
 
   @Test
@@ -195,20 +189,24 @@ public class DefaultKeyStorageTest {
 
     KeyEntry loadedEntry = storage.load(alias);
 
-    assertThat(loadedEntry, instanceOf(JsonKeyEntry.class));
+    assertTrue(loadedEntry instanceof JsonKeyEntry);
     assertEquals(entry.getName(), loadedEntry.getName());
     assertArrayEquals(entry.getValue(), loadedEntry.getValue());
     assertEquals(entry.getMeta(), loadedEntry.getMeta());
   }
 
-  @Test(expected = KeyEntryNotFoundException.class)
+  @Test
   public void load_nonExisting() {
-    storage.load(alias);
+    assertThrows(KeyEntryNotFoundException.class, () -> {
+      storage.load(alias);
+    });
   }
 
-  @Test(expected = KeyEntryNotFoundException.class)
+  @Test
   public void load_nullName() {
-    storage.load(alias);
+    assertThrows(KeyEntryNotFoundException.class, () -> {
+      storage.load(alias);
+    });
   }
 
   @Test
@@ -227,7 +225,7 @@ public class DefaultKeyStorageTest {
     assertTrue(names.isEmpty());
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws CryptoException {
     crypto = new VirgilCrypto();
 
@@ -252,10 +250,12 @@ public class DefaultKeyStorageTest {
     assertTrue(storage.exists(alias));
   }
 
-  @Test(expected = KeyEntryAlreadyExistsException.class)
+  @Test
   public void store_duplicated() {
     storage.store(entry);
-    storage.store(entry);
+    assertThrows(KeyEntryAlreadyExistsException.class, () -> {
+      storage.store(entry);
+    });
   }
 
 }

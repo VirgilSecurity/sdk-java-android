@@ -38,8 +38,7 @@ public class ConvertUtils {
   /**
    * Decode HEX string to byte array.
    *
-   * @param value
-   *          The string to be converted.
+   * @param value The string to be converted.
    * @return the byte array.
    */
   public static byte[] hexToBytes(String value) {

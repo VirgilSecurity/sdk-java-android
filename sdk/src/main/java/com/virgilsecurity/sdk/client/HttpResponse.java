@@ -37,7 +37,6 @@ import java.util.Map;
 
 /**
  * @author Andrii Iakovenko
- *
  */
 public class HttpResponse {
 

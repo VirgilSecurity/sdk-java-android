@@ -31,12 +31,5 @@
   ~ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   ~ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.virgilsecurity.crypto"
-    android:versionCode="1"
-    android:versionName="3.0" >
-    
-    <uses-sdk
-        android:minSdkVersion="16"
-        android:targetSdkVersion="16" />
-</manifest>
+<manifest
+        package="com.virgilsecurity.sdk.crypto"/>

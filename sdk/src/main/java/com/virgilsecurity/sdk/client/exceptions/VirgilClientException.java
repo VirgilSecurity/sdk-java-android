@@ -39,7 +39,6 @@ import com.virgilsecurity.sdk.crypto.exceptions.VirgilException;
  * Represents errors occurred during interaction with SDK components.
  *
  * @author Andrii Iakovenko
- *
  */
 public class VirgilClientException extends VirgilException {
 
@@ -49,16 +48,14 @@ public class VirgilClientException extends VirgilException {
 
   /**
    * Create a new instance of {@code VirgilException}.
-   *
    */
   public VirgilClientException() {
   }
 
   /**
    * Create new instance of {@link VirgilClientException}.
-   * 
-   * @param code
-   *          the error code
+   *
+   * @param code the error code
    */
   public VirgilClientException(int code) {
     this.code = code;
@@ -67,10 +64,8 @@ public class VirgilClientException extends VirgilException {
   /**
    * Create a new instance of {@code VirgilException}.
    *
-   * @param message
-   *          the detail message
-   * @param code
-   *          the error code
+   * @param message the detail message
+   * @param code    the error code
    */
   public VirgilClientException(int code, String message) {
     super(message);
@@ -80,8 +75,7 @@ public class VirgilClientException extends VirgilException {
   /**
    * Create a new instance of {@code VirgilException}.
    *
-   * @param message
-   *          the detail message
+   * @param message the detail message
    */
   public VirgilClientException(String message) {
     super(message);
@@ -89,11 +83,9 @@ public class VirgilClientException extends VirgilException {
 
   /**
    * Create new instance of {@link VirgilClientException}.
-   * 
-   * @param message
-   *          the detail message
-   * @param cause
-   *          the cause
+   *
+   * @param message the detail message
+   * @param cause   the cause
    */
   public VirgilClientException(String message, Throwable cause) {
     super(message, cause);
@@ -101,9 +93,8 @@ public class VirgilClientException extends VirgilException {
 
   /**
    * Create new instance of {@link VirgilClientException}.
-   * 
-   * @param cause
-   *          the cause
+   *
+   * @param cause the cause
    */
   public VirgilClientException(Throwable cause) {
     super(cause);
@@ -111,7 +102,7 @@ public class VirgilClientException extends VirgilException {
 
   /**
    * Get the error code.
-   * 
+   *
    * @return the error code.
    */
   public int getCode() {

@@ -67,8 +67,7 @@ public class JwtHeaderContent {
   /**
    * Instantiates a new Jwt header content.
    *
-   * @param keyIdentifier
-   *          the identifier of public key
+   * @param keyIdentifier the identifier of public key
    */
   public JwtHeaderContent(String keyIdentifier) {
     this();
@@ -78,10 +77,8 @@ public class JwtHeaderContent {
   /**
    * Instantiates a new Jwt header content.
    *
-   * @param algorithm
-   *          the algorithm used in signature
-   * @param keyIdentifier
-   *          the identifier of public key
+   * @param algorithm     the algorithm used in signature
+   * @param keyIdentifier the identifier of public key
    */
   public JwtHeaderContent(String algorithm, String keyIdentifier) {
     this();
@@ -92,12 +89,9 @@ public class JwtHeaderContent {
   /**
    * Instantiates a new Jwt header content.
    *
-   * @param algorithm
-   *          the algorithm used in signature
-   * @param type
-   *          the token type (default is "JWT")
-   * @param keyIdentifier
-   *          the identifier of public key
+   * @param algorithm     the algorithm used in signature
+   * @param type          the token type (default is "JWT")
+   * @param keyIdentifier the identifier of public key
    */
   public JwtHeaderContent(String algorithm, String type, String keyIdentifier) {
     this();
@@ -109,14 +103,10 @@ public class JwtHeaderContent {
   /**
    * Instantiates a new Jwt header content.
    *
-   * @param algorithm
-   *          the algorithm used in signature
-   * @param type
-   *          the token type (default is "JWT")
-   * @param contentType
-   *          the content type for this Jwt
-   * @param keyIdentifier
-   *          the identifier of public key
+   * @param algorithm     the algorithm used in signature
+   * @param type          the token type (default is "JWT")
+   * @param contentType   the content type for this Jwt
+   * @param keyIdentifier the identifier of public key
    */
   public JwtHeaderContent(String algorithm, String type, String contentType, String keyIdentifier) {
     this.algorithm = algorithm;
@@ -127,7 +117,7 @@ public class JwtHeaderContent {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -211,7 +201,7 @@ public class JwtHeaderContent {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -228,8 +218,7 @@ public class JwtHeaderContent {
   /**
    * Sets algorithm used in signature.
    *
-   * @param algorithm
-   *          the algorithm used in signature
+   * @param algorithm the algorithm used in signature
    */
   void setAlgorithm(String algorithm) {
     this.algorithm = algorithm;
@@ -238,8 +227,7 @@ public class JwtHeaderContent {
   /**
    * Sets content type.
    *
-   * @param contentType
-   *          the content type
+   * @param contentType the content type
    */
   void setContentType(String contentType) {
     this.contentType = contentType;
@@ -248,8 +236,7 @@ public class JwtHeaderContent {
   /**
    * Sets identifier of public key.
    *
-   * @param keyIdentifier
-   *          the identifier of public key
+   * @param keyIdentifier the identifier of public key
    */
   void setKeyIdentifier(String keyIdentifier) {
     this.keyIdentifier = keyIdentifier;
@@ -258,8 +245,7 @@ public class JwtHeaderContent {
   /**
    * Sets token type.
    *
-   * @param type
-   *          the token type
+   * @param type the token type
    */
   void setType(String type) {
     this.type = type;

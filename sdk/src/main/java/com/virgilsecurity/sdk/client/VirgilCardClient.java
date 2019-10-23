@@ -33,6 +33,7 @@
 
 package com.virgilsecurity.sdk.client;
 
+import com.google.gson.annotations.SerializedName;
 import com.virgilsecurity.sdk.cards.model.RawSignedModel;
 import com.virgilsecurity.sdk.client.exceptions.VirgilCardIsOutdatedException;
 import com.virgilsecurity.sdk.client.exceptions.VirgilCardServiceException;
@@ -45,15 +46,9 @@ import com.virgilsecurity.sdk.utils.Tuple;
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.google.gson.annotations.SerializedName;
 
 /**
  * The {@link VirgilCardClient} class represents a Virgil Security service client and contains all
@@ -78,8 +73,7 @@ public class VirgilCardClient implements CardClient {
   /**
    * Create a new instance of {@code CardClient}.
    *
-   * @param httpClient
-   *          http client that will be used for firing requests
+   * @param httpClient http client that will be used for firing requests
    */
   public VirgilCardClient(HttpClient httpClient) {
     this(BASE_URL + SERVICE_VERSION, httpClient);
@@ -88,8 +82,7 @@ public class VirgilCardClient implements CardClient {
   /**
    * Create a new instance of {@code CardClient} with default HttpClient.
    *
-   * @param serviceUrl
-   *          the service url to fire requests to
+   * @param serviceUrl the service url to fire requests to
    */
   public VirgilCardClient(String serviceUrl) {
     try {
@@ -103,10 +96,8 @@ public class VirgilCardClient implements CardClient {
   /**
    * Create a new instance of {@code CardClient}.
    *
-   * @param serviceUrl
-   *          the service url to fire requests to
-   * @param httpClient
-   *          http client that will be used for firing requests
+   * @param serviceUrl the service url to fire requests to
+   * @param httpClient http client that will be used for firing requests
    */
   public VirgilCardClient(String serviceUrl, HttpClient httpClient) {
     try {
@@ -120,8 +111,7 @@ public class VirgilCardClient implements CardClient {
   /**
    * Create a new instance of {@code CardClient} with default HttpClient.
    *
-   * @param serviceUrl
-   *          the service url to fire requests to
+   * @param serviceUrl the service url to fire requests to
    */
   public VirgilCardClient(URL serviceUrl) {
     this.serviceUrl = serviceUrl;
@@ -131,10 +121,8 @@ public class VirgilCardClient implements CardClient {
   /**
    * Create a new instance of {@code CardClient}.
    *
-   * @param serviceUrl
-   *          the service url to fire requests to
-   * @param httpClient
-   *          http client that will be used for firing requests
+   * @param serviceUrl the service url to fire requests to
+   * @param httpClient http client that will be used for firing requests
    */
   public VirgilCardClient(URL serviceUrl, HttpClient httpClient) {
     this.serviceUrl = serviceUrl;
@@ -144,13 +132,10 @@ public class VirgilCardClient implements CardClient {
   /**
    * Get card from Virgil Services by specified identifier.
    *
-   * @param cardId
-   *          the card identifier.
-   * @param token
-   *          token to authorize the request.
+   * @param cardId the card identifier.
+   * @param token  token to authorize the request.
    * @return the card loaded from Virgil Cards service.
-   * @throws VirgilServiceException
-   *           if service call failed
+   * @throws VirgilServiceException if service call failed
    */
   public Tuple<RawSignedModel, Boolean> getCard(String cardId, String token)
       throws VirgilServiceException {
@@ -161,6 +146,30 @@ public class VirgilCardClient implements CardClient {
     } catch (VirgilCardIsOutdatedException e) {
       LOGGER.fine("Outdated Card is received");
       return new Tuple<>(e.getCardModel(), true);
+    } catch (VirgilServiceException e) {
+      LOGGER.log(Level.SEVERE, "Some service issue occurred during request executing", e);
+      throw e;
+    } catch (Exception e) {
+      LOGGER.log(Level.SEVERE, "Some issue occurred during request executing", e);
+      throw new VirgilCardServiceException(e);
+    }
+  }
+
+  @Override
+  public List<String> getOutdated(Collection<String> cardIds, String token) throws VirgilServiceException {
+    if (cardIds == null) {
+      throw new NullArgumentException("CardClient -> 'cardIds' should not be null");
+    }
+
+    try {
+      URL url = new URL(serviceUrl, Endpoints.ACTIONS_GET_OUTDATED.path);
+      GetOutdatedRequestData requestData = new GetOutdatedRequestData(cardIds);
+      String body = ConvertionUtils.getGson().toJson(requestData);
+
+      String[] cards = httpClient.execute(url, "POST", token,
+              new ByteArrayInputStream(ConvertionUtils.toBytes(body)), String[].class);
+
+      return Arrays.asList(cards);
     } catch (VirgilServiceException e) {
       LOGGER.log(Level.SEVERE, "Some service issue occurred during request executing", e);
       throw e;
@@ -191,13 +200,10 @@ public class VirgilCardClient implements CardClient {
   /**
    * Publishes card in Virgil Cards service.
    *
-   * @param rawCard
-   *          raw signed model of card to be published.
-   * @param token
-   *          token to authorize the request.
+   * @param rawCard raw signed model of card to be published.
+   * @param token   token to authorize the request.
    * @return the {@link RawSignedModel} of the Card that is published to Virgil Cards service.
-   * @throws VirgilServiceException
-   *           if an error occurred while publishing Card.
+   * @throws VirgilServiceException if an error occurred while publishing Card.
    */
   public RawSignedModel publishCard(RawSignedModel rawCard, String token)
       throws VirgilServiceException {
@@ -219,13 +225,10 @@ public class VirgilCardClient implements CardClient {
   /**
    * Search cards Virgil Services by specified identity.
    *
-   * @param identity
-   *          the identity for search.
-   * @param token
-   *          token to authorize the request.
+   * @param identity the identity for search.
+   * @param token    token to authorize the request.
    * @return A list of found cards.
-   * @throws VirgilServiceException
-   *           if service call failed
+   * @throws VirgilServiceException if service call failed
    */
   public List<RawSignedModel> searchCards(String identity, String token)
       throws VirgilServiceException {
@@ -243,13 +246,10 @@ public class VirgilCardClient implements CardClient {
   /**
    * Search cards Virgil Services by specified identity.
    *
-   * @param identities
-   *          the identity for search.
-   * @param token
-   *          token to authorize the request.
+   * @param identities the identity for search.
+   * @param token      token to authorize the request.
    * @return A list of found cards.
-   * @throws VirgilServiceException
-   *           if service call failed
+   * @throws VirgilServiceException if service call failed
    */
   public List<RawSignedModel> searchCards(Collection<String> identities, String token)
       throws VirgilServiceException {
@@ -284,8 +284,7 @@ public class VirgilCardClient implements CardClient {
    * Also, such cards could be obtained using get query, but will be absent in search query result.
    *
    * @param cardId identifier of card to revoke.
-   * @param token token to authorize the request.
-   *
+   * @param token  token to authorize the request.
    * @throws VirgilServiceException if an error occurred while deleting Card.
    */
   public void revokeCard(String cardId, String token) throws VirgilServiceException {
@@ -293,10 +292,10 @@ public class VirgilCardClient implements CardClient {
       URL url = new URL(serviceUrl, Endpoints.ACTIONS_DELETE.path + "/" + cardId);
 
       httpClient.execute(url,
-                         "POST",
-                         token,
-                         null,
-                         RawSignedModel.class);
+          "POST",
+          token,
+          null,
+          RawSignedModel.class);
     } catch (VirgilServiceException e) {
       LOGGER.log(Level.SEVERE, "Some service issue occurred during request executing", e);
       throw e;
@@ -309,8 +308,7 @@ public class VirgilCardClient implements CardClient {
   /**
    * Sets http client that is used to fire requests.
    *
-   * @param httpClient
-   *          the http client
+   * @param httpClient the http client
    */
   public void setHttpClient(HttpClient httpClient) {
     this.httpClient = httpClient;
@@ -333,9 +331,27 @@ public class VirgilCardClient implements CardClient {
     }
   }
 
+  private class GetOutdatedRequestData {
+    @SerializedName("card_ids")
+    private List<String> cardIds;
+
+    public GetOutdatedRequestData() {
+      this(Collections.EMPTY_LIST);
+    }
+
+    public GetOutdatedRequestData(Collection<String> cardIds) {
+      this.cardIds = new ArrayList<>(cardIds);
+    }
+
+    public List<String> getCardIds() {
+      return cardIds;
+    }
+  }
+
   private enum Endpoints {
     ACTIONS_DELETE("actions/revoke"),
-    ACTIONS_SEARCH("actions/search");
+    ACTIONS_SEARCH("actions/search"),
+    ACTIONS_GET_OUTDATED("actions/outdated");
 
     private final String path;
 

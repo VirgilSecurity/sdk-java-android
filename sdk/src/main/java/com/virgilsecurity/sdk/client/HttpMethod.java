@@ -35,7 +35,6 @@ package com.virgilsecurity.sdk.client;
 
 /**
  * @author Andrii Iakovenko
- *
  */
 public enum HttpMethod {
   GET, POST, PUT, DELETE

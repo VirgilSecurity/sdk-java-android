@@ -37,7 +37,6 @@ package com.virgilsecurity.sdk.exception;
  * Thrown to indicate that an argument was <code>null</code> and should not have been.
  *
  * @author Andrii Iakovenko
- *
  */
 public class NullArgumentException extends IllegalArgumentException {
 
@@ -46,8 +45,7 @@ public class NullArgumentException extends IllegalArgumentException {
   /**
    * Create a new instance of {@code NullArgumentException}.
    *
-   * @param argName
-   *          the name of the argument that was {@code null}.
+   * @param argName the name of the argument that was {@code null}.
    */
   public NullArgumentException(String argName) {
     super((argName == null ? "Argument" : argName) + " must not be null.");

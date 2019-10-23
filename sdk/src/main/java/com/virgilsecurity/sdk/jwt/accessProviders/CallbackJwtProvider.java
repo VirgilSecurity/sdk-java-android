@@ -53,9 +53,8 @@ public class CallbackJwtProvider implements AccessTokenProvider {
     /**
      * In this callback you should return valid JsonWebToken as base64 string in 2 or 3 parts
      * separated with dot ('.').
-     * 
-     * @param tokenContext
-     *          the tokenContext that is used to get token
+     *
+     * @param tokenContext the tokenContext that is used to get token
      * @return the string
      */
     String onGetToken(TokenContext tokenContext);
@@ -66,8 +65,7 @@ public class CallbackJwtProvider implements AccessTokenProvider {
   /**
    * Instantiates a new Callback jwt provider.
    *
-   * @param getTokenCallback
-   *          the get token callback
+   * @param getTokenCallback the get token callback
    */
   public CallbackJwtProvider(GetTokenCallback getTokenCallback) {
     this.getTokenCallback = getTokenCallback;
@@ -86,8 +84,7 @@ public class CallbackJwtProvider implements AccessTokenProvider {
   /**
    * Sets get token callback.
    *
-   * @param getTokenCallback
-   *          the get token callback
+   * @param getTokenCallback the get token callback
    */
   public void setGetTokenCallback(GetTokenCallback getTokenCallback) {
     Validator.checkNullAgrument(getTokenCallback,

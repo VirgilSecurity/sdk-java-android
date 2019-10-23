@@ -33,33 +33,28 @@
 
 package com.virgilsecurity.sdk.crypto;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.exception.NullArgumentException;
+import org.apache.commons.lang3.ArrayUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link VirgilAccessTokenSigner}.
- * 
- * @author Andrii Iakovenko
  *
+ * @author Andrii Iakovenko
  */
 public class VirgilAccessTokenSignerTest {
 
   private static final byte[] TOKEN = "the token".getBytes(StandardCharsets.UTF_8);
 
   private VirgilAccessTokenSigner signer;
-  private PublicKey publicKey;
-  private PrivateKey privateKey;
+  private VirgilPublicKey publicKey;
+  private VirgilPrivateKey privateKey;
 
   @Test
   public void generateTokenSignature() throws CryptoException {
@@ -68,14 +63,18 @@ public class VirgilAccessTokenSignerTest {
     assertNotNull(signature);
   }
 
-  @Test(expected = NullArgumentException.class)
-  public void generateTokenSignature_nullKey() throws CryptoException {
-    this.signer.generateTokenSignature(TOKEN, null);
+  @Test
+  public void generateTokenSignature_nullKey() {
+    assertThrows(NullArgumentException.class, () -> {
+      this.signer.generateTokenSignature(TOKEN, null);
+    });
   }
 
-  @Test(expected = NullArgumentException.class)
-  public void generateTokenSignature_nullToken() throws CryptoException {
-    this.signer.generateTokenSignature(null, this.privateKey);
+  @Test
+  public void generateTokenSignature_nullToken() {
+    assertThrows(NullArgumentException.class, () -> {
+      this.signer.generateTokenSignature(null, this.privateKey);
+    });
   }
 
   @Test
@@ -88,7 +87,7 @@ public class VirgilAccessTokenSignerTest {
     assertNotNull(this.signer.getVirgilCrypto());
   }
 
-  @Before
+  @BeforeEach
   public void setup() throws CryptoException {
     this.signer = new VirgilAccessTokenSigner();
 
@@ -103,14 +102,18 @@ public class VirgilAccessTokenSignerTest {
     assertTrue(this.signer.verifyTokenSignature(signature, TOKEN, this.publicKey));
   }
 
-  @Test(expected = NullArgumentException.class)
-  public void verifyTokenSignature_nullKey() throws CryptoException {
-    this.signer.generateTokenSignature(TOKEN, null);
+  @Test
+  public void verifyTokenSignature_nullKey() {
+    assertThrows(NullArgumentException.class, () -> {
+      this.signer.generateTokenSignature(TOKEN, null);
+    });
   }
 
-  @Test(expected = NullArgumentException.class)
-  public void verifyTokenSignature_nullToken() throws CryptoException {
-    this.signer.generateTokenSignature(null, this.privateKey);
+  @Test
+  public void verifyTokenSignature_nullToken() {
+    assertThrows(NullArgumentException.class, () -> {
+      this.signer.generateTokenSignature(null, this.privateKey);
+    });
   }
 
   @Test

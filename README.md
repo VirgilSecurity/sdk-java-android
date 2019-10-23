@@ -183,6 +183,19 @@ try {
 }
 ```
 
+## Run benchmarks
+
+Build artifacts with a command
+```bash
+mvn clean install -DskipTests
+```
+
+A JAR file with benchmarks and all dependencies will be build. You can find it at `/benchmark/target/benchmark.jar`.
+You can copy this JAR file to any other machine with install JRE and run with a command
+```bash
+java -jar <path_to_jar>
+```
+
 ## Docs
 Virgil Security has a powerful set of APIs, and the documentation below can get you started today.
 

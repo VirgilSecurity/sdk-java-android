@@ -40,7 +40,7 @@ import java.util.Objects;
 /**
  * A private key.
  */
-public class VirgilPrivateKey implements PrivateKey, Serializable {
+public class VirgilPrivateKey implements Serializable {
 
   private static final long serialVersionUID = 3949844179494530851L;
 
@@ -70,7 +70,7 @@ public class VirgilPrivateKey implements PrivateKey, Serializable {
    *
    * @param identifier The key identifier.
    * @param privateKey Underlying private key.
-   * @param keyType The key type.
+   * @param keyType    The key type.
    */
   public VirgilPrivateKey(byte[] identifier,
                           com.virgilsecurity.crypto.foundation.PrivateKey privateKey,
@@ -134,15 +134,21 @@ public class VirgilPrivateKey implements PrivateKey, Serializable {
     this.keyType = keyType;
   }
 
-  @Override public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     VirgilPrivateKey that = (VirgilPrivateKey) o;
     return Arrays.equals(identifier, that.identifier)
         && keyType == that.keyType;
   }
 
-  @Override public int hashCode() {
+  @Override
+  public int hashCode() {
     int result = Objects.hash(privateKey, keyType);
     result = 31 * result + Arrays.hashCode(identifier);
     return result;

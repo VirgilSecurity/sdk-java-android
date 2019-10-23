@@ -33,39 +33,33 @@
 
 package com.virgilsecurity.sdk.examples;
 
-import java.util.concurrent.TimeUnit;
-
 import com.virgilsecurity.sdk.cards.Card;
 import com.virgilsecurity.sdk.cards.CardManager;
 import com.virgilsecurity.sdk.cards.model.RawSignedModel;
 import com.virgilsecurity.sdk.cards.validation.VirgilCardVerifier;
 import com.virgilsecurity.sdk.client.exceptions.VirgilServiceException;
 import com.virgilsecurity.sdk.common.TimeSpan;
-import com.virgilsecurity.sdk.crypto.AccessTokenSigner;
-import com.virgilsecurity.sdk.crypto.CardCrypto;
-import com.virgilsecurity.sdk.crypto.PrivateKey;
-import com.virgilsecurity.sdk.crypto.VirgilAccessTokenSigner;
-import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
-import com.virgilsecurity.sdk.crypto.VirgilCrypto;
-import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
+import com.virgilsecurity.sdk.crypto.*;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.jwt.JwtGenerator;
 import com.virgilsecurity.sdk.jwt.TokenContext;
 import com.virgilsecurity.sdk.jwt.accessProviders.CallbackJwtProvider;
 import com.virgilsecurity.sdk.jwt.accessProviders.CallbackJwtProvider.GetTokenCallback;
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider;
-import com.virgilsecurity.sdk.utils.Base64;
+import com.virgilsecurity.common.util.Base64;
+
+import java.security.PrivateKey;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Andrii Iakovenko
- *
  */
 public class GenerateCardExample {
 
   public static void main(String[] args) throws CryptoException {
     String identity = "Alice";
     VirgilCrypto virgilCrypto = new VirgilCrypto();
-    CardCrypto cardCrypto = new VirgilCardCrypto(virgilCrypto);
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto(virgilCrypto);
     AccessTokenProvider accessTokenProvider = new CallbackJwtProvider(null);
     CardManager cardManager = new CardManager(cardCrypto, accessTokenProvider,
         new VirgilCardVerifier(cardCrypto, true, false));
@@ -89,7 +83,7 @@ public class GenerateCardExample {
     String identity = "Alice";
 
     VirgilCrypto virgilCrypto = new VirgilCrypto();
-    CardCrypto cardCrypto = new VirgilCardCrypto(virgilCrypto);
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto(virgilCrypto);
     AccessTokenProvider accessTokenProvider = new CallbackJwtProvider(null);
     CardManager cardManager = new CardManager(cardCrypto, accessTokenProvider,
         new VirgilCardVerifier(cardCrypto));
@@ -112,8 +106,8 @@ public class GenerateCardExample {
 
     VirgilCrypto virgilCrypto = new VirgilCrypto();
     // Import API Private key from string
-    PrivateKey apiKey = virgilCrypto.importPrivateKey(Base64.decode(apiKeyBase64)).getPrivateKey();
-    AccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner(virgilCrypto);
+    VirgilPrivateKey apiKey = virgilCrypto.importPrivateKey(Base64.decode(apiKeyBase64)).getPrivateKey();
+    VirgilAccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner(virgilCrypto);
     JwtGenerator jwtGenerator = new JwtGenerator(appId, apiKey, apiKeyId,
         TimeSpan.fromTime(1, TimeUnit.DAYS), accessTokenSigner);
 
@@ -125,18 +119,14 @@ public class GenerateCardExample {
     VirgilCrypto virgilCrypto = new VirgilCrypto();
 
     // Initialize CardManager
-    CardCrypto cardCrypto = new VirgilCardCrypto(virgilCrypto);
-    AccessTokenProvider accessTokenProvider = new CallbackJwtProvider(new GetTokenCallback() {
-
-      @Override
-      public String onGetToken(TokenContext tokenContext) {
-        // Make call to your Server to obtain Jwt token
-        try {
-          return jwtTokenGeneratorOnServer(tokenContext);
-        } catch (CryptoException e) {
-          // Handle an error here
-          return null;
-        }
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto(virgilCrypto);
+    AccessTokenProvider accessTokenProvider = new CallbackJwtProvider(tokenContext -> {
+      // Make call to your Server to obtain Jwt token
+      try {
+        return jwtTokenGeneratorOnServer(tokenContext);
+      } catch (CryptoException e) {
+        // Handle an error here
+        return null;
       }
     });
     CardManager cardManager = new CardManager(cardCrypto, accessTokenProvider,

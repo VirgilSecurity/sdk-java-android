@@ -37,7 +37,6 @@ package com.virgilsecurity.sdk.crypto.exceptions;
  * Represents errors occurred during interaction with SDK components.
  *
  * @author Andrii Iakovenko
- *
  */
 public class KeyStorageException extends RuntimeException {
 
@@ -45,7 +44,6 @@ public class KeyStorageException extends RuntimeException {
 
   /**
    * Create a new instance of {@code KeyStorageException}.
-   *
    */
   public KeyStorageException() {
   }
@@ -53,9 +51,8 @@ public class KeyStorageException extends RuntimeException {
   /**
    * Create a new instance of {@code KeyStorageException} with the specified detail message.
    *
-   * @param message
-   *          the detail message. The detail message is saved for later retrieval by the
-   *          {@link #getMessage()} method.
+   * @param message the detail message. The detail message is saved for later retrieval by the
+   *                {@link #getMessage()} method.
    */
   public KeyStorageException(String message) {
     super(message);
@@ -64,10 +61,9 @@ public class KeyStorageException extends RuntimeException {
   /**
    * Create a new instance of {@code KeyStorageException}.
    *
-   * @param cause
-   *          the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
-   *          {@code null} value is permitted, and indicates that the cause is nonexistent or
-   *          unknown.)
+   * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
+   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
+   *              unknown.)
    */
   public KeyStorageException(Throwable cause) {
     super(cause);

@@ -33,25 +33,22 @@
 
 package com.virgilsecurity.sdk.jwt;
 
-import static org.junit.Assert.assertTrue;
-
 import com.virgilsecurity.sdk.CompatibilityDataProvider;
 import com.virgilsecurity.sdk.FakeDataFactory;
-import com.virgilsecurity.sdk.crypto.AccessTokenSigner;
-import com.virgilsecurity.sdk.crypto.PublicKey;
 import com.virgilsecurity.sdk.crypto.VirgilAccessTokenSigner;
 import com.virgilsecurity.sdk.crypto.VirgilCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilPublicKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link JwtVerifier}.
- * 
- * @author Andrii Iakovenko
  *
+ * @author Andrii Iakovenko
  */
 public class JwtVerifierTest {
 
@@ -59,12 +56,12 @@ public class JwtVerifierTest {
   private FakeDataFactory fake;
   private JwtVerifier verifier;
 
-  @Before
+  @BeforeEach
   public void setup() throws CryptoException {
     this.dataProvider = new CompatibilityDataProvider();
     this.fake = new FakeDataFactory();
 
-    AccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner();
+    VirgilAccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner();
     this.verifier = new JwtVerifier(fake.getApiPublicKey(), fake.getApiPublicKeyId(),
         accessTokenSigner);
   }
@@ -72,12 +69,12 @@ public class JwtVerifierTest {
   @Test
   public void stc_22() throws CryptoException {
     // STC_22
-    AccessTokenSigner signer = new VirgilAccessTokenSigner();
+    VirgilAccessTokenSigner signer = new VirgilAccessTokenSigner();
     VirgilCrypto crypto = new VirgilCrypto();
     String apiPublicKeyId = dataProvider.getString("STC-22.api_key_id");
     String apiPublicKeyBase64 = dataProvider.getString("STC-22.api_public_key_base64");
 
-    PublicKey apiPublicKey = crypto
+    VirgilPublicKey apiPublicKey = crypto
         .importPublicKey(ConvertionUtils.base64ToBytes(apiPublicKeyBase64));
     Jwt token = new Jwt(dataProvider.getString("STC-22.jwt"));
 

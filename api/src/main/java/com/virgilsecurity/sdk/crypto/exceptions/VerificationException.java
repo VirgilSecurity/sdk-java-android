@@ -37,7 +37,6 @@ package com.virgilsecurity.sdk.crypto.exceptions;
  * Signals that an exception of some sort has occurred during verification.
  *
  * @author Andrii Iakovenko
- *
  */
 public class VerificationException extends CryptoException {
 
@@ -45,7 +44,6 @@ public class VerificationException extends CryptoException {
 
   /**
    * Create a new instance of {@code VerificationException}.
-   *
    */
   public VerificationException() {
   }
@@ -53,8 +51,7 @@ public class VerificationException extends CryptoException {
   /**
    * Create a new instance of {@code VerificationException}.
    *
-   * @param message
-   *          the message which indicates the cause of Exception.
+   * @param message the message which indicates the cause of Exception.
    */
   public VerificationException(String message) {
     super(message);
@@ -63,10 +60,9 @@ public class VerificationException extends CryptoException {
   /**
    * Create a new instance of {@code VerificationException}.
    *
-   * @param cause
-   *          the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
-   *          {@code null} value is permitted, and indicates that the cause is nonexistent or
-   *          unknown.)
+   * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
+   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
+   *              unknown.)
    */
   public VerificationException(Throwable cause) {
     super(cause);

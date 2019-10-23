@@ -44,11 +44,9 @@ public interface CardVerifier {
   /**
    * Verify card method that checks whether the provided Card is valid.
    *
-   * @param card
-   *          the Card to verify
+   * @param card the Card to verify
    * @return {@code true} if valid, otherwise {@code false}
-   * @throws CryptoException
-   *           if issue occurred during Card verification
+   * @throws CryptoException if issue occurred during Card verification
    */
   boolean verifyCard(Card card) throws CryptoException;
 }

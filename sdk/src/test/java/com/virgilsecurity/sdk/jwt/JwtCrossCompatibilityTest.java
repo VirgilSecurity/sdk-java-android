@@ -33,14 +33,6 @@
 
 package com.virgilsecurity.sdk.jwt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.virgilsecurity.sdk.FakeDataFactory;
@@ -51,27 +43,27 @@ import com.virgilsecurity.sdk.jwt.accessProviders.CallbackJwtProvider;
 import com.virgilsecurity.sdk.jwt.accessProviders.CallbackJwtProvider.GetTokenCallback;
 import com.virgilsecurity.sdk.jwt.accessProviders.ConstAccessTokenProvider;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 
 import java.io.InputStreamReader;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link Jwt} which verify cross-platform compatibility.
- * 
+ *
  * @author Andrii Iakovenko
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class JwtCrossCompatibilityTest {
 
   private static final int TOKEN_EXPIRE_IN_SECONDS = 3;
@@ -79,8 +71,6 @@ public class JwtCrossCompatibilityTest {
   private static final String INVALID_TOKEN = "INVALID_TOKEN";
   private static final String TEST_OPERATION = "TEST_OPERATION_STC_24";
   private static final String TOKEN_CONTEXT_SERVICE = "cards";
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   private JsonObject sampleJson;
   private FakeDataFactory fake;
@@ -88,7 +78,7 @@ public class JwtCrossCompatibilityTest {
   @Mock
   private GetTokenCallback callback;
 
-  @Before
+  @BeforeEach
   public void setUp() throws CryptoException {
     this.sampleJson = (JsonObject) new JsonParser().parse(new InputStreamReader(this.getClass()
         .getClassLoader().getResourceAsStream("com/virgilsecurity/sdk/test_data.txt")));
@@ -102,8 +92,7 @@ public class JwtCrossCompatibilityTest {
     CallbackJwtProvider provider = new CallbackJwtProvider(callback);
 
     // Prepare contexts
-    TokenContext ctx = new TokenContext(fake.getIdentity(), TEST_OPERATION, false,
-        TOKEN_CONTEXT_SERVICE);
+    TokenContext ctx = new TokenContext(fake.getIdentity(), TOKEN_CONTEXT_SERVICE, TEST_OPERATION, false);
 
     // Set getTokenCallback to use JwtGenerator + call counter
     TimeSpan ttl = TimeSpan.fromTime(TOKEN_EXPIRE_IN_SECONDS, TimeUnit.SECONDS);
@@ -128,15 +117,15 @@ public class JwtCrossCompatibilityTest {
     // Call getToken(false)
     Jwt accessToken2 = (Jwt) provider.getToken(ctx);
     assertNotNull(accessToken2);
-    assertFalse("CallbackJwtProvider should always return new token",
-        Objects.equals(accessToken1, accessToken2));
+    assertFalse(Objects.equals(accessToken1, accessToken2), "CallbackJwtProvider should always return new token");
     verify(this.callback, times(2)).onGetToken(ctx);
 
     // Return invalid token
     when(this.callback.onGetToken(ctx)).thenReturn(INVALID_TOKEN);
 
-    expectedException.expect(IllegalArgumentException.class);
-    provider.getToken(ctx);
+    assertThrows(IllegalArgumentException.class, () -> {
+      provider.getToken(ctx);
+    });
   }
 
   @Test
@@ -228,20 +217,18 @@ public class JwtCrossCompatibilityTest {
         generator.generateToken(this.fake.getIdentity()));
 
     // Prepare contexts
-    TokenContext ctx = new TokenContext(fake.getIdentity(), "stc_37", false, TOKEN_CONTEXT_SERVICE);
+    TokenContext ctx = new TokenContext(fake.getIdentity(), TOKEN_CONTEXT_SERVICE, "stc_37", false);
 
-    assertFalse("Token should not be expired", ((Jwt) tokenProvider.getToken(ctx)).isExpired());
+    assertFalse(((Jwt) tokenProvider.getToken(ctx)).isExpired(), "Token should not be expired");
 
     // Wait till token is expired
     Thread.sleep(TOKEN_EXPIRE_IN_SECONDS * 1000);
 
     // Check if tokens are the same regardless of the tokenContext and won't force reload
     Jwt jwtOne = (Jwt) tokenProvider.getToken(ctx);
-    assertTrue("Token should be expired", jwtOne.isExpired());
+    assertTrue(jwtOne.isExpired(), "Token should be expired");
     Jwt jwtTwo = (Jwt) tokenProvider.getToken(ctx);
-    assertEquals(
-        "ConstAccessTokenProvider always returns the same token regardless of the tokenContext",
-        jwtOne, jwtTwo);
-    assertTrue("Token should be expired", jwtTwo.isExpired());
+    assertEquals(jwtOne, jwtTwo, "ConstAccessTokenProvider always returns the same token regardless of the tokenContext");
+    assertTrue(jwtTwo.isExpired(), "Token should be expired");
   }
 }

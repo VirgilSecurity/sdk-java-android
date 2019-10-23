@@ -35,7 +35,6 @@ package com.virgilsecurity.sdk.client.exceptions;
 
 /**
  * @author Andrii Iakovenko
- *
  */
 public class NotSupportedException extends RuntimeException {
 
@@ -49,9 +48,8 @@ public class NotSupportedException extends RuntimeException {
 
   /**
    * Create new instance of {@link NotSupportedException}.
-   * 
-   * @param message
-   *          The message.
+   *
+   * @param message The message.
    */
   public NotSupportedException(String message) {
     super(message);

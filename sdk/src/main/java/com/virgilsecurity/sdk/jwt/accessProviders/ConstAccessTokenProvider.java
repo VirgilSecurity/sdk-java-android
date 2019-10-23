@@ -56,8 +56,7 @@ public class ConstAccessTokenProvider implements AccessTokenProvider {
   /**
    * Instantiates a new Const access token provider.
    *
-   * @param jwtToken
-   *          the jwt token
+   * @param jwtToken the jwt token
    */
   public ConstAccessTokenProvider(Jwt jwtToken) {
     Validator.checkNullAgrument(jwtToken, "ConstAccessTokenProvider -> 'jwt' should not be null");
@@ -72,8 +71,7 @@ public class ConstAccessTokenProvider implements AccessTokenProvider {
   /**
    * Sets jwt.
    *
-   * @param jwtToken
-   *          the jwt token
+   * @param jwtToken the jwt token
    */
   public void setJwt(Jwt jwtToken) {
     if (jwtToken != null) {

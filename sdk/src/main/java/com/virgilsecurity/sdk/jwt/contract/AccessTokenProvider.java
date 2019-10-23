@@ -44,11 +44,9 @@ public interface AccessTokenProvider {
   /**
    * Gets token.
    *
-   * @param tokenContext
-   *          the tokenContext that is used to get token
+   * @param tokenContext the tokenContext that is used to get token
    * @return the token
-   * @throws CryptoException
-   *           if issue occurred while getting token
+   * @throws CryptoException if issue occurred while getting token
    */
   AccessToken getToken(TokenContext tokenContext) throws CryptoException;
 }

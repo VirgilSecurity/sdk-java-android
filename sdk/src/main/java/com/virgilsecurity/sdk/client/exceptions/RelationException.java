@@ -35,7 +35,6 @@ package com.virgilsecurity.sdk.client.exceptions;
 
 /**
  * @author Andrii Iakovenko
- *
  */
 public class RelationException extends VirgilClientException {
 

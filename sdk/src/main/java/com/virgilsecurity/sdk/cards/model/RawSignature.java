@@ -54,10 +54,8 @@ public class RawSignature {
   /**
    * Instantiates a new Raw signature.
    *
-   * @param signer
-   *          the signer type
-   * @param signature
-   *          the signature
+   * @param signer    the signer type
+   * @param signature the signature
    */
   public RawSignature(String signer, String signature) {
     this.signer = signer;
@@ -67,12 +65,9 @@ public class RawSignature {
   /**
    * Instantiates a new Raw signature.
    *
-   * @param snapshot
-   *          the snapshot that contains additional data associated with signature
-   * @param signer
-   *          the signer type
-   * @param signature
-   *          the signature
+   * @param snapshot  the snapshot that contains additional data associated with signature
+   * @param signer    the signer type
+   * @param signature the signature
    */
   public RawSignature(String snapshot, String signer, String signature) {
     this.snapshot = snapshot;
@@ -129,8 +124,7 @@ public class RawSignature {
   /**
    * Sets signature.
    *
-   * @param signature
-   *          the signature
+   * @param signature the signature
    */
   public void setSignature(String signature) {
     this.signature = signature;
@@ -139,8 +133,7 @@ public class RawSignature {
   /**
    * Sets signer type.
    *
-   * @param signer
-   *          the signer
+   * @param signer the signer
    */
   public void setSigner(String signer) {
     this.signer = signer;
@@ -149,8 +142,7 @@ public class RawSignature {
   /**
    * Sets snapshot that contains additional data associated with signature.
    *
-   * @param snapshot
-   *          the snapshot that contains additional data associated with signature
+   * @param snapshot the snapshot that contains additional data associated with signature
    */
   public void setSnapshot(String snapshot) {
     this.snapshot = snapshot;

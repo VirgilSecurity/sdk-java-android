@@ -33,9 +33,9 @@
 
 package com.virgilsecurity.sdk.utils;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * OsUtilsTest class.
@@ -50,7 +50,8 @@ public class OsUtilsTest {
   private static final String UNKNOWN_OS = "unknown";
 
 
-  @Test public void test_os_type() {
+  @Test
+  public void test_os_type() {
     Class androidClass = null;
     try {
       androidClass = Class.forName("android.os.Build");

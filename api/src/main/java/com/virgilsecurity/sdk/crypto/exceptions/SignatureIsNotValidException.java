@@ -37,7 +37,6 @@ package com.virgilsecurity.sdk.crypto.exceptions;
  * Signals that an exception of some sort has occurred during verification.
  *
  * @author Andrii Iakovenko
- *
  */
 public class SignatureIsNotValidException extends CryptoException {
 
@@ -45,7 +44,6 @@ public class SignatureIsNotValidException extends CryptoException {
 
   /**
    * Create a new instance of {@code SignatureIsNotValidException}.
-   *
    */
   public SignatureIsNotValidException() {
     super("Digital signature is not valid");

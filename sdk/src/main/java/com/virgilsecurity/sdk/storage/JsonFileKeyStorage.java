@@ -52,7 +52,6 @@ import java.util.Set;
  * Virgil implementation of a storage facility for cryptographic keys.
  *
  * @author Andrii Iakovenko
- *
  */
 public class JsonFileKeyStorage implements KeyStorage {
 
@@ -60,7 +59,6 @@ public class JsonFileKeyStorage implements KeyStorage {
 
   /**
    * Create a new instance of {@code VirgilKeyStorage}.
-   *
    */
   public JsonFileKeyStorage() {
     StringBuilder path = new StringBuilder(System.getProperty("user.home"));
@@ -73,8 +71,7 @@ public class JsonFileKeyStorage implements KeyStorage {
   /**
    * Create a new instance of {@code VirgilKeyStorage}.
    *
-   * @param keysPath
-   *          The path to key storage folder.
+   * @param keysPath The path to key storage folder.
    */
   public JsonFileKeyStorage(String keysPath) {
     this.keysPath = keysPath;
@@ -82,7 +79,7 @@ public class JsonFileKeyStorage implements KeyStorage {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.crypto.KeyStore#delete(java.lang.String)
    */
   @Override
@@ -97,7 +94,7 @@ public class JsonFileKeyStorage implements KeyStorage {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.crypto.KeyStore#exists(java.lang.String)
    */
   @Override
@@ -111,7 +108,7 @@ public class JsonFileKeyStorage implements KeyStorage {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.crypto.KeyStore#load(java.lang.String)
    */
   @Override
@@ -144,7 +141,7 @@ public class JsonFileKeyStorage implements KeyStorage {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.storage.KeyStorage#names()
    */
   @Override
@@ -161,7 +158,7 @@ public class JsonFileKeyStorage implements KeyStorage {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.crypto.KeyStore#store(com.virgilsecurity.sdk. crypto.KeyEntry)
    */
   @Override
@@ -207,7 +204,7 @@ public class JsonFileKeyStorage implements KeyStorage {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.storage.KeyStorage#createEntry(java.lang.String, byte[])
    */
   @Override
@@ -217,7 +214,7 @@ public class JsonFileKeyStorage implements KeyStorage {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.virgilsecurity.sdk.storage.KeyStorage#update(com.virgilsecurity.sdk.storage.KeyEntry)
    */
   @Override

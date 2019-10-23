@@ -33,15 +33,9 @@
 
 package com.virgilsecurity.sdk;
 
-import static com.virgilsecurity.sdk.CompatibilityDataProvider.JSON;
-import static com.virgilsecurity.sdk.CompatibilityDataProvider.STRING;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.virgilsecurity.sdk.cards.Card;
 import com.virgilsecurity.sdk.cards.CardManager;
 import com.virgilsecurity.sdk.cards.CardSignature;
@@ -52,30 +46,24 @@ import com.virgilsecurity.sdk.cards.validation.VirgilCardVerifier;
 import com.virgilsecurity.sdk.client.VirgilCardClient;
 import com.virgilsecurity.sdk.common.PropertyManager;
 import com.virgilsecurity.sdk.common.TimeSpan;
-import com.virgilsecurity.sdk.crypto.CardCrypto;
-import com.virgilsecurity.sdk.crypto.PrivateKey;
-import com.virgilsecurity.sdk.crypto.VirgilAccessTokenSigner;
-import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
-import com.virgilsecurity.sdk.crypto.VirgilCrypto;
-import com.virgilsecurity.sdk.crypto.VirgilPublicKey;
+import com.virgilsecurity.sdk.crypto.*;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.jwt.Jwt;
 import com.virgilsecurity.sdk.jwt.JwtGenerator;
 import com.virgilsecurity.sdk.jwt.JwtVerifier;
 import com.virgilsecurity.sdk.jwt.accessProviders.ConstAccessTokenProvider;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
+import static com.virgilsecurity.sdk.CompatibilityDataProvider.JSON;
+import static com.virgilsecurity.sdk.CompatibilityDataProvider.STRING;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CrossCompatibilityTest extends PropertyManager {
 
@@ -94,7 +82,7 @@ public class CrossCompatibilityTest extends PropertyManager {
   private CompatibilityDataProvider dataProvider;
   private VirgilCrypto crypto;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     dataProvider = new CompatibilityDataProvider();
     crypto = new VirgilCrypto(true);
@@ -242,9 +230,9 @@ public class CrossCompatibilityTest extends PropertyManager {
     final String apiPublicKeyIdentifier = dataProvider.getJsonByKey(23, "api_key_id");
     final String apiAppId = dataProvider.getJsonByKey(23, "app_id");
 
-    PrivateKey privateKey = crypto.importPrivateKey(
+    VirgilPrivateKey privateKey = crypto.importPrivateKey(
         ConvertionUtils.base64ToBytes(dataProvider.getJsonByKey(23, "api_private_key_base64")))
-                                  .getPrivateKey();
+        .getPrivateKey();
 
     VirgilAccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner();
 
@@ -263,7 +251,7 @@ public class CrossCompatibilityTest extends PropertyManager {
   @Test
   public void stc_3_json() throws CryptoException {
     // STC_3
-    CardCrypto cardCrypto = new VirgilCardCrypto();
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto();
     VirgilCardVerifier cardVerifier = Mockito.mock(VirgilCardVerifier.class);
     Mockito.when(cardVerifier.verifyCard(Mockito.any(Card.class))).thenReturn(true);
 
@@ -291,7 +279,7 @@ public class CrossCompatibilityTest extends PropertyManager {
   @Test
   public void stc_3_string() throws CryptoException {
     // STC_2
-    CardCrypto cardCrypto = new VirgilCardCrypto();
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto();
     VirgilCardVerifier cardVerifier = Mockito.mock(VirgilCardVerifier.class);
     Mockito.when(cardVerifier.verifyCard(Mockito.any(Card.class))).thenReturn(true);
 
@@ -320,7 +308,7 @@ public class CrossCompatibilityTest extends PropertyManager {
   public void stc_4_json() throws CryptoException {
     // STC_4
     final JsonObject baseData = dataProvider.getJsonObject(4);
-    CardCrypto cardCrypto = new VirgilCardCrypto();
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto();
     VirgilCardVerifier cardVerifier = Mockito.mock(VirgilCardVerifier.class);
     Mockito.when(cardVerifier.verifyCard(Mockito.any(Card.class))).thenReturn(true);
 
@@ -334,7 +322,7 @@ public class CrossCompatibilityTest extends PropertyManager {
     assertEquals(card.getIdentity(), "test");
     assertArrayEquals(
         ConvertionUtils.base64ToBytes(dataProvider.getJsonByKey(4, "public_key_base64")),
-        crypto.exportPublicKey((VirgilPublicKey) card.getPublicKey()));
+        crypto.exportPublicKey(card.getPublicKey()));
     assertEquals(card.getVersion(), "5.0");
 
     RawSignedModel rawSignedModel = RawSignedModel.fromJson(importedFromJson);
@@ -376,7 +364,7 @@ public class CrossCompatibilityTest extends PropertyManager {
   public void stc_4_string() throws CryptoException {
     // STC_4
     final JsonObject baseData = dataProvider.getJsonObject(4);
-    CardCrypto cardCrypto = new VirgilCardCrypto();
+    VirgilCardCrypto cardCrypto = new VirgilCardCrypto();
     VirgilCardVerifier cardVerifier = Mockito.mock(VirgilCardVerifier.class);
     Mockito.when(cardVerifier.verifyCard(Mockito.any(Card.class))).thenReturn(true);
 
@@ -390,7 +378,7 @@ public class CrossCompatibilityTest extends PropertyManager {
     assertEquals(card.getIdentity(), "test");
     assertArrayEquals(
         ConvertionUtils.base64ToBytes(dataProvider.getJsonByKey(4, "public_key_base64")),
-        crypto.exportPublicKey((VirgilPublicKey) card.getPublicKey()));
+        crypto.exportPublicKey(card.getPublicKey()));
     assertEquals(card.getVersion(), "5.0");
 
     RawSignedModel rawSignedModel = RawSignedModel.fromString(importedFromString);

@@ -46,10 +46,8 @@ public class Validator {
   /**
    * Check whether provided byte[ ] is empty.
    *
-   * @param data
-   *          the data to check
-   * @param message
-   *          the message that will be shown if provided byte[ ] is empty
+   * @param data    the data to check
+   * @param message the message that will be shown if provided byte[ ] is empty
    */
   public static void checkEmptyAgrument(byte[] data, String message) {
     if (data.length == 0) {
@@ -60,10 +58,8 @@ public class Validator {
   /**
    * Check whether provided list is empty.
    *
-   * @param list
-   *          the list to check
-   * @param message
-   *          the message that will be shown if provided list is empty
+   * @param list    the list to check
+   * @param message the message that will be shown if provided list is empty
    */
   public static void checkEmptyAgrument(List<?> list, String message) {
     if (list.isEmpty()) {
@@ -74,10 +70,8 @@ public class Validator {
   /**
    * Check whether provided string is empty.
    *
-   * @param string
-   *          the string to check
-   * @param message
-   *          the message that will be shown if provided string is empty
+   * @param string  the string to check
+   * @param message the message that will be shown if provided string is empty
    */
   public static void checkEmptyAgrument(String string, String message) {
     if (string.isEmpty()) {
@@ -88,10 +82,8 @@ public class Validator {
   /**
    * Check whether provided object is null.
    *
-   * @param o
-   *          object to check
-   * @param message
-   *          the message that will be shown if provided object is null
+   * @param o       object to check
+   * @param message the message that will be shown if provided object is null
    */
   public static void checkNullAgrument(Object o, String message) {
     if (o == null) {
@@ -103,10 +95,8 @@ public class Validator {
   /**
    * Check whether provided byte[ ] is null or empty.
    *
-   * @param data
-   *          the data to check
-   * @param message
-   *          the message that will be shown if provided byte[ ] is null or empty
+   * @param data    the data to check
+   * @param message the message that will be shown if provided byte[ ] is null or empty
    */
   public static void checkNullEmptyAgrument(byte[] data, String message) {
     checkNullAgrument(data, message);
@@ -116,10 +106,8 @@ public class Validator {
   /**
    * Check whether provided List is null or empty.
    *
-   * @param list
-   *          the list to check
-   * @param message
-   *          the message that will be shown if provided List is null or empty
+   * @param list    the list to check
+   * @param message the message that will be shown if provided List is null or empty
    */
   public static void checkNullEmptyAgrument(List<?> list, String message) {
     checkNullAgrument(list, message);

@@ -1,0 +1,36 @@
+dependencies {
+    api project(":common")
+    api project(":crypto")
+
+    testImplementation "org.junit.jupiter:junit-jupiter:$versions.junit"
+    testImplementation "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"
+    testImplementation "com.virgilsecurity.crypto:ratchet:$versions.virgilCrypto"
+    testImplementation "org.apache.commons:commons-lang3:$versions.commonsLang"
+    testImplementation "org.mockito:mockito-core:$versions.mockito"
+    testImplementation "org.mockito:mockito-junit-jupiter:$versions.mockitoJunit"
+}
+
+sourceSets.main.java.srcDirs = ["${buildDir}/generated/", "src/main/java"]
+
+task generateVirgilInfo(type: Copy) {
+    from('src/main/templates') {
+        include '**/*.java'
+    }
+    into "$buildDir/generated"
+    expand(version: "$project.version")
+    includeEmptyDirs = false
+}
+
+compileJava.dependsOn(generateVirgilInfo)
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom {
+                name = 'Virgil SDK'
+            }
+            artifactId = "sdk"
+        }
+    }
+}

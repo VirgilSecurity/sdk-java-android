@@ -42,17 +42,14 @@ import java.util.Set;
  * This interface describes a storage facility for cryptographic keys.
  *
  * @author Andrii Iakovenko
- *
  */
 public interface KeyStorage {
 
   /**
    * Factory method for creating {@linkplain KeyEntry}.
-   * 
-   * @param name
-   *          the key name.
-   * @param value
-   *          the key value.
+   *
+   * @param name  the key name.
+   * @param value the key value.
    * @return created {@linkplain KeyEntry instance}.
    */
   KeyEntry createEntry(String name, byte[] value);
@@ -60,16 +57,14 @@ public interface KeyStorage {
   /**
    * Deletes the private key from key store by given Id.
    *
-   * @param name
-   *          the key name.
+   * @param name the key name.
    */
   void delete(String name);
 
   /**
    * Checks if the private key exists in this storage by given alias.
    *
-   * @param name
-   *          the key name.
+   * @param name the key name.
    * @return {@code true} if the private key exists, {@code false} otherwise.
    */
   boolean exists(String name);
@@ -77,16 +72,15 @@ public interface KeyStorage {
   /**
    * Loads the private key associated with the given alias.
    *
-   * @param name
-   *          the key name.
+   * @param name the key name.
    * @return The requested private key, or null if the given alias does not exist or does not
-   *         identify a key-related entry.
+   * identify a key-related entry.
    */
   KeyEntry load(String name);
 
   /**
    * Get names of keys stored in key store.
-   * 
+   *
    * @return the set of key names.
    */
   Set<String> names();
@@ -94,20 +88,16 @@ public interface KeyStorage {
   /**
    * Stores the private key (that has already been protected) to the given alias.
    *
-   * @param keyEntry
-   *          the key entry.
-   * @throws KeyEntryAlreadyExistsException
-   *           if key with the same name is already stored
+   * @param keyEntry the key entry.
+   * @throws KeyEntryAlreadyExistsException if key with the same name is already stored
    */
   void store(KeyEntry keyEntry);
 
   /**
    * Updates the private key (that has already been protected) to the given alias.
    *
-   * @param keyEntry
-   *          the key entry.
-   * @throws KeyEntryNotFoundException
-   *           if key with the same name doesn't exists.
+   * @param keyEntry the key entry.
+   * @throws KeyEntryNotFoundException if key with the same name doesn't exists.
    */
   void update(KeyEntry keyEntry);
 

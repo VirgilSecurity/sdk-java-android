@@ -51,8 +51,7 @@ public class VirgilCardVerificationException extends CryptoException {
   /**
    * Instantiates a new Virgil card verification exception.
    *
-   * @param message
-   *          the message
+   * @param message the message
    */
   public VirgilCardVerificationException(String message) {
     super(message);
@@ -61,8 +60,7 @@ public class VirgilCardVerificationException extends CryptoException {
   /**
    * Instantiates a new Virgil card verification exception.
    *
-   * @param cause
-   *          the cause
+   * @param cause the cause
    */
   public VirgilCardVerificationException(Throwable cause) {
     super(cause);

@@ -37,7 +37,6 @@ package com.virgilsecurity.sdk.crypto.exceptions;
  * Signals that an exception of some sort has occurred during decryption.
  *
  * @author Andrii Iakovenko
- *
  */
 public class DecryptionException extends CryptoException {
 
@@ -45,7 +44,6 @@ public class DecryptionException extends CryptoException {
 
   /**
    * Create a new instance of {@code DecryptionException}.
-   *
    */
   public DecryptionException() {
   }
@@ -53,10 +51,9 @@ public class DecryptionException extends CryptoException {
   /**
    * Create a new instance of {@code DecryptionException}.
    *
-   * @param cause
-   *          the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
-   *          {@code null} value is permitted, and indicates that the cause is nonexistent or
-   *          unknown.)
+   * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
+   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
+   *              unknown.)
    */
   public DecryptionException(Throwable cause) {
     super(cause);

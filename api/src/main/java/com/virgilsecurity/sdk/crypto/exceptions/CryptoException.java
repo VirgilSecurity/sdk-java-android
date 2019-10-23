@@ -37,7 +37,6 @@ package com.virgilsecurity.sdk.crypto.exceptions;
  * This class is the general class of exceptions produced by crypto library.
  *
  * @author Andrii Iakovenko
- *
  */
 public class CryptoException extends VirgilException {
 
@@ -45,7 +44,6 @@ public class CryptoException extends VirgilException {
 
   /**
    * Create a new instance of {@code CryptoException}.
-   *
    */
   public CryptoException() {
   }
@@ -53,9 +51,8 @@ public class CryptoException extends VirgilException {
   /**
    * Create a new instance of {@code CryptoException} with the specified detail message.
    *
-   * @param message
-   *          the detail message. The detail message is saved for later retrieval by the
-   *          {@link #getMessage()} method.
+   * @param message the detail message. The detail message is saved for later retrieval by the
+   *                {@link #getMessage()} method.
    */
   public CryptoException(String message) {
     super(message);
@@ -64,10 +61,9 @@ public class CryptoException extends VirgilException {
   /**
    * Create a new instance of {@code CryptoException}.
    *
-   * @param cause
-   *          the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
-   *          {@code null} value is permitted, and indicates that the cause is nonexistent or
-   *          unknown.)
+   * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
+   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
+   *              unknown.)
    */
   public CryptoException(Throwable cause) {
     super(cause);

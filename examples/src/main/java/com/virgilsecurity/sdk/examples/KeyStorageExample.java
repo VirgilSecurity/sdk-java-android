@@ -33,22 +33,17 @@
 
 package com.virgilsecurity.sdk.examples;
 
-import java.util.Map;
-
-import com.virgilsecurity.sdk.crypto.PrivateKey;
-import com.virgilsecurity.sdk.crypto.VirgilCrypto;
-import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
-import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
-import com.virgilsecurity.sdk.crypto.VirgilPrivateKeyExporter;
+import com.virgilsecurity.sdk.crypto.*;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.storage.JsonFileKeyStorage;
 import com.virgilsecurity.sdk.storage.KeyStorage;
 import com.virgilsecurity.sdk.storage.PrivateKeyStorage;
 import com.virgilsecurity.sdk.utils.Tuple;
 
+import java.util.Map;
+
 /**
  * @author Andrii Iakovenko
- *
  */
 public class KeyStorageExample {
 
@@ -68,7 +63,7 @@ public class KeyStorageExample {
     privateKeyStorage.store(privateKey, "Alice", null);
 
     // Load a private key
-    Tuple<PrivateKey, Map<String, String>> privateKeyEntry = privateKeyStorage.load("Alice");
+    Tuple<VirgilPrivateKey, Map<String, String>> privateKeyEntry = privateKeyStorage.load("Alice");
 
     // Delete a private key
     privateKeyStorage.delete("Alice");

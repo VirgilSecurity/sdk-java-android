@@ -37,7 +37,6 @@ package com.virgilsecurity.sdk.crypto.exceptions;
  * Represents errors occurred during interaction with SDK components.
  *
  * @author Andrii Iakovenko
- *
  */
 public class VirgilException extends Exception {
 
@@ -45,7 +44,6 @@ public class VirgilException extends Exception {
 
   /**
    * Create a new instance of {@code VirgilException}.
-   *
    */
   public VirgilException() {
   }
@@ -53,9 +51,8 @@ public class VirgilException extends Exception {
   /**
    * Create a new instance of {@code VirgilException} with the specified detail message.
    *
-   * @param message
-   *          the detail message. The detail message is saved for later retrieval by the
-   *          {@link #getMessage()} method.
+   * @param message the detail message. The detail message is saved for later retrieval by the
+   *                {@link #getMessage()} method.
    */
   public VirgilException(String message) {
     super(message);
@@ -63,11 +60,9 @@ public class VirgilException extends Exception {
 
   /**
    * Create new instance of {@link VirgilException}.
-   * 
-   * @param message
-   *          the detail message
-   * @param cause
-   *          the cause
+   *
+   * @param message the detail message
+   * @param cause   the cause
    */
   public VirgilException(String message, Throwable cause) {
     super(message, cause);
@@ -76,10 +71,9 @@ public class VirgilException extends Exception {
   /**
    * Create a new instance of {@code VirgilException}.
    *
-   * @param cause
-   *          the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
-   *          {@code null} value is permitted, and indicates that the cause is nonexistent or
-   *          unknown.)
+   * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
+   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
+   *              unknown.)
    */
   public VirgilException(Throwable cause) {
     super(cause);

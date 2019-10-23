@@ -35,9 +35,8 @@ package com.virgilsecurity.sdk.exception;
 
 /**
  * This exception throw if instance is not fully initialized to make operation.
- * 
- * @author Andrii Iakovenko
  *
+ * @author Andrii Iakovenko
  */
 public class IncompleteInitializationException extends RuntimeException {
 
@@ -45,9 +44,8 @@ public class IncompleteInitializationException extends RuntimeException {
 
   /**
    * Create new instance of {@link IncompleteInitializationException}.
-   * 
-   * @param message
-   *          the detail message.
+   *
+   * @param message the detail message.
    */
   public IncompleteInitializationException(String message) {
     super(message);

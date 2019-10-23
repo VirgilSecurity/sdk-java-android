@@ -35,9 +35,8 @@ package com.virgilsecurity.crypto.utils;
 
 /**
  * This is utils class which implements Base64 encoding/decoding functionality.
- * 
- * @author Andrii Iakovenko
  *
+ * @author Andrii Iakovenko
  */
 public class Base64 {
 
@@ -61,7 +60,7 @@ public class Base64 {
 
   // Mapping table from Base64 characters to 6-bit nibbles.
   private static final byte[] map2 = new byte[128];
-  
+
   static {
     for (int i = 0; i < map2.length; i++) {
       map2[i] = -1;
@@ -74,12 +73,10 @@ public class Base64 {
   /**
    * Decodes a byte array from Base64 format. No blanks or line breaks are allowed within the Base64
    * encoded input data.
-   * 
-   * @param in
-   *          A character array containing the Base64 encoded data.
+   *
+   * @param in A character array containing the Base64 encoded data.
    * @return An array containing the decoded data bytes.
-   * @throws IllegalArgumentException
-   *           If the input is not valid Base64 encoded data.
+   * @throws IllegalArgumentException If the input is not valid Base64 encoded data.
    */
   public static byte[] decode(char[] in) {
     return decode(in, 0, in.length);
@@ -88,16 +85,12 @@ public class Base64 {
   /**
    * Decodes a byte array from Base64 format. No blanks or line breaks are allowed within the Base64
    * encoded input data.
-   * 
-   * @param in
-   *          A character array containing the Base64 encoded data.
-   * @param offset
-   *          Offset of the first character in <code>in</code> to be processed.
-   * @param len
-   *          Number of characters to process in <code>in</code>, starting at <code>iOff</code>.
+   *
+   * @param in     A character array containing the Base64 encoded data.
+   * @param offset Offset of the first character in <code>in</code> to be processed.
+   * @param len    Number of characters to process in <code>in</code>, starting at <code>iOff</code>.
    * @return An array containing the decoded data bytes.
-   * @throws IllegalArgumentException
-   *           If the input is not valid Base64 encoded data.
+   * @throws IllegalArgumentException If the input is not valid Base64 encoded data.
    */
   public static byte[] decode(char[] in, int offset, int len) {
     if (len % 4 != 0) {
@@ -143,9 +136,8 @@ public class Base64 {
 
   /**
    * Decode Base64 string to byte array.
-   * 
-   * @param base64String
-   *          The string to be converted
+   *
+   * @param base64String The string to be converted
    * @return the byte array
    */
   public static byte[] decode(String base64String) {
@@ -155,8 +147,7 @@ public class Base64 {
   /**
    * Encode byte array to Base64 string.
    *
-   * @param bytes
-   *          the byte array to be converted
+   * @param bytes the byte array to be converted
    * @return the base64 string
    */
   public static String encode(byte[] bytes) {
@@ -165,13 +156,10 @@ public class Base64 {
 
   /**
    * Encodes a byte array into Base64 format. No blanks or line breaks are inserted in the output.
-   * 
-   * @param in
-   *          An array containing the data bytes to be encoded.
-   * @param offset
-   *          Offset of the first byte in <code>in</code> to be processed.
-   * @param len
-   *          Number of bytes to process in <code>in</code>, starting at <code>iOff</code>.
+   *
+   * @param in     An array containing the data bytes to be encoded.
+   * @param offset Offset of the first byte in <code>in</code> to be processed.
+   * @param len    Number of bytes to process in <code>in</code>, starting at <code>iOff</code>.
    * @return A character array containing the Base64 encoded data.
    */
   public static char[] encode(byte[] in, int offset, int len) {

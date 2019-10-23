@@ -33,76 +33,53 @@
 
 package com.virgilsecurity.sdk.storage;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import com.virgilsecurity.sdk.crypto.PrivateKey;
-import com.virgilsecurity.sdk.crypto.PrivateKeyExporter;
 import com.virgilsecurity.sdk.crypto.VirgilCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
+import com.virgilsecurity.sdk.crypto.VirgilPrivateKeyExporter;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.crypto.exceptions.KeyEntryNotFoundException;
 import com.virgilsecurity.sdk.utils.Tuple;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.util.collections.Sets;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.IOException;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@code VirgilKeyStorage}.
  *
  * @author Andrii Iakovenko
- * 
- * @see VirgilKeyStorage
- *
+ * @see PrivateKeyStorage
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class PrivateKeyStorageTest {
   private VirgilCrypto crypto;
   private String keyName;
-  private PrivateKey privateKey;
+  private VirgilPrivateKey privateKey;
 
   @Mock
-  private PrivateKeyExporter keyExporter;
+  private VirgilPrivateKeyExporter keyExporter;
 
   @Mock
   private KeyStorage keyStorage;
   private PrivateKeyStorage storage;
 
-  @Before
+  @BeforeEach
   public void setUp() throws CryptoException {
     this.crypto = new VirgilCrypto();
     this.privateKey = this.crypto.generateKeyPair().getPrivateKey();
     this.keyName = UUID.randomUUID().toString();
 
-    storage = new PrivateKeyStorage(keyExporter, keyStorage);
-
-    // Configure mocks
-    byte[] privateKeyData = this.crypto.exportPrivateKey((VirgilPrivateKey) privateKey);
-    when(this.keyExporter.exportPrivateKey(privateKey)).thenReturn(privateKeyData);
-    when(this.keyExporter.importPrivateKey(privateKeyData))
-        .thenReturn(this.crypto.importPrivateKey(privateKeyData).getPrivateKey());
+    this.storage = new PrivateKeyStorage(keyExporter, keyStorage);
   }
 
   @Test
@@ -115,18 +92,22 @@ public class PrivateKeyStorageTest {
     assertEquals(this.keyName, keyNameCaptor.getValue());
   }
 
-  @Test(expected = KeyEntryNotFoundException.class)
+  @Test
   public void delete_nonExisting() {
     doThrow(KeyEntryNotFoundException.class).when(this.keyStorage).delete(this.keyName);
 
-    storage.delete(this.keyName);
+    assertThrows(KeyEntryNotFoundException.class, () -> {
+      storage.delete(this.keyName);
+    });
   }
 
-  @Test(expected = KeyEntryNotFoundException.class)
+  @Test
   public void delete_nullName() {
     doThrow(KeyEntryNotFoundException.class).when(this.keyStorage).delete(null);
 
-    storage.delete(null);
+    assertThrows(KeyEntryNotFoundException.class, () -> {
+      storage.delete(null);
+    });
   }
 
   @Test
@@ -152,6 +133,12 @@ public class PrivateKeyStorageTest {
 
   @Test
   public void load() throws CryptoException {
+    // Configure mocks
+    byte[] privateKeyData = this.crypto.exportPrivateKey(privateKey);
+    when(this.keyExporter.exportPrivateKey(privateKey)).thenReturn(privateKeyData);
+    when(this.keyExporter.importPrivateKey(privateKeyData))
+        .thenReturn(this.crypto.importPrivateKey(privateKeyData).getPrivateKey());
+
     Map<String, String> meta = new HashMap<>();
     meta.put("key1", "value1");
     meta.put("key2", "value2");
@@ -160,12 +147,11 @@ public class PrivateKeyStorageTest {
     entry.setMeta(meta);
     when(this.keyStorage.load(this.keyName)).thenReturn(entry);
 
-    Tuple<PrivateKey, Map<String, String>> keyData = storage.load(this.keyName);
+    Tuple<VirgilPrivateKey, Map<String, String>> keyData = storage.load(this.keyName);
     assertNotNull(keyData);
 
-    PrivateKey key = keyData.getLeft();
+    VirgilPrivateKey key = keyData.getLeft();
     assertNotNull(key);
-    assertThat(key, instanceOf(VirgilPrivateKey.class));
     assertEquals(this.privateKey, key);
 
     assertEquals(meta, keyData.getRight());
@@ -173,31 +159,40 @@ public class PrivateKeyStorageTest {
 
   @Test
   public void load_noMeta() throws CryptoException {
+    // Configure mocks
+    byte[] privateKeyData = this.crypto.exportPrivateKey(privateKey);
+    when(this.keyExporter.exportPrivateKey(privateKey)).thenReturn(privateKeyData);
+    when(this.keyExporter.importPrivateKey(privateKeyData))
+        .thenReturn(this.crypto.importPrivateKey(privateKeyData).getPrivateKey());
+
     KeyEntry entry = new JsonKeyEntry(this.keyName,
         this.keyExporter.exportPrivateKey(this.privateKey));
     when(this.keyStorage.load(this.keyName)).thenReturn(entry);
 
-    Tuple<PrivateKey, Map<String, String>> keyData = storage.load(this.keyName);
+    Tuple<VirgilPrivateKey, Map<String, String>> keyData = storage.load(this.keyName);
     assertNotNull(keyData);
 
-    PrivateKey key = keyData.getLeft();
+    VirgilPrivateKey key = keyData.getLeft();
     assertNotNull(key);
-    assertThat(key, instanceOf(VirgilPrivateKey.class));
     assertEquals(this.privateKey, key);
 
     assertTrue(keyData.getRight().isEmpty());
   }
 
-  @Test(expected = KeyEntryNotFoundException.class)
-  public void load_nonExisting() throws CryptoException {
+  @Test
+  public void load_nonExisting() {
     when(this.keyStorage.load(this.keyName)).thenThrow(KeyEntryNotFoundException.class);
-    storage.load(this.keyName);
+    assertThrows(KeyEntryNotFoundException.class, () -> {
+      storage.load(this.keyName);
+    });
   }
 
-  @Test(expected = KeyEntryNotFoundException.class)
-  public void load_nullName() throws CryptoException {
+  @Test
+  public void load_nullName() {
     when(this.keyStorage.load(null)).thenThrow(KeyEntryNotFoundException.class);
-    storage.load(null);
+    assertThrows(KeyEntryNotFoundException.class, () -> {
+      storage.load(null);
+    });
   }
 
   @Test
@@ -222,7 +217,9 @@ public class PrivateKeyStorageTest {
 
   @Test
   public void store() throws CryptoException {
-    // when(this.keyStorage.exists(Mockito.anyString())).thenReturn(false);
+    // Configure mocks
+    byte[] privateKeyData = this.crypto.exportPrivateKey((VirgilPrivateKey) privateKey);
+    when(this.keyExporter.exportPrivateKey(privateKey)).thenReturn(privateKeyData);
 
     Map<String, String> meta = new HashMap<>();
     meta.put("key1", "value1");
@@ -238,7 +235,7 @@ public class PrivateKeyStorageTest {
     assertNotNull(keyEntry);
     assertEquals(this.keyName, keyEntry.getName());
     assertArrayEquals(crypto.exportPrivateKey((VirgilPrivateKey) this.privateKey),
-                      keyEntry.getValue());
+        keyEntry.getValue());
     assertNotNull(keyEntry.getMeta());
     assertEquals(meta, keyEntry.getMeta());
   }
@@ -246,7 +243,10 @@ public class PrivateKeyStorageTest {
   @SuppressWarnings("unchecked")
   @Test
   public void store_noMeta() throws CryptoException {
-    // when(this.keyStorage.exists(Mockito.anyString())).thenReturn(false);
+    // Configure mocks
+    byte[] privateKeyData = this.crypto.exportPrivateKey((VirgilPrivateKey) privateKey);
+    when(this.keyExporter.exportPrivateKey(privateKey)).thenReturn(privateKeyData);
+
     storage.store(this.privateKey, this.keyName, Collections.EMPTY_MAP);
 
     verify(this.keyExporter, times(1)).exportPrivateKey(privateKey);
@@ -258,7 +258,7 @@ public class PrivateKeyStorageTest {
     assertNotNull(keyEntry);
     assertEquals(this.keyName, keyEntry.getName());
     assertArrayEquals(crypto.exportPrivateKey((VirgilPrivateKey) this.privateKey),
-                      keyEntry.getValue());
+        keyEntry.getValue());
     assertNotNull(keyEntry.getMeta());
     assertTrue(keyEntry.getMeta().isEmpty());
   }

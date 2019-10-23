@@ -33,36 +33,25 @@
 
 package com.virgilsecurity.sdk.crypto;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.virgilsecurity.crypto.foundation.CtrDrbg;
-import com.virgilsecurity.crypto.foundation.KeyAlg;
-import com.virgilsecurity.crypto.foundation.KeyAlgFactory;
-import com.virgilsecurity.crypto.foundation.KeyAsn1Serializer;
-import com.virgilsecurity.crypto.foundation.RawPublicKey;
-import com.virgilsecurity.crypto.foundation.Sha256;
-import com.virgilsecurity.crypto.foundation.Sha512;
-import com.virgilsecurity.crypto.foundation.Signer;
+import com.virgilsecurity.crypto.foundation.*;
 import com.virgilsecurity.crypto.utils.Base64;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests which verify cross-platform compatibility.
  *
  * @author Andrii Iakovenko
- *
  */
 public class CryptoFormatsTests {
 
@@ -70,7 +59,7 @@ public class CryptoFormatsTests {
   private CtrDrbg random;
   private JsonObject sampleJson;
 
-  @Before
+  @BeforeEach
   public void setup() {
     this.crypto = new VirgilCrypto();
     this.random = new CtrDrbg();

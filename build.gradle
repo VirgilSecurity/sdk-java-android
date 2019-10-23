@@ -1,0 +1,219 @@
+/*
+ * Copyright (c) 2015-2019, Virgil Security, Inc.
+ *
+ * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
+ *
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     (1) Redistributions of source code must retain the above copyright notice, this
+ *     list of conditions and the following disclaimer.
+ *
+ *     (2) Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *
+ *     (3) Neither the name of virgil nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *     this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+buildscript { 
+
+    ext.versions = [
+
+            // Virgil
+            virgilCrypto      : '0.10.2',
+
+            // Common
+            commonsLang       : '3.9',
+            commonsIo         : '2.6',
+            gson              : '2.8.5',
+
+            // Gradle
+            gradle            : '3.4.2',
+
+            // Android
+            appCompat         : '28.0.0',
+            androidx          : '1.1.1',
+
+            // Kotlin
+            kotlinVersion     : '1.3.50',
+            coroutines        : '1.3.0-M1',
+
+
+            // Tests
+            testsRunner       : '1.0.2',
+            espresso          : '3.0.2',
+            junit             : '5.5.0',
+            junitPlugin       : '1.0.0',
+            jsonsimple        : '1.5.1',
+            mockito           : '3.0.0',
+            mockitoJunit      : '3.0.0',
+            mannodermaus      : '1.5.0.0',
+            mannodermausJunit5:'1.1.0',
+
+            // Android Tests
+            junitAndroid      : '4.12',
+
+            // Publish
+            mavenPublishPlugin: '3.6.2',
+            dokka             : '0.9.17'
+    ]
+
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:$versions.gradle"
+        classpath "de.mannodermaus.gradle.plugins:android-junit5:$versions.mannodermaus"
+        classpath "digital.wup:android-maven-publish:$versions.mavenPublishPlugin"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlinVersion" }
+}
+
+plugins {
+    id 'checkstyle'
+    id 'signing'
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots'
+        }
+        google()
+        jcenter()
+    }
+}
+
+def authentication_username = hasProperty('authentication_username') ? authentication_username : System.getenv('authentication_username')
+def authentication_password = hasProperty('authentication_password') ? authentication_password : System.getenv('authentication_password')
+
+subprojects {
+    group 'com.virgilsecurity.sdk'
+    version '6.0'
+
+    apply plugin: 'maven-publish'
+    apply plugin: 'checkstyle'
+
+    def isAndroid = (it.name == 'crypto-android' || it.name == 'android-utils')
+
+    if (!isAndroid) {
+        apply plugin: 'java-library'
+
+        sourceCompatibility = JavaVersion.VERSION_1_8
+
+        dependencies {
+            testImplementation "org.junit.jupiter:junit-jupiter:$versions.junit"
+        }
+
+        test {
+            useJUnitPlatform()
+            testLogging {
+                events "passed", "skipped", "failed"
+            }
+        }
+    }
+
+    // Don't publish examples subproject
+    if (it.name != 'examples') {
+
+        apply plugin: 'signing'
+
+        if (!isAndroid) {
+            task sourcesJar(type: Jar) {
+                from sourceSets.main.allJava
+                archiveClassifier = 'sources'
+            }
+
+            task javadocJar(type: Jar) {
+                from javadoc
+                archiveClassifier = 'javadoc'
+            }
+        }
+
+        publishing {
+            publications {
+                mavenJava(MavenPublication) {
+                    if (!isAndroid) {
+                        artifact sourcesJar
+                        artifact javadocJar
+                    }
+                    pom {
+                        description = 'Virgil is a stack of security libraries (ECIES with Crypto Agility wrapped in Virgil Cryptogram) and all the necessary infrastructure to enable seamless, end-to-end encryption for any application, platform or device.\n' +
+                                'Learn about Virgil Java/Android SDK https://virgilsecurity.com/api-docs/java-android/quickstart'
+                        url = 'https://www.virgilsecurity.com/'
+                        licenses {
+                            license {
+                                name = 'Virgil Security, Inc. license'
+                                url = 'https://github.com/VirgilSecurity/virgil-sdk-java-android/blob/master/LICENSE.md'
+                            }
+                        }
+                        developers {
+                            developer {
+                                id = 'BuddahLD'
+                                name = 'Danylo Oliinyk'
+                                email = 'doliinyk@virgilsecurity.com'
+                                organizationUrl = 'https://github.com/BuddahLD'
+                            }
+                            developer {
+                                id = 'andrii-iakovenko'
+                                name = 'Andrii Iakovenko'
+                                email = 'andrii-iakovenko@gmail.com'
+                                organizationUrl = 'https://github.com/andrii-iakovenko'
+                            }
+                        }
+                        scm {
+                            connection = 'scm:git:https://github.com/VirgilSecurity/virgil-sdk-java.git'
+                            developerConnection = 'scm:git:git@github.com:VirgilSecurity/virgil-sdk-java.git'
+                            url = 'https://github.com/VirgilSecurity/virgil-sdk-java-android'
+                        }
+                    }
+                }
+            }
+
+            repositories {
+                maven {
+                    def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+                    url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                    credentials {
+                        username "${authentication_username}"
+                        password "${authentication_password}"
+                    }
+                }
+            }
+        }
+
+        signing {
+            sign publishing.publications.mavenJava
+        }
+    }
+
+    checkstyle {
+        toolVersion '7.8.1'
+        configFile rootProject.file('config/checkstyle/checkstyle.xml')
+        configProperties = [
+                'checkstyle.header.file' : rootProject.file('config/checkstyle/java.header'),
+                'checkstyle.javadoc.severity' : 'error'
+        ]
+        ignoreFailures true
+    }
+}

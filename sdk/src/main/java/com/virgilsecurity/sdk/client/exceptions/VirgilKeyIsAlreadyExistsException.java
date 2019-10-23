@@ -37,7 +37,6 @@ package com.virgilsecurity.sdk.client.exceptions;
  * This exception occurred when key with the same name already exists at the storage.
  *
  * @author Andrii Iyakovenko
- *
  */
 public class VirgilKeyIsAlreadyExistsException extends VirgilClientException {
 
@@ -45,7 +44,6 @@ public class VirgilKeyIsAlreadyExistsException extends VirgilClientException {
 
   /**
    * Create a new instance of {@code VirgilKeyIsAlreadyExistsException}.
-   *
    */
   public VirgilKeyIsAlreadyExistsException() {
     super("Virgil Key is already exists.");

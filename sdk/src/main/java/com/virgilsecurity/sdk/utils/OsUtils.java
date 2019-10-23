@@ -98,7 +98,8 @@ public class OsUtils {
       this.agentName = loggedName;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
       return name;
     }
 

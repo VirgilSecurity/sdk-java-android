@@ -65,19 +65,14 @@ public class JwtBodyContent {
   /**
    * Instantiates a new Jwt body content.
    *
-   * @param appId
-   *          the application identifier
-   * @param identity
-   *          the identity
-   * @param additionalData
-   *          the additional data associated with token
-   * @param expiresAt
-   *          a lifetime of token
-   * @param issuedAt
-   *          when the token is issued at
+   * @param appId          the application identifier
+   * @param identity       the identity
+   * @param additionalData the additional data associated with token
+   * @param expiresAt      a lifetime of token
+   * @param issuedAt       when the token is issued at
    */
   public JwtBodyContent(String appId, String identity, Map<String, String> additionalData,
-      TimeSpan expiresAt, Date issuedAt) {
+                        TimeSpan expiresAt, Date issuedAt) {
     this(appId, identity, expiresAt, issuedAt);
 
     this.additionalData = additionalData;
@@ -86,14 +81,10 @@ public class JwtBodyContent {
   /**
    * Instantiates a new Jwt body content.
    *
-   * @param appId
-   *          the application identifier
-   * @param identity
-   *          the identity
-   * @param expiresAt
-   *          a lifetime of token
-   * @param issuedAt
-   *          when the token is issued at
+   * @param appId     the application identifier
+   * @param identity  the identity
+   * @param expiresAt a lifetime of token
+   * @param issuedAt  when the token is issued at
    */
   public JwtBodyContent(String appId, String identity, TimeSpan expiresAt, Date issuedAt) {
     if (appId != null) {
@@ -108,7 +99,7 @@ public class JwtBodyContent {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -220,7 +211,7 @@ public class JwtBodyContent {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override

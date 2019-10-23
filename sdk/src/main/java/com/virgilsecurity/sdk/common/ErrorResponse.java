@@ -36,9 +36,7 @@ package com.virgilsecurity.sdk.common;
 import com.google.gson.annotations.SerializedName;
 
 /**
- *
  * @author Andrii Iakovenko
- *
  */
 public class ErrorResponse {
 
@@ -63,16 +61,14 @@ public class ErrorResponse {
   }
 
   /**
-   * @param code
-   *          the code to set
+   * @param code the code to set
    */
   public void setCode(int code) {
     this.code = code;
   }
 
   /**
-   * @param message
-   *          the message to set
+   * @param message the message to set
    */
   public void setMessage(String message) {
     this.message = message;

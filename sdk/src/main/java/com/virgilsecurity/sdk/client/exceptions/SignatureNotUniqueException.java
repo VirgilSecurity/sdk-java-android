@@ -35,7 +35,6 @@ package com.virgilsecurity.sdk.client.exceptions;
 
 /**
  * @author Andrii Iakovenko
- *
  */
 public class SignatureNotUniqueException extends RuntimeException {
 
@@ -50,8 +49,7 @@ public class SignatureNotUniqueException extends RuntimeException {
   /**
    * Create new instance of {@link SignatureNotUniqueException}.
    *
-   * @param message
-   *          The message.
+   * @param message The message.
    */
   public SignatureNotUniqueException(String message) {
     super(message);

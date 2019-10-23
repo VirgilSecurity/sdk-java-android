@@ -37,7 +37,6 @@ package com.virgilsecurity.sdk.client.exceptions;
  * Exception class for Virgil Identity Service operations.
  *
  * @author Andrii Iakovenko
- *
  */
 public class VirgilIdentityServiceException extends VirgilServiceException {
 
@@ -46,8 +45,7 @@ public class VirgilIdentityServiceException extends VirgilServiceException {
   /**
    * Create a new instance of {@code VirgilIdentityServiceException}.
    *
-   * @param e
-   *          the exception.
+   * @param e the exception.
    */
   public VirgilIdentityServiceException(Exception e) {
     super(e);

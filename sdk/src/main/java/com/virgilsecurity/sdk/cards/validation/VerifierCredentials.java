@@ -43,10 +43,8 @@ public class VerifierCredentials {
   /**
    * Instantiates a new Verifier credentials.
    *
-   * @param signer
-   *          the signer
-   * @param publicKey
-   *          the public key of verifier
+   * @param signer    the signer
+   * @param publicKey the public key of verifier
    */
   public VerifierCredentials(String signer, byte[] publicKey) {
     this.signer = signer;
@@ -74,8 +72,7 @@ public class VerifierCredentials {
   /**
    * Sets public key of verifier.
    *
-   * @param publicKey
-   *          the public key
+   * @param publicKey the public key
    */
   public void setPublicKey(byte[] publicKey) {
     this.publicKey = publicKey;
@@ -84,8 +81,7 @@ public class VerifierCredentials {
   /**
    * Sets signer.
    *
-   * @param signer
-   *          the signer
+   * @param signer the signer
    */
   public void setSigner(String signer) {
     this.signer = signer;

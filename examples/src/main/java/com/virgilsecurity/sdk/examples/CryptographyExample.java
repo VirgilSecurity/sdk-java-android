@@ -33,25 +33,16 @@
 
 package com.virgilsecurity.sdk.examples;
 
+import com.virgilsecurity.sdk.crypto.*;
+import com.virgilsecurity.sdk.crypto.exceptions.*;
+import com.virgilsecurity.sdk.utils.ConvertionUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.virgilsecurity.sdk.crypto.KeyType;
-import com.virgilsecurity.sdk.crypto.VirgilCrypto;
-import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
-import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
-import com.virgilsecurity.sdk.crypto.VirgilPublicKey;
-import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.sdk.crypto.exceptions.DecryptionException;
-import com.virgilsecurity.sdk.crypto.exceptions.EncryptionException;
-import com.virgilsecurity.sdk.crypto.exceptions.SigningException;
-import com.virgilsecurity.sdk.crypto.exceptions.VerificationException;
-import com.virgilsecurity.sdk.utils.ConvertionUtils;
-
 /**
  * @author Andrii Iakovenko
- *
  */
 public class CryptographyExample {
 
@@ -100,7 +91,7 @@ public class CryptographyExample {
   }
 
   private String decryptThenVerify(byte[] encryptedData, VirgilPrivateKey receiverPrivateKey,
-      VirgilPublicKey senderPublicKey) throws CryptoException {
+                                   VirgilPublicKey senderPublicKey) throws CryptoException {
     VirgilCrypto crypto = new VirgilCrypto();
 
     // data to be decrypted and verified
@@ -242,7 +233,7 @@ public class CryptographyExample {
   }
 
   private byte[] signThenEncrypt(VirgilPrivateKey senderPrivateKey,
-      VirgilPublicKey receiverPublicKey) throws CryptoException {
+                                 VirgilPublicKey receiverPublicKey) throws CryptoException {
     VirgilCrypto crypto = new VirgilCrypto();
 
     // prepare a message
@@ -265,7 +256,7 @@ public class CryptographyExample {
   }
 
   private boolean verifySignature(byte[] signature, byte[] dataToSign,
-      VirgilPublicKey senderPublicKey) throws VerificationException {
+                                  VirgilPublicKey senderPublicKey) throws VerificationException {
     VirgilCrypto crypto = new VirgilCrypto();
 
     // verify a signature

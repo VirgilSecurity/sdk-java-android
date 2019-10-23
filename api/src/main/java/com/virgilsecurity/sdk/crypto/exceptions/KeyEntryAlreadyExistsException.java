@@ -37,7 +37,6 @@ package com.virgilsecurity.sdk.crypto.exceptions;
  * The exception that is thrown when an key pair is already exists.
  *
  * @author Andrii Iakovenko
- *
  */
 public class KeyEntryAlreadyExistsException extends KeyStorageException {
 
@@ -45,7 +44,6 @@ public class KeyEntryAlreadyExistsException extends KeyStorageException {
 
   /**
    * Create a new instance of {@code KeyEntryAlreadyExistsException}.
-   *
    */
   public KeyEntryAlreadyExistsException() {
   }

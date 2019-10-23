@@ -51,7 +51,6 @@ public enum SignerType {
    * !!!!! If you're reading this and don't know what signer type you should use: You should NEVER
    * use 'self' or 'virgil' signature! Use your Own signature with any signer type - for example
    * 'mycustomservice'. !!!!!
-   *
    */
   private final String signerType;
 

@@ -46,7 +46,6 @@ public class VirgilKeyPair {
 
   /**
    * Create a new instance of {@code KeyPairVirgiled}.
-   *
    */
   public VirgilKeyPair() {
   }
@@ -54,10 +53,8 @@ public class VirgilKeyPair {
   /**
    * Create a new instance of {@code KeyPair}.
    *
-   * @param publicKey
-   *          the Virgil public key.
-   * @param privateKey
-   *          the Virgil private key.
+   * @param publicKey  the Virgil public key.
+   * @param privateKey the Virgil private key.
    */
   public VirgilKeyPair(VirgilPublicKey publicKey, VirgilPrivateKey privateKey) {
     this.publicKey = publicKey;
@@ -66,7 +63,7 @@ public class VirgilKeyPair {
 
   /**
    * Get the Virgil private key.
-   * 
+   *
    * @return the Virgil private key
    */
   public VirgilPrivateKey getPrivateKey() {
@@ -76,8 +73,7 @@ public class VirgilKeyPair {
   /**
    * Set the Virgil private key.
    *
-   * @param privateKey
-   *          the Virgil private key to set.
+   * @param privateKey the Virgil private key to set.
    */
   public void setPrivateKey(VirgilPrivateKey privateKey) {
     this.privateKey = privateKey;
@@ -85,7 +81,7 @@ public class VirgilKeyPair {
 
   /**
    * Get the Virgil public key.
-   * 
+   *
    * @return the Virgil public key
    */
   public VirgilPublicKey getPublicKey() {
@@ -95,14 +91,14 @@ public class VirgilKeyPair {
   /**
    * Set the Virgil public key.
    *
-   * @param publicKey
-   *          the Virgil public key to set.
+   * @param publicKey the Virgil public key to set.
    */
   public void setPublicKey(VirgilPublicKey publicKey) {
     this.publicKey = publicKey;
   }
 
-  @Override public boolean equals(Object o) {
+  @Override
+  public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
@@ -114,7 +110,8 @@ public class VirgilKeyPair {
         && Objects.equals(privateKey, keyPair.privateKey);
   }
 
-  @Override public int hashCode() {
+  @Override
+  public int hashCode() {
     return Objects.hash(publicKey, privateKey);
   }
 }

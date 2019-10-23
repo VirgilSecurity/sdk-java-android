@@ -39,7 +39,6 @@ import com.virgilsecurity.sdk.common.HttpError;
  * Exception class for Virgil Cards Service operations.
  *
  * @author Andrii Iakovenko
- *
  */
 public class VirgilCardServiceException extends VirgilServiceException {
 
@@ -47,7 +46,6 @@ public class VirgilCardServiceException extends VirgilServiceException {
 
   /**
    * Create a new instance of {@code VirgilCardServiceException}.
-   *
    */
   public VirgilCardServiceException() {
   }
@@ -55,8 +53,7 @@ public class VirgilCardServiceException extends VirgilServiceException {
   /**
    * Create a new instance of {@code VirgilCardServiceException}.
    *
-   * @param e
-   *          the exception.
+   * @param e the exception.
    */
   public VirgilCardServiceException(Exception e) {
     super(e);
@@ -65,8 +62,7 @@ public class VirgilCardServiceException extends VirgilServiceException {
   /**
    * Create a new instance of {@code VirgilCardServiceException}.
    *
-   * @param code
-   *          the error code.
+   * @param code the error code.
    */
   public VirgilCardServiceException(int code) {
     super(code);
@@ -75,10 +71,8 @@ public class VirgilCardServiceException extends VirgilServiceException {
   /**
    * Create a new instance of {@code VirgilCardServiceException}.
    *
-   * @param code
-   *          The error code.
-   * @param message
-   *          The error message.
+   * @param code    The error code.
+   * @param message The error message.
    */
   public VirgilCardServiceException(int code, String message) {
     super(code, message);
@@ -87,12 +81,9 @@ public class VirgilCardServiceException extends VirgilServiceException {
   /**
    * Create a new instance of {@code VirgilCardServiceException}.
    *
-   * @param code
-   *          The error code from Virgil Services.
-   * @param message
-   *          The error message from Virgil Services.
-   * @param httpError
-   *          the http error by itself
+   * @param code      The error code from Virgil Services.
+   * @param message   The error message from Virgil Services.
+   * @param httpError the http error by itself
    */
   public VirgilCardServiceException(int code, String message, HttpError httpError) {
     super(code, message, httpError);
@@ -100,9 +91,8 @@ public class VirgilCardServiceException extends VirgilServiceException {
 
   /**
    * Create new instance of {@link VirgilCardServiceException}.
-   * 
-   * @param message
-   *          the detail message
+   *
+   * @param message the detail message
    */
   public VirgilCardServiceException(String message) {
     super(-1, message);

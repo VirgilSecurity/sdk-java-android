@@ -52,8 +52,7 @@ public class Whitelist {
   /**
    * Add verifiers credential.
    *
-   * @param verifiersCredential
-   *          the verifiers credentials
+   * @param verifiersCredential the verifiers credentials
    */
   public void addVerifiersCredentials(VerifierCredentials verifiersCredential) {
     if (verifiersCredentials == null) {
@@ -75,8 +74,7 @@ public class Whitelist {
   /**
    * Sets verifiers credentials.
    *
-   * @param verifiersCredentials
-   *          the verifiers credentials
+   * @param verifiersCredentials the verifiers credentials
    */
   public void setVerifiersCredentials(List<VerifierCredentials> verifiersCredentials) {
     this.verifiersCredentials = verifiersCredentials;

@@ -42,9 +42,8 @@ import java.util.List;
 
 /**
  * Interface representing operations with Virgil Cards service.
- * 
- * @author Andrii Iakovenko
  *
+ * @author Andrii Iakovenko
  */
 public interface CardClient {
 
@@ -52,23 +51,28 @@ public interface CardClient {
    * Get card from Virgil Services by specified identifier.
    *
    * @param cardId the card identifier.
-   * @param token token to authorize the request.
-   *
+   * @param token  token to authorize the request.
    * @return the card loaded from Virgil Cards service.
-   *
    * @throws VirgilServiceException if service call failed.
    */
   public Tuple<RawSignedModel, Boolean> getCard(String cardId, String token)
       throws VirgilServiceException;
 
   /**
+   * Returns list of cards that were replaced with newer ones.
+   *
+   * @param  cardIds card ids to check.
+   * @param token   token to authorize the request.
+   * @return list of cards identifiers.
+   */
+  List<String> getOutdated(Collection<String> cardIds, String token) throws VirgilServiceException;
+
+  /**
    * Publishes card in Virgil Cards service.
    *
    * @param rawCard raw signed model of card to be published.
-   * @param token token to authorize the request.
-   *
+   * @param token   token to authorize the request.
    * @return the {@link RawSignedModel} of the Card that is published to Virgil Cards service.
-   *
    * @throws VirgilServiceException if an error occurred while publishing Card.
    */
   public RawSignedModel publishCard(RawSignedModel rawCard, String token)
@@ -78,10 +82,8 @@ public interface CardClient {
    * Search cards Virgil Services by specified identity.
    *
    * @param identity the identity for search.
-   * @param token token to authorize the request.
-   *
+   * @param token    token to authorize the request.
    * @return A list of found cards.
-   *
    * @throws VirgilServiceException if service call failed.
    */
   public List<RawSignedModel> searchCards(String identity, String token)
@@ -91,10 +93,8 @@ public interface CardClient {
    * Search cards Virgil Services by specified identity.
    *
    * @param identities the identity for search.
-   * @param token token to authorize the request.
-   *
+   * @param token      token to authorize the request.
    * @return A list of found cards.
-   *
    * @throws VirgilServiceException if service call failed.
    */
   public List<RawSignedModel> searchCards(Collection<String> identities, String token)
@@ -105,8 +105,7 @@ public interface CardClient {
    * Also, such cards could be obtained using get query, but will be absent in search query result.
    *
    * @param cardId identifier of card to revoke.
-   * @param token token to authorize the request.
-   *
+   * @param token  token to authorize the request.
    * @throws VirgilServiceException if service call failed.
    */
   public void revokeCard(String cardId, String token) throws VirgilServiceException;

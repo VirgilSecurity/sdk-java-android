@@ -58,10 +58,8 @@ public class Jwt implements AccessToken {
   /**
    * Instantiates a new Jwt.
    *
-   * @param headerContent
-   *          the header content
-   * @param bodyContent
-   *          the body content
+   * @param headerContent the header content
+   * @param bodyContent   the body content
    */
   public Jwt(JwtHeaderContent headerContent, JwtBodyContent bodyContent) {
     this(headerContent, bodyContent, null);
@@ -70,12 +68,9 @@ public class Jwt implements AccessToken {
   /**
    * Instantiates a new Jwt.
    *
-   * @param headerContent
-   *          the header content
-   * @param bodyContent
-   *          the body content
-   * @param signatureData
-   *          the signature data
+   * @param headerContent the header content
+   * @param bodyContent   the body content
+   * @param signatureData the signature data
    */
   public Jwt(JwtHeaderContent headerContent, JwtBodyContent bodyContent, byte[] signatureData) {
     Validator.checkNullAgrument(headerContent, "Jwt -> 'headerContent' should not be null");
@@ -101,15 +96,14 @@ public class Jwt implements AccessToken {
   /**
    * Instantiates a new Jwt.
    *
-   * @param jwtToken
-   *          the jwt token in string representation. Should have at least two parts - header and
-   *          body. (ex. "***.***", where "***" is base64 encoded string)
+   * @param jwtToken the jwt token in string representation. Should have at least two parts - header and
+   *                 body. (ex. "***.***", where "***" is base64 encoded string)
    */
   public Jwt(String jwtToken) {
     if (jwtToken == null) {
       throw new IllegalArgumentException("'jwtToken' cannot be null");
     }
-    
+
     String[] jwtParts = jwtToken.split("[.]");
 
     if (jwtParts.length < 2 || jwtParts.length > 3) {
@@ -228,11 +222,9 @@ public class Jwt implements AccessToken {
   /**
    * Whether the token is expired comparing to some predefined date.
    *
-   * @param lifeTimePredefined
-   *          predefined date that will be used in comparison to check whether the token is expired.
-   *          For example to set expiration date in some near future (+5 seconds beyond current
-   *          time).
-   *
+   * @param lifeTimePredefined predefined date that will be used in comparison to check whether the token is expired.
+   *                           For example to set expiration date in some near future (+5 seconds beyond current
+   *                           time).
    * @return if the token is already expired then - {@code true}, otherwise {@code false}
    */
   public boolean isExpired(Date lifeTimePredefined) {

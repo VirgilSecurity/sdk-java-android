@@ -63,8 +63,7 @@ public abstract class VirgilServiceException extends Exception {
   /**
    * Create a new instance of {@code VirgilServiceException}.
    *
-   * @param cause
-   *          the cause
+   * @param cause the cause
    */
   public VirgilServiceException(Exception cause) {
     super(cause);
@@ -74,8 +73,7 @@ public abstract class VirgilServiceException extends Exception {
   /**
    * Create a new instance of {@code VirgilServiceException}.
    *
-   * @param code
-   *          the error code
+   * @param code the error code
    */
   public VirgilServiceException(int code) {
     this.errorCode = code;
@@ -84,10 +82,8 @@ public abstract class VirgilServiceException extends Exception {
   /**
    * Create a new instance of {@code VirgilServiceException}.
    *
-   * @param code
-   *          the error code
-   * @param cause
-   *          the cause
+   * @param code  the error code
+   * @param cause the cause
    */
   public VirgilServiceException(int code, Exception cause) {
     super(cause);
@@ -98,10 +94,8 @@ public abstract class VirgilServiceException extends Exception {
   /**
    * Create a new instance of {@code VirgilServiceException}.
    *
-   * @param code
-   *          the error code
-   * @param messageError
-   *          the error message
+   * @param code         the error code
+   * @param messageError the error message
    */
   public VirgilServiceException(int code, String messageError) {
     this.errorCode = code;
@@ -111,12 +105,9 @@ public abstract class VirgilServiceException extends Exception {
   /**
    * Create a new instance of {@code VirgilServiceException}.
    *
-   * @param code
-   *          the error code from Virgil Service
-   * @param messageError
-   *          the error message from Virgil Service
-   * @param httpError
-   *          the {@link HttpError} by itself
+   * @param code         the error code from Virgil Service
+   * @param messageError the error message from Virgil Service
+   * @param httpError    the {@link HttpError} by itself
    */
   public VirgilServiceException(int code, String messageError, HttpError httpError) {
     this.errorCode = code;
@@ -126,7 +117,7 @@ public abstract class VirgilServiceException extends Exception {
 
   /**
    * Get the error code.
-   * 
+   *
    * @return the error code
    */
   public int getErrorCode() {
