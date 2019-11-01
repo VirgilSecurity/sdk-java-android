@@ -126,14 +126,13 @@ def static getSystemProperty(String name) {
  *
  * @param name Of property to get.
  */
-def getProperty(String name) {
-    def systemProperty = getSystemProperty(name)
-
+def getGradleOrSystemProperty(String name, Project project) {
     def property
-    if (systemProperty != null) {
-        property = systemProperty
-    } else if (hasProperty(name)) {
+
+    if (project.hasProperty(name)) {
         property = project.getProperty(name)
+    } else {
+        property = getSystemProperty(name)
     }
 
     return property
@@ -148,17 +147,19 @@ subprojects {
     apply from: '../tests-verbal-output.gradle'
 
     task loadPublishProperties {
-        Properties properties = new Properties()
-        properties.load(new FileInputStream("${rootProject.projectDir.path}/publish.properties"))
-        properties.entrySet().forEach {
-            project.ext.setProperty((String) it.key, (String) it.value)
+        if (new File("${rootProject.projectDir.path}/publish.properties").exists()) {
+            Properties properties = new Properties()
+            properties.load(new FileInputStream("${rootProject.projectDir.path}/publish.properties"))
+            properties.entrySet().forEach {
+                project.ext.setProperty((String) it.key, (String) it.value)
+            }
         }
     }
 
     publish.dependsOn(loadPublishProperties)
 
-    def authentication_username = getProperty('authentication_username')
-    def authentication_password = getProperty('authentication_password')
+    def authentication_username = getGradleOrSystemProperty('authentication_username', project)
+    def authentication_password = getGradleOrSystemProperty('authentication_password', project)
 
     def isAndroid = (it.name == 'crypto-android' || it.name == 'android-utils')
 
@@ -258,8 +259,8 @@ subprojects {
         toolVersion '7.8.1'
         configFile rootProject.file('config/checkstyle/checkstyle.xml')
         configProperties = [
-                'checkstyle.header.file' : rootProject.file('config/checkstyle/java.header'),
-                'checkstyle.javadoc.severity' : 'error'
+                'checkstyle.header.file'     : rootProject.file('config/checkstyle/java.header'),
+                'checkstyle.javadoc.severity': 'error'
         ]
         ignoreFailures true
     }
