@@ -76,7 +76,7 @@ class CloudKeyStorageTest {
         this.publicKey = keyPair.publicKey
         this.publicKeys = arrayListOf(this.publicKey)
 
-        val jwtGenerator = JwtGenerator(TestConfig.appId, TestConfig.apiKey, TestConfig.apiPublicKeyId, TimeSpan.fromTime(600, TimeUnit.SECONDS),
+        val jwtGenerator = JwtGenerator(TestConfig.appId, TestConfig.appPrivateKey, TestConfig.appPublicKeyId, TimeSpan.fromTime(600, TimeUnit.SECONDS),
                 VirgilAccessTokenSigner(this.virgilCrypto))
         this.provider = CachingJwtProvider(CachingJwtProvider.RenewJwtCallback { jwtGenerator.generateToken(identity) })
 

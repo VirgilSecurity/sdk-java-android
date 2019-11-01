@@ -79,8 +79,8 @@ class SyncKeyStorageTests {
 
         val jwtGenerator = JwtGenerator(
             TestConfig.appId,
-            TestConfig.apiKey,
-            TestConfig.apiPublicKeyId,
+            TestConfig.appPrivateKey,
+            TestConfig.appPublicKeyId,
             TimeSpan.fromTime(100, TimeUnit.SECONDS),
             VirgilAccessTokenSigner(this.virgilCrypto)
         )
@@ -110,8 +110,8 @@ class SyncKeyStorageTests {
     fun init() {
         val jwtGenerator = JwtGenerator(
             TestConfig.appId,
-            TestConfig.apiKey,
-            TestConfig.apiPublicKeyId,
+            TestConfig.appPrivateKey,
+            TestConfig.appPublicKeyId,
             TimeSpan.fromTime(100, TimeUnit.SECONDS),
             VirgilAccessTokenSigner(this.virgilCrypto)
         )
@@ -567,8 +567,8 @@ class SyncKeyStorageTests {
 
         val jwtGenerator = JwtGenerator(
             TestConfig.appId,
-            TestConfig.apiKey,
-            TestConfig.apiPublicKeyId,
+            TestConfig.appPrivateKey,
+            TestConfig.appPublicKeyId,
             TimeSpan.fromTime(100, TimeUnit.SECONDS),
             VirgilAccessTokenSigner(this.virgilCrypto)
         )

@@ -38,7 +38,7 @@ package com.virgilsecurity.crypto.utils;
  *
  * @author Andrii Iakovenko
  */
-public class Base64 {
+public class Base64 { // TODO Do we need duplicate Base64 from common?
 
   // Mapping table from 6-bit nibbles to Base64 characters.
   private static final char[] map1 = new char[64];

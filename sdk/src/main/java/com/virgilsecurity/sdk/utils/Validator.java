@@ -41,7 +41,7 @@ import java.util.List;
 /**
  * The {@linkplain Validator} is used for validation purposes to make code cleaner.
  */
-public class Validator {
+public class Validator { // TODO Move to common
 
   /**
    * Check whether provided byte[ ] is empty.

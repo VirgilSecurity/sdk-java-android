@@ -69,7 +69,7 @@ class KeyknoxClientTest {
         this.publicKey = keyPair.publicKey
 
 
-        val jwtGenerator = JwtGenerator(TestConfig.appId, TestConfig.apiKey, TestConfig.apiPublicKeyId, TimeSpan.fromTime(600, TimeUnit.SECONDS),
+        val jwtGenerator = JwtGenerator(TestConfig.appId, TestConfig.appPrivateKey, TestConfig.appPublicKeyId, TimeSpan.fromTime(600, TimeUnit.SECONDS),
                 VirgilAccessTokenSigner(this.virgilCrypto))
         val tokenProvider = CachingJwtProvider(CachingJwtProvider.RenewJwtCallback { jwtGenerator.generateToken(identity) })
         this.keyknoxClient = KeyknoxClient(tokenProvider, URL(TestConfig.keyknoxServiceAddress))

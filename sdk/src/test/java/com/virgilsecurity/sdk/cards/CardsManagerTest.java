@@ -57,6 +57,7 @@ import com.virgilsecurity.sdk.utils.ConvertionUtils;
 import com.virgilsecurity.sdk.utils.StringUtils;
 import com.virgilsecurity.sdk.utils.TestUtils;
 import com.virgilsecurity.sdk.utils.Tuple;
+import com.virgilsecurity.testcommon.utils.PropertyUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -74,6 +75,7 @@ import static org.mockito.Mockito.when;
 public class CardsManagerTest extends PropertyManager {
 
   private static final String SIGNER_TYPE_EXTRA = "bestsignerever";
+  private static final String CARDS_SERVICE_PUBLIC_KEY = "bestsignerever";
 
   private Mocker mocker;
   private VirgilCrypto crypto;
@@ -95,8 +97,8 @@ public class CardsManagerTest extends PropertyManager {
       cardClient = new VirgilCardClient(url);
     }
     cardVerifier = new VirgilCardVerifier(cardCrypto);
-    if (!StringUtils.isBlank(getPropertyByName("CARDS_SERVICE_PUBLIC_KEY"))) {
-      cardVerifier.setServiceKey(getPropertyByName("CARDS_SERVICE_PUBLIC_KEY"));
+    if (!StringUtils.isBlank(PropertyUtils.getSystemProperty(CARDS_SERVICE_PUBLIC_KEY))) {
+      cardVerifier.setServiceKey(PropertyUtils.getSystemProperty(CARDS_SERVICE_PUBLIC_KEY));
     }
     dataProvider = new CompatibilityDataProvider();
   }

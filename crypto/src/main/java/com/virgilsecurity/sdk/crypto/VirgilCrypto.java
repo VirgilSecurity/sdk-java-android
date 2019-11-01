@@ -168,7 +168,7 @@ public class VirgilCrypto {
    * @return Generated key pair.
    * @throws CryptoException if crypto operation failed
    */
-  public VirgilKeyPair generateKeyPair(KeyType keyType) throws CryptoException {
+  public VirgilKeyPair generateKeyPair(KeyType keyType) throws CryptoException { // FIXME Check all foundation RuntimeException are being caught
     return generateKeyPair(keyType, this.rng);
   }
 

@@ -31,33 +31,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.common.util
-
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.virgilsecurity.common.model.Data
-import java.nio.charset.Charset
-import java.nio.charset.StandardCharsets
-
+package com.virgilsecurity.testcommon.utils
 
 /**
- * SerializeUtils class.
+ * PropertyUtils class.
  */
-class SerializeUtils {
+object PropertyUtils {
 
-    companion object {
-        private val gson: Gson by lazy { Gson() }
-
-        @JvmStatic @JvmOverloads
-        fun serialize(clazz: Any, charset: Charset = StandardCharsets.UTF_8) =
-            Data(gson.toJson(clazz).toByteArray(charset))
-
-        @JvmStatic @JvmOverloads
-        fun <T> deserialize(data: Data, clazz: Class<T>, charset: Charset = StandardCharsets.UTF_8) =
-            gson.fromJson(String(data.data, charset), clazz)
-
-        @JvmStatic @JvmOverloads
-        fun <T> deserialize(data: Data, type: TypeToken<T>, charset: Charset = StandardCharsets.UTF_8) =
-            gson.fromJson(String(data.data, charset), type.type) as T
+    /**
+     * Gets system property by provided [name]. If property has not been found - *null* will be returned.
+     *
+     * You can provide system property as *-DpropertyName=propertyValue* as JVM argument. See Java Docs for more info.
+     */
+    @JvmStatic fun getSystemProperty(name: String): String? {
+        return if (System.getProperty(name) != null) {
+            System.getProperty(name)
+        } else {
+            System.getenv(name)
+        }
     }
 }

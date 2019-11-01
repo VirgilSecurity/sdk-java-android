@@ -98,7 +98,7 @@ public class VirgilCryptoTest {
     values.remove(KeyType.CURVE25519);
     values.remove(KeyType.RSA_2048);
     values.remove(KeyType.RSA_4096);
-    values.remove(KeyType.RSA_8192);
+    values.remove(KeyType.RSA_8192); // TODO add SECP
 
     return values.stream().map(key -> Arguments.of(new VirgilCrypto(key)));
   }

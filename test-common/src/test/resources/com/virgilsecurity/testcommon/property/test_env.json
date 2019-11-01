@@ -1,0 +1,16 @@
+{
+  "dev": {
+    "DEV_PROPERTY1":"DEV_VALUE1",
+    "DEV_PROPERTY2":"DEV_VALUE2"
+  },
+
+  "stg": {
+    "STG_PROPERTY1":"STG_VALUE1",
+    "STG_PROPERTY2":"STG_VALUE2"
+  },
+
+  "pro": {
+    "PRO_PROPERTY1":"PRO_VALUE1",
+    "PRO_PROPERTY2":"PRO_VALUE2"
+  }
+}

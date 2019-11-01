@@ -8,6 +8,7 @@ dependencies {
     testImplementation "org.apache.commons:commons-lang3:$versions.commonsLang"
     testImplementation "org.mockito:mockito-core:$versions.mockito"
     testImplementation "org.mockito:mockito-junit-jupiter:$versions.mockitoJunit"
+    testImplementation project(":test-common")
 }
 
 sourceSets.main.java.srcDirs = ["${buildDir}/generated/", "src/main/java"]

@@ -40,7 +40,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author Andrii Iakovenko
  */
-public class Base64 {
+public class Base64 { // TODO change with foundation Base64
 
   // Mapping table from 6-bit nibbles to Base64 characters.
   private static final char[] map1 = new char[64];

@@ -119,7 +119,7 @@ public class ConvertionUtils {
    * @param value The string to be converted
    * @return the byte array
    */
-  public static byte[] base64ToBytes(String value) {
+  public static byte[] base64ToBytes(String value) { // FIXME remove
     return Base64.decode(value);
   }
 
