@@ -59,4 +59,7 @@ public class EncryptionException extends CryptoException {
     super(cause);
   }
 
+  public EncryptionException(String message) {
+    super(message);
+  }
 }
