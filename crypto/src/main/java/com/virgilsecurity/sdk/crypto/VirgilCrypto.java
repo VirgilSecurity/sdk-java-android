@@ -76,6 +76,100 @@ public class VirgilCrypto {
   private KeyType defaultKeyType;
   private boolean useSHA256Fingerprints;
 
+  interface InputOutput {
+  }
+
+  static class IOData implements InputOutput {
+    private byte[] input;
+
+    IOData(byte[] input) {
+      this.input = input;
+    }
+
+    byte[] getInput() {
+      return input;
+    }
+  }
+
+  static class IOStream implements InputOutput {
+    static final int STREAM_SIZE_UNDEFINED = -1;
+
+    private InputStream inputStream;
+    // Default *streamSize* value is -1 which means that *streamSize* is undefined.
+    private int streamSize = STREAM_SIZE_UNDEFINED;
+    private OutputStream outputStream;
+
+    IOStream(InputStream inputStream, int streamSize, OutputStream outputStream) {
+      this.inputStream = inputStream;
+      this.streamSize = streamSize;
+      this.outputStream = outputStream;
+    }
+
+    IOStream(InputStream inputStream, OutputStream outputStream) {
+      this.inputStream = inputStream;
+      this.outputStream = outputStream;
+    }
+
+    InputStream getInputStream() {
+      return inputStream;
+    }
+
+    int getStreamSize() {
+      return streamSize;
+    }
+
+    OutputStream getOutputStream() {
+      return outputStream;
+    }
+  }
+
+  static class SigningOptions {
+    private VirgilPrivateKey privateKey;
+    private SigningMode mode;
+
+    SigningOptions(VirgilPrivateKey privateKey, SigningMode mode) {
+      this.privateKey = privateKey;
+      this.mode = mode;
+    }
+
+    public VirgilPrivateKey getPrivateKey() {
+      return privateKey;
+    }
+
+    public SigningMode getMode() {
+      return mode;
+    }
+  }
+
+  static class VerifyingOptions {
+    private List<VirgilPublicKey> publicKeys;
+    private VerifyingMode mode;
+
+    VerifyingOptions(List<VirgilPublicKey> publicKeys, VerifyingMode mode) {
+      this.publicKeys = publicKeys;
+      this.mode = mode;
+    }
+
+    public List<VirgilPublicKey> getPublicKeys() {
+      return publicKeys;
+    }
+
+    public VerifyingMode getMode() {
+      return mode;
+    }
+  }
+
+  enum SigningMode {
+    SIGN_AND_ENCRYPT,
+    SIGN_THEN_ENCRYPT
+  }
+
+  enum VerifyingMode {
+    DECRYPT_AND_VERIFY,
+    DECRYPT_THEN_VERIFY,
+    ANY
+  }
+
   /**
    * Create new instance of {@link VirgilCrypto}.
    */
@@ -239,21 +333,16 @@ public class VirgilCrypto {
    *
    * @param data       Raw data bytes for encryption.
    * @param publicKeys List of recipients' public keys.
+   *
    * @return Encrypted bytes.
+   *
    * @throws EncryptionException If encryption failed.
    */
   public byte[] encrypt(byte[] data, List<VirgilPublicKey> publicKeys) throws EncryptionException {
-    try (RecipientCipher cipher = new RecipientCipher(); Aes256Gcm aesGcm = new Aes256Gcm()) {
-      cipher.setEncryptionCipher(aesGcm);
-      cipher.setRandom(this.rng);
-
-      for (VirgilPublicKey recipient : publicKeys) {
-        cipher.addKeyRecipient(recipient.getIdentifier(), recipient.getPublicKey());
-      }
-
-      return encryptData(data, cipher);
-    } catch (Exception e) {
-      throw new EncryptionException(e);
+    try {
+      return encrypt(new IOData(data), null, publicKeys);
+    } catch (Exception exception) {
+      throw new EncryptionException(exception);
     }
   }
 
@@ -272,6 +361,7 @@ public class VirgilCrypto {
    * @param inputStream  Input stream for encrypted.
    * @param outputStream Output stream for encrypted data.
    * @param publicKey    Recipient's public key.
+   *
    * @throws EncryptionException if encryption failed
    */
   public void encrypt(InputStream inputStream, OutputStream outputStream, VirgilPublicKey publicKey)
@@ -294,41 +384,15 @@ public class VirgilCrypto {
    * @param inputStream  Input stream to be encrypted.
    * @param outputStream Output stream for encrypted data.
    * @param publicKeys   List of recipients' public keys.
+   *
    * @throws EncryptionException if encryption failed
    */
   public void encrypt(InputStream inputStream, OutputStream outputStream,
                       List<VirgilPublicKey> publicKeys) throws EncryptionException {
-    try (RecipientCipher cipher = new RecipientCipher(); Aes256Gcm aesGcm = new Aes256Gcm()) {
-      cipher.setEncryptionCipher(aesGcm);
-      cipher.setRandom(rng);
-
-      for (VirgilPublicKey recipient : publicKeys) {
-        cipher.addKeyRecipient(recipient.getIdentifier(), recipient.getPublicKey());
-      }
-
-      cipher.startEncryption();
-      byte[] messageInfo = cipher.packMessageInfo();
-
-      outputStream.write(messageInfo);
-
-      while (inputStream.available() > 0) {
-        byte[] data;
-
-        if (inputStream.available() >= CHUNK_SIZE) {
-          data = new byte[CHUNK_SIZE];
-        } else {
-          data = new byte[inputStream.available()];
-        }
-        inputStream.read(data);
-
-        byte[] encryptedData = cipher.processEncryption(data);
-        outputStream.write(encryptedData);
-      }
-
-      byte[] finish = cipher.finishEncryption();
-      outputStream.write(finish);
-    } catch (IOException e) {
-      throw new EncryptionException(e);
+    try {
+      encrypt(new IOStream(inputStream, outputStream), null, publicKeys);
+    } catch (Exception exception) {
+      throw new EncryptionException(exception);
     }
   }
 
@@ -341,7 +405,9 @@ public class VirgilCrypto {
    * @param data       The data to encrypt.
    * @param privateKey The Private key to sign the data.
    * @param publicKey  The recipient's Public key to encrypt the data.
+   *
    * @return Signed and encrypted data bytes.
+   *
    * @throws CryptoException if crypto sing or encrypt operation failed
    */
   @Deprecated
@@ -370,474 +436,15 @@ public class VirgilCrypto {
    * @param data       The data to encrypt.
    * @param privateKey The Private key to sign the data.
    * @param publicKeys The list of Public key recipients to encrypt the data.
+   *
    * @return Signed and encrypted data bytes.
+   *
    * @throws CryptoException If crypto sing or encrypt operation failed.
    */
   @Deprecated
   public byte[] signThenEncrypt(byte[] data, VirgilPrivateKey privateKey,
                                 List<VirgilPublicKey> publicKeys) throws CryptoException {
-    try (RecipientCipher cipher = new RecipientCipher(); Aes256Gcm aesGcm = new Aes256Gcm()) {
-      byte[] signature = generateSignature(data, privateKey);
-      cipher.setEncryptionCipher(aesGcm);
-      cipher.setRandom(rng);
-
-      for (VirgilPublicKey publicKey : publicKeys) {
-        cipher.addKeyRecipient(publicKey.getIdentifier(), publicKey.getPublicKey());
-      }
-
-      cipher.customParams().addData(CUSTOM_PARAM_SIGNATURE, signature);
-      cipher.customParams().addData(CUSTOM_PARAM_SIGNER_ID, privateKey.getIdentifier());
-
-      return encryptData(data, cipher);
-
-    } catch (Exception e) {
-      throw new CryptoException(e.getMessage());
-    }
-  }
-
-  public byte[] authEncrypt(byte[] data, VirgilPrivateKey privateKey, VirgilPublicKey recipient) {
-
-  }
-
-  public byte[] authEncrypt(byte[] data, VirgilPrivateKey privateKey, List<VirgilPublicKey> recipients) {
-
-  }
-
-  public byte[] authDecrypt(byte[] data, VirgilPrivateKey privateKey, VirgilPublicKey signersPublicKey) {
-
-  }
-
-  public byte[] authDecrypt(byte[] data, VirgilPrivateKey privateKey, List<VirgilPublicKey> signersPublicKeys) {
-
-  }
-
-  public byte[] authDecrypt(byte[] data, VirgilPrivateKey privateKey, VirgilPublicKey signersPublicKey,
-                            boolean allowNotEncryptedSignature) {
-
-  }
-
-  public byte[] authDecrypt(byte[] data, VirgilPrivateKey privateKey, List<VirgilPublicKey> signersPublicKeys,
-                            boolean allowNotEncryptedSignature) {
-
-  }
-
-  public void authEncrypt(InputStream inputStream, int streamSize, OutputStream outputStream,
-                          VirgilPrivateKey privateKey, VirgilPublicKey recipient) {
-
-  }
-
-  public void authEncrypt(InputStream inputStream, int streamSize, OutputStream outputStream,
-                          VirgilPrivateKey privateKey, List<VirgilPublicKey> recipients) {
-
-  }
-
-  public void authDecrypt(InputStream inputStream, OutputStream outputStream, VirgilPrivateKey privateKey,
-                          List<VirgilPublicKey> signersPublicKeys) {
-
-  }
-
-  public void authDecrypt(InputStream inputStream, OutputStream outputStream, VirgilPrivateKey privateKey,
-                          VirgilPublicKey signersPublicKey) {
-
-  }
-
-  interface InputOutput {
-  }
-
-  static class IOData implements InputOutput {
-    private byte[] input;
-
-    public IOData(byte[] input) {
-      this.input = input;
-    }
-
-    public byte[] getInput() {
-      return input;
-    }
-  }
-
-  static class IOStream implements InputOutput {
-    public static final int STREAM_SIZE_UNDEFINED = -1;
-
-    private InputStream inputStream;
-    // Default *streamSize* value is -1 which means that *streamSize* is undefined.
-    private int streamSize = STREAM_SIZE_UNDEFINED;
-    private OutputStream outputStream;
-
-    public IOStream(InputStream inputStream, int streamSize, OutputStream outputStream) {
-      this.inputStream = inputStream;
-      this.streamSize = streamSize;
-      this.outputStream = outputStream;
-    }
-
-    public IOStream(InputStream inputStream, OutputStream outputStream) {
-      this.inputStream = inputStream;
-      this.outputStream = outputStream;
-    }
-
-    public InputStream getInputStream() {
-      return inputStream;
-    }
-
-    public int getStreamSize() {
-      return streamSize;
-    }
-
-    public OutputStream getOutputStream() {
-      return outputStream;
-    }
-  }
-
-  enum SigningMode {
-    SIGN_AND_ENCRYPT,
-    SIGN_THEN_ENCRYPT
-  }
-
-  enum VerifyingMode {
-    DECRYPT_AND_VERIFY,
-    DECRYPT_THEN_VERIFY,
-    ANY
-  }
-
-  static class SigningOptions {
-    private VirgilPrivateKey privateKey;
-    private SigningMode mode;
-
-    public SigningOptions(VirgilPrivateKey privateKey, SigningMode mode) {
-      this.privateKey = privateKey;
-      this.mode = mode;
-    }
-
-    public VirgilPrivateKey getPrivateKey() {
-      return privateKey;
-    }
-
-    public SigningMode getMode() {
-      return mode;
-    }
-  }
-
-  static class VerifyingOptions {
-    private List<VirgilPublicKey> publicKeys;
-    private VerifyingMode mode;
-
-    public VerifyingOptions(List<VirgilPublicKey> publicKeys, VerifyingMode mode) {
-      this.publicKeys = publicKeys;
-      this.mode = mode;
-    }
-
-    public List<VirgilPublicKey> getPublicKeys() {
-      return publicKeys;
-    }
-
-    public VerifyingMode getMode() {
-      return mode;
-    }
-  }
-
-  private void startEncryption(RecipientCipher cipher, InputOutput inputOutput) {
-    startEncryption(cipher, inputOutput, null);
-  }
-
-  private void startEncryption(RecipientCipher cipher, InputOutput inputOutput,
-                               SigningOptions signingOptions) throws SigningException {
-    if (signingOptions != null) {
-      switch (signingOptions.mode) {
-        case SIGN_AND_ENCRYPT:
-          if (inputOutput instanceof IOData) {
-            byte[] signature = generateSignature(((IOData) inputOutput).getInput(), signingOptions.getPrivateKey());
-            cipher.customParams().addData(VirgilCrypto.CUSTOM_PARAM_SIGNATURE, signature);
-            cipher.customParams().addData(VirgilCrypto.CUSTOM_PARAM_SIGNER_ID,
-                    signingOptions.privateKey.getIdentifier());
-          } else if (inputOutput instanceof IOStream) {
-            throw new IllegalStateException("signAndEncrypt is not supported for streams.");
-          } else {
-            throw new IllegalStateException("Only IOData and IOStream are supported.");
-          }
-          break;
-        case SIGN_THEN_ENCRYPT:
-          cipher.setSignerHash(new Sha512());
-          cipher.addSigner(signingOptions.getPrivateKey().getIdentifier(),
-                  signingOptions.getPrivateKey().getPrivateKey());
-
-          int size;
-
-          if (inputOutput instanceof IOData) {
-            size = ((IOData) inputOutput).getInput().length;
-          } else if (inputOutput instanceof IOStream) {
-            if (((IOStream) inputOutput).getStreamSize() == IOStream.STREAM_SIZE_UNDEFINED) {
-              throw new IllegalStateException("signThenEncrypt for streams with unknown size is not supported.");
-            } else {
-              size = ((IOStream) inputOutput).getStreamSize();
-            }
-          } else {
-            throw new IllegalStateException("Only IOData and IOStream are supported.");
-          }
-
-          cipher.startSignedEncryption(size);
-          break;
-      }
-    } else {
-      cipher.startEncryption();
-    }
-  }
-
-  private byte[] processEncryption(RecipientCipher cipher, InputOutput inputOutput) {
-    return processEncryption(cipher, inputOutput, null);
-  }
-
-  private byte[] processEncryption(RecipientCipher cipher, InputOutput inputOutput, SigningOptions signingOptions)
-          throws IOException, EncryptionException {
-
-    if (inputOutput instanceof IOData) {
-      byte[] messageInfo = cipher.packMessageInfo();
-      byte[] processEncryption = cipher.processEncryption(((IOData) inputOutput).getInput());
-      byte[] finishEncryption = cipher.finishEncryption();
-
-      byte[] result = concatenate(messageInfo, processEncryption, finishEncryption);
-
-      if (signingOptions != null && signingOptions.mode == SigningMode.SIGN_THEN_ENCRYPT) {
-        byte[] messageInfoFooter = cipher.packMessageInfoFooter();
-        result = concatenate(result, messageInfoFooter);
-      }
-
-      return result;
-    } else if (inputOutput instanceof IOStream) {
-      InputStream inputStream = ((IOStream) inputOutput).getInputStream();
-      int streamSize = ((IOStream) inputOutput).getStreamSize();
-      OutputStream outputStream = ((IOStream) inputOutput).getOutputStream();
-
-      byte[] messageInfo = cipher.packMessageInfo();
-      outputStream.write(messageInfo);
-
-      while (inputStream.available() > 0) {
-        byte[] data;
-
-        if (inputStream.available() >= CHUNK_SIZE) {
-          data = new byte[CHUNK_SIZE];
-        } else {
-          data = new byte[inputStream.available()];
-        }
-        streamSize -= inputStream.read(data);
-
-        byte[] encryptedData = cipher.processEncryption(data);
-        outputStream.write(encryptedData);
-      }
-
-      if (streamSize != 0) {
-        throw new EncryptionException("Invalid stream size");
-      }
-
-      byte[] finish = cipher.finishEncryption();
-      outputStream.write(finish);
-
-      if (signingOptions != null && signingOptions.mode == SigningMode.SIGN_THEN_ENCRYPT) {
-        byte[] messageInfoFooter = cipher.packMessageInfoFooter();
-        outputStream.write(messageInfoFooter);
-      }
-
-      return null;
-    } else {
-      throw new IllegalStateException("Only IOData and IOStream are supported.");
-    }
-  }
-
-  byte[] encrypt(InputOutput inputOutput, SigningOptions signingOptions,
-                 List<VirgilPublicKey> recipients) throws SigningException, IOException, EncryptionException {
-
-    try (Aes256Gcm aseGcm = new Aes256Gcm(); RecipientCipher cipher = new RecipientCipher()) {
-      cipher.setEncryptionCipher(aseGcm);
-      cipher.setRandom(this.rng);
-
-      for (VirgilPublicKey recipient : recipients) {
-        cipher.addKeyRecipient(recipient.getIdentifier(), recipient.getPublicKey());
-      }
-
-      startEncryption(cipher, inputOutput, signingOptions);
-
-      return processEncryption(cipher, inputOutput, signingOptions);
-    }
-  }
-
-  private byte[] processDecryption(RecipientCipher cipher, InputOutput inputOutput) throws IOException {
-    if (inputOutput instanceof IOData) {
-      byte[] processDecryption = cipher.processDecryption(((IOData) inputOutput).getInput());
-      byte[] finishDecryption = cipher.finishDecryption();
-
-      return concatenate(processDecryption, finishDecryption);
-    } else if (inputOutput instanceof IOStream) {
-      InputStream inputStream = ((IOStream) inputOutput).getInputStream();
-      OutputStream outputStream = ((IOStream) inputOutput).getOutputStream();
-
-      while (inputStream.available() > 0) {
-        byte[] data;
-
-        if (inputStream.available() >= CHUNK_SIZE) {
-          data = new byte[CHUNK_SIZE];
-          inputStream.read(data);
-        } else {
-          data = new byte[inputStream.available()];
-          inputStream.read(data);
-        }
-
-        byte[] decryptedChunk = cipher.processDecryption(data);
-        outputStream.write(decryptedChunk);
-      }
-
-      byte[] finish = cipher.finishDecryption();
-      outputStream.write(finish);
-
-      return null;
-    } else {
-      throw new IllegalStateException("Only IOData and IOStream are supported.");
-    }
-  }
-
-  private void verifyPlainSignature(RecipientCipher cipher, InputOutput inputOutput,
-                                    List<VirgilPublicKey> publicKeys) throws VerificationException {
-    verifyPlainSignature(cipher, inputOutput, null, publicKeys);
-  }
-
-  private void verifyPlainSignature(RecipientCipher cipher, InputOutput inputOutput, byte[] result,
-                                    List<VirgilPublicKey> publicKeys) throws VerificationException {
-    if (inputOutput instanceof IOStream) {
-      throw new IllegalStateException("ignAndEncrypt is not supported for streams.");
-    }
-
-    VirgilPublicKey signerPublicKey;
-
-    if (publicKeys.size() == 1) {
-      signerPublicKey = publicKeys.get(0);
-    } else {
-      byte[] signerId;
-
-      try {
-        signerId = cipher.customParams().findData(VirgilCrypto.CUSTOM_PARAM_SIGNER_ID);
-      } catch (Throwable throwable) {
-        throw new VerificationException("Signer has not been found.");
-      }
-
-      VirgilPublicKey publicKey = null;
-      for (VirgilPublicKey publicKeyIterator : publicKeys) {
-        if (publicKeyIterator.getIdentifier().equals(signerId)) {
-          publicKey = publicKeyIterator;
-        }
-      }
-
-      if (publicKey == null) {
-        throw new VerificationException("Signer has not been found.");
-      }
-
-      signerPublicKey = publicKey;
-    }
-
-    byte[] signature;
-
-    try {
-      signature = cipher.customParams().findData(VirgilCrypto.CUSTOM_PARAM_SIGNATURE);
-    } catch (Throwable throwable) {
-      throw new VerificationException("Signature has not been found.");
-    }
-
-    if (!verifySignature(signature, result, signerPublicKey)) {
-      throw new VerificationException("Signature has not been verified.");
-    }
-  }
-
-  private void verifyEncryptedSignature(RecipientCipher cipher,
-                                        List<VirgilPublicKey> publicKeys) throws VerificationException {
-    if (!cipher.isDataSigned()) {
-      throw new VerificationException("Data is not signed.");
-    }
-
-    SignerInfoList signerInfoList = cipher.signerInfos();
-
-    if (!signerInfoList.hasItem() && signerInfoList.hasNext()) {
-      throw new VerificationException("Data is not signed.");
-    }
-
-    SignerInfo signerInfo = signerInfoList.item();
-
-    VirgilPublicKey signerPublicKey = null;
-    for (VirgilPublicKey publicKeyIterator : publicKeys) {
-      if (Arrays.equals(publicKeyIterator.getIdentifier(), signerInfo.signerId())) {
-        signerPublicKey = publicKeyIterator;
-      }
-    }
-
-    if (signerPublicKey == null) {
-      throw new VerificationException("Signer has not been found.");
-    }
-
-    if (!cipher.verifySignerInfo(signerInfo, signerPublicKey.getPublicKey())) {
-      throw new VerificationException("Signature has not been verified.");
-    }
-  }
-
-  private void finishDecryption(RecipientCipher cipher, InputOutput inputOutput) throws VerificationException {
-    finishDecryption(cipher, inputOutput, null, null);
-  }
-
-  private void finishDecryption(RecipientCipher cipher, InputOutput inputOutput,
-                                byte[] result) throws VerificationException {
-
-    finishDecryption(cipher, inputOutput, result, null);
-  }
-
-  private void finishDecryption(RecipientCipher cipher, InputOutput inputOutput, byte[] result,
-                                VerifyingOptions verifyingOptions) throws VerificationException {
-    if (verifyingOptions == null) {
-      return;
-    }
-
-    VerifyingMode mode = verifyingOptions.mode;
-
-    if (mode == VerifyingMode.ANY) {
-      mode = cipher.isDataSigned() ? VerifyingMode.DECRYPT_THEN_VERIFY : VerifyingMode.DECRYPT_AND_VERIFY;
-    }
-
-    switch (mode) {
-      case DECRYPT_AND_VERIFY:
-        verifyPlainSignature(cipher, inputOutput, result, verifyingOptions.publicKeys);
-        break;
-
-      case DECRYPT_THEN_VERIFY:
-        verifyEncryptedSignature(cipher, verifyingOptions.publicKeys);
-        break;
-    }
-  }
-
-  byte[] decrypt(InputOutput inputOutput, VerifyingOptions verifyingOptions,
-                 VirgilPrivateKey privateKey) throws IOException, VerificationException {
-
-    try (RecipientCipher cipher = new RecipientCipher()) {
-      cipher.setRandom(this.rng);
-
-      cipher.startDecryptionWithKey(privateKey.getIdentifier(), privateKey.getPrivateKey(), new byte[0]);
-
-      byte[] result = processDecryption(cipher, inputOutput);
-
-      finishDecryption(cipher, inputOutput, result, verifyingOptions);
-
-      return result;
-    }
-  }
-
-  /**
-   * Encrypts data using provided {@link RecipientCipher}.
-   *
-   * @param data   Data to encrypt.
-   * @param cipher To encrypt provided data.
-   * @return Encrypted data.
-   */
-  private byte[] encryptData(byte[] data, RecipientCipher cipher) {
-    cipher.startEncryption();
-
-    byte[] messageInfo = cipher.packMessageInfo();
-    byte[] processEncryption = cipher.processEncryption(data);
-    byte[] finish = cipher.finishEncryption();
-
-    return concatenate(concatenate(messageInfo, processEncryption), finish);
+    return encrypt(new IOData(data), new SigningOptions(privateKey, SigningMode.SIGN_AND_ENCRYPT), publicKeys);
   }
 
   /**
@@ -852,20 +459,14 @@ public class VirgilCrypto {
    *
    * @param data       The encrypted data bytes to decrypt.
    * @param privateKey The private key used for decryption.
+   *
    * @return Decrypted data bytes.
+   *
    * @throws DecryptionException If decryption failed.
    */
   public byte[] decrypt(byte[] data, VirgilPrivateKey privateKey) throws DecryptionException {
-    try (RecipientCipher cipher = new RecipientCipher()) {
-      cipher.setRandom(this.rng);
-
-      cipher.startDecryptionWithKey(privateKey.getIdentifier(), privateKey.getPrivateKey(),
-          new byte[0]);
-
-      byte[] processDecryption = cipher.processDecryption(data);
-      byte[] finish = cipher.finishDecryption();
-
-      return concatenate(processDecryption, finish);
+    try {
+      return decrypt(new IOData(data), null, privateKey);
     } catch (Exception exception) {
       if (exception instanceof FoundationException) {
         throw new DecryptionException(processErrorCode((FoundationException) exception));
@@ -881,32 +482,13 @@ public class VirgilCrypto {
    * @param inputStream  Encrypted stream for decryption.
    * @param outputStream Output stream for decrypted data.
    * @param privateKey   Private key for decryption.
-   * @throws DecryptionException if decryption failed
+   *
+   * @throws DecryptionException If decryption failed.
    */
   public void decrypt(InputStream inputStream, OutputStream outputStream,
                       VirgilPrivateKey privateKey) throws DecryptionException {
-    try (RecipientCipher cipher = new RecipientCipher()) {
-      cipher.setRandom(this.rng);
-      cipher.startDecryptionWithKey(privateKey.getIdentifier(), privateKey.getPrivateKey(),
-          new byte[0]);
-
-      while (inputStream.available() > 0) {
-        byte[] data;
-
-        if (inputStream.available() >= CHUNK_SIZE) {
-          data = new byte[CHUNK_SIZE];
-          inputStream.read(data);
-        } else {
-          data = new byte[inputStream.available()];
-          inputStream.read(data);
-        }
-
-        byte[] decryptedChunk = cipher.processDecryption(data);
-        outputStream.write(decryptedChunk);
-      }
-
-      byte[] finish = cipher.finishDecryption();
-      outputStream.write(finish);
+    try {
+      decrypt(new IOStream(inputStream, outputStream), null, privateKey);
     } catch (Exception exception) {
       if (exception instanceof FoundationException) {
         throw new DecryptionException(processErrorCode((FoundationException) exception));
@@ -951,53 +533,9 @@ public class VirgilCrypto {
   @Deprecated
   public byte[] decryptThenVerify(byte[] data, VirgilPrivateKey privateKey,
                                   List<VirgilPublicKey> signersPublicKeys) throws CryptoException {
-    try (RecipientCipher cipher = new RecipientCipher()) {
-      cipher.setRandom(this.rng);
-      cipher.startDecryptionWithKey(privateKey.getIdentifier(), privateKey.getPrivateKey(),
-          new byte[0]);
-
-      byte[] processDecryption = cipher.processDecryption(data);
-      byte[] finish = cipher.finishDecryption();
-
-      byte[] decryptedData = concatenate(processDecryption, finish);
-
-      VirgilPublicKey signerPublicKey = null;
-
-      if (signersPublicKeys.size() == 1) {
-        signerPublicKey = signersPublicKeys.get(0);
-      } else {
-        byte[] signerId;
-        try {
-          signerId = cipher.customParams().findData(CUSTOM_PARAM_SIGNER_ID);
-        } catch (Throwable throwable) {
-          throw new CryptoException(SIGNER_NOT_FOUND);
-        }
-
-        for (VirgilPublicKey publicKey : signersPublicKeys) {
-          if (Arrays.equals(publicKey.getIdentifier(), signerId)) {
-            signerPublicKey = publicKey;
-            break;
-          }
-        }
-        if (signerPublicKey == null) {
-          throw new CryptoException(SIGNER_NOT_FOUND);
-        }
-      }
-
-      byte[] signature;
-
-      try {
-        signature = cipher.customParams().findData(CUSTOM_PARAM_SIGNATURE);
-      } catch (Throwable throwable) {
-        throw new CryptoException("Signature not found");
-      }
-
-      boolean isValid = verifySignature(signature, decryptedData, signerPublicKey);
-      if (!isValid) {
-        throw new SignatureIsNotValidException();
-      }
-
-      return decryptedData;
+    try {
+      return decrypt(new IOData(data), new VerifyingOptions(signersPublicKeys, VerifyingMode.DECRYPT_AND_VERIFY),
+              privateKey);
     } catch (Exception exception) {
       if (exception instanceof FoundationException) {
         throw new DecryptionException(processErrorCode((FoundationException) exception));
@@ -1008,19 +546,322 @@ public class VirgilCrypto {
   }
 
   /**
-   * Gets message from provided {@link FoundationException}'s error code.
+   * Signs (with private key) Then Encrypts data (and signature) for passed PublicKeys.
+   * <p>
+   * <ol>
+   * <li> Generates signature depending on KeyType</li>
+   * <li> Generates random AES-256 KEY1</li>
+   * <li> Encrypts data with KEY1 using AES-256-GCM and generates signature</li>
+   * <li> Encrypts signature with KEY1 using AES-256-GCM</li>
+   * <li> Generates ephemeral key pair for each recipient</li>
+   * <li> Uses Diffie-Hellman to obtain shared secret with each recipient's public key & each ephemeral private key</li>
+   * <li> Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
+   * <li> Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
+   * </ol>
    *
-   * @param exception To extract code from.
-   * @return Error message corresponding to error code.
+   * @param data Data to be signedThenEncrypted.
+   * @param privateKey Sender private key.
+   * @param recipient Recipient's public key.
+   *
+   * @return SignedThenEncrypted data.
+   *
+   * @throws SigningException If crypto sign operation failed.
+   * @throws EncryptionException If encryption failed.
    */
-  private String processErrorCode(FoundationException exception) {
-    int errorCode = exception.getStatusCode();
+  public byte[] authEncrypt(byte[] data, VirgilPrivateKey privateKey,
+                            VirgilPublicKey recipient) throws SigningException, EncryptionException {
 
-    if (errorCode == ERROR_CODE_WRONG_PRIVATE_KEY) {
-      return "Given Private key does not corresponds to any of "
-          + "Public keys that were used for encryption.";
-    } else {
-      return exception.getMessage();
+    return authEncrypt(data, privateKey, Collections.singletonList(recipient));
+  }
+
+  /**
+   * Signs (with private key) Then Encrypts data (and signature) for passed PublicKeys.
+   *
+   * <ol>
+   * <li>Generates signature depending on KeyType</li>
+   * <li>Generates random AES-256 KEY1</li>
+   * <li>Encrypts data with KEY1 using AES-256-GCM and generates signature</li>
+   * <li>Encrypts signature with KEY1 using AES-256-GCM</li>
+   * <li>Generates ephemeral key pair for each recipient</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key & each ephemeral private key</li>
+   * <li>Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
+   * <li>Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
+   * </ol>
+   *
+   * @param data       Data to be signedThenEncrypted.
+   * @param privateKey Sender private key.
+   * @param recipients Recipients' public keys.
+   * @return SignedThenEncrypted data.
+   * @throws SigningException    If crypto sign operation failed.
+   * @throws EncryptionException If encryption failed.
+   */
+  public byte[] authEncrypt(byte[] data, VirgilPrivateKey privateKey,
+                            List<VirgilPublicKey> recipients) throws EncryptionException, SigningException {
+
+    return encrypt(new IOData(data), new SigningOptions(privateKey, SigningMode.SIGN_THEN_ENCRYPT), recipients);
+  }
+
+  /**
+   * Decrypts (with private key) data and signature and Verifies signature using any of signers' PublicKeys.
+   *
+   * <ol>
+   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key & recipient's private key</li>
+   * <li>Computes KDF to obtain AES-256 KEY2 from shared secret</li>
+   * <li>Decrypts KEY1 using AES-256-CBC</li>
+   * <li>Decrypts data and signature using KEY1 and AES-256-GCM</li>
+   * <li>Finds corresponding PublicKey according to signer id inside data</li>
+   * <li>Verifies signature </li>
+   * </ol>
+   *
+   * @param data             Signed Then Encrypted data.
+   * @param privateKey       Receiver's private key.
+   * @param signersPublicKey Possible signer's public key.
+   *                         WARNING: Data should have signature of ANY public key from array.
+   * @return Decrypted then verified data.
+   * @throws VerificationException If crypto verify operation failed.
+   * @throws DecryptionException   If decryption failed.
+   */
+  public byte[] authDecrypt(byte[] data, VirgilPrivateKey privateKey,
+                            VirgilPublicKey signersPublicKey) throws VerificationException, DecryptionException {
+
+    return authDecrypt(data, privateKey, Collections.singletonList(signersPublicKey));
+  }
+
+  /**
+   * Decrypts (with private key) data and signature and Verifies signature using any of signers' PublicKeys.
+   *
+   * <ol>
+   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key & recipient's private key</li>
+   * <li>Computes KDF to obtain AES-256 KEY2 from shared secret</li>
+   * <li>Decrypts KEY1 using AES-256-CBC</li>
+   * <li>Decrypts data and signature using KEY1 and AES-256-GCM</li>
+   * <li>Finds corresponding PublicKey according to signer id inside data</li>
+   * <li>Verifies signature </li>
+   * </ol>
+   *
+   * @param data              Signed Then Encrypted data.
+   * @param privateKey        Receiver's private key.
+   * @param signersPublicKeys Array of possible signers' public keys.
+   *                          WARNING: Data should have signature of ANY public key from array.
+   * @return Decrypted then verified data.
+   * @throws VerificationException If crypto verify operation failed.
+   * @throws DecryptionException   If decryption failed.
+   */
+  public byte[] authDecrypt(byte[] data, VirgilPrivateKey privateKey,
+                            List<VirgilPublicKey> signersPublicKeys) throws VerificationException, DecryptionException {
+
+    return authDecrypt(data, privateKey, signersPublicKeys, false);
+  }
+
+  /**
+   * Decrypts (with private key) data and signature and Verifies signature using any of signers' PublicKeys.
+   *
+   * <ol>
+   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key & recipient's private key</li>
+   * <li>Computes KDF to obtain AES-256 KEY2 from shared secret</li>
+   * <li>Decrypts KEY1 using AES-256-CBC</li>
+   * <li>Decrypts data and signature using KEY1 and AES-256-GCM</li>
+   * <li>Finds corresponding PublicKey according to signer id inside data</li>
+   * <li>Verifies signature </li>
+   * </ol>
+   *
+   * @param data                       Signed Then Encrypted data.
+   * @param privateKey                 Receiver's private key.
+   * @param signersPublicKey           Possible signer's public key.
+   *                                   WARNING: Data should have signature of ANY public key from array.
+   * @param allowNotEncryptedSignature Allows storing signature in plain text for compatibility with
+   *                                   deprecated signAndEncrypt.
+   * @return Decrypted then verified data.
+   * @throws VerificationException If crypto verify operation failed.
+   * @throws DecryptionException   If decryption failed.
+   */
+  public byte[] authDecrypt(byte[] data, VirgilPrivateKey privateKey, VirgilPublicKey signersPublicKey,
+                            boolean allowNotEncryptedSignature) throws VerificationException, DecryptionException {
+
+    return authDecrypt(data, privateKey, Collections.singletonList(signersPublicKey), allowNotEncryptedSignature);
+  }
+
+  /**
+   * Decrypts (with private key) data and signature and Verifies signature using any of signers' PublicKeys.
+   *
+   * <ol>
+   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key & recipient's private key</li>
+   * <li>Computes KDF to obtain AES-256 KEY2 from shared secret</li>
+   * <li>Decrypts KEY1 using AES-256-CBC</li>
+   * <li>Decrypts data and signature using KEY1 and AES-256-GCM</li>
+   * <li>Finds corresponding PublicKey according to signer id inside data</li>
+   * <li>Verifies signature </li>
+   * </ol>
+   *
+   * @param data                       Signed Then Encrypted data.
+   * @param privateKey                 Receiver's private key.
+   * @param signersPublicKeys          Array of possible signers' public keys.
+   *                                   WARNING: Data should have signature of ANY public key from array.
+   * @param allowNotEncryptedSignature Allows storing signature in plain text for compatibility with
+   *                                   deprecated signAndEncrypt.
+   * @return Decrypted then verified data.
+   * @throws VerificationException If crypto verify operation failed.
+   * @throws DecryptionException   If decryption failed.
+   */
+  public byte[] authDecrypt(byte[] data, VirgilPrivateKey privateKey, List<VirgilPublicKey> signersPublicKeys,
+                            boolean allowNotEncryptedSignature) throws VerificationException, DecryptionException {
+
+    VerifyingMode verifyingMode = allowNotEncryptedSignature ? VerifyingMode.ANY : VerifyingMode.DECRYPT_THEN_VERIFY;
+    return decrypt(new IOData(data), new VerifyingOptions(signersPublicKeys, verifyingMode), privateKey);
+  }
+
+  /**
+   * Signs (with private key) Then Encrypts stream (and signature) for passed PublicKeys.
+   *
+   * <ol>
+   * <li>Generates signature depending on KeyType</li>
+   * <li>Generates random AES-256 KEY1</li>
+   * <li>Encrypts data with KEY1 using AES-256-GCM and generates signature</li>
+   * <li>Encrypts signature with KEY1 using AES-256-GCM</li>
+   * <li>Generates ephemeral key pair for each recipient</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key & each ephemeral private key</li>
+   * <li>Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
+   * <li>Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
+   * </ol>
+   *
+   * @param inputStream  Input stream.
+   * @param streamSize   Input stream size.
+   * @param outputStream Output stream.
+   * @param privateKey   Private key to generate signatures.
+   * @param recipient    Recipient's public key.
+   * @throws SigningException    If crypto sign operation failed.
+   * @throws EncryptionException If encryption failed.
+   */
+  public void authEncrypt(InputStream inputStream, int streamSize, OutputStream outputStream,
+                          VirgilPrivateKey privateKey, VirgilPublicKey recipient)
+          throws SigningException, EncryptionException {
+
+    authEncrypt(inputStream, streamSize, outputStream, privateKey, Collections.singletonList(recipient));
+  }
+
+  /**
+   * Signs (with private key) Then Encrypts stream (and signature) for passed PublicKeys.
+   *
+   * <ol>
+   * <li>Generates signature depending on KeyType</li>
+   * <li>Generates random AES-256 KEY1</li>
+   * <li>Encrypts data with KEY1 using AES-256-GCM and generates signature</li>
+   * <li>Encrypts signature with KEY1 using AES-256-GCM</li>
+   * <li>Generates ephemeral key pair for each recipient</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key & each ephemeral private key</li>
+   * <li>Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
+   * <li>Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
+   * </ol>
+   *
+   * @param inputStream  Input stream.
+   * @param streamSize   Input stream size.
+   * @param outputStream Output stream.
+   * @param privateKey   Private key to generate signatures.
+   * @param recipients   Recipients' public keys.
+   * @throws SigningException    If crypto sign operation failed.
+   * @throws EncryptionException If encryption failed.
+   */
+  public void authEncrypt(InputStream inputStream, int streamSize, OutputStream outputStream,
+                          VirgilPrivateKey privateKey, List<VirgilPublicKey> recipients)
+          throws EncryptionException, SigningException {
+
+    encrypt(new IOStream(inputStream, streamSize, outputStream),
+            new SigningOptions(privateKey, SigningMode.SIGN_THEN_ENCRYPT), recipients);
+  }
+
+  /**
+   * Decrypts (using passed PrivateKey) then verifies (using one of public keys) stream.
+   *
+   * <div><li>NOTE: Decrypted stream should not be used until decryption of whole InputStream completed due to
+   * security reasons.</li></div>
+   *
+   * <ol>
+   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key & recipient's private key</li>
+   * <li>Computes KDF to obtain AES-256 KEY2 from shared secret</li>
+   * <li>Decrypts KEY1 using AES-256-CBC</li>
+   * <li>Decrypts data and signature using KEY1 and AES-256-GCM</li>
+   * <li>Finds corresponding PublicKey according to signer id inside data</li>
+   * <li>Verifies signature</li>
+   * </ol>
+   *
+   * @param inputStream      Stream with encrypted data.
+   * @param outputStream     Stream with decrypted data.
+   * @param privateKey       Recipient's private key.
+   * @param signersPublicKey Possible signer's public key.
+   *                         WARNING: Stream should have signature of ANY public key from array.
+   * @throws VerificationException If crypto verify operation failed.
+   * @throws DecryptionException   If decryption failed.
+   */
+  public void authDecrypt(InputStream inputStream, OutputStream outputStream, VirgilPrivateKey privateKey,
+                          VirgilPublicKey signersPublicKey) throws VerificationException, DecryptionException {
+
+    authDecrypt(inputStream, outputStream, privateKey, Collections.singletonList(signersPublicKey));
+  }
+
+  /**
+   * Decrypts (using passed PrivateKey) then verifies (using one of public keys) stream.
+   *
+   * <div><li>NOTE: Decrypted stream should not be used until decryption of whole InputStream completed due to
+   * security reasons.</li></div>
+   *
+   * <ol>
+   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key & recipient's private key</li>
+   * <li>Computes KDF to obtain AES-256 KEY2 from shared secret</li>
+   * <li>Decrypts KEY1 using AES-256-CBC</li>
+   * <li>Decrypts data and signature using KEY1 and AES-256-GCM</li>
+   * <li>Finds corresponding PublicKey according to signer id inside data</li>
+   * <li>Verifies signature</li>
+   * </ol>
+   *
+   * @param inputStream       Stream with encrypted data.
+   * @param outputStream      Stream with decrypted data.
+   * @param privateKey        Recipient's private key.
+   * @param signersPublicKeys Array of possible signers' public keys.
+   *                          WARNING: Stream should have signature of ANY public key from array.
+   * @throws VerificationException If crypto verify operation failed.
+   * @throws DecryptionException   If decryption failed.
+   */
+  public void authDecrypt(InputStream inputStream, OutputStream outputStream, VirgilPrivateKey privateKey,
+                          List<VirgilPublicKey> signersPublicKeys) throws VerificationException, DecryptionException {
+
+    decrypt(new IOStream(inputStream, outputStream),
+            new VerifyingOptions(signersPublicKeys, VerifyingMode.DECRYPT_THEN_VERIFY), privateKey);
+  }
+
+  byte[] encrypt(InputOutput inputOutput, SigningOptions signingOptions,
+                 List<VirgilPublicKey> recipients) throws SigningException, EncryptionException {
+
+    try (Aes256Gcm aseGcm = new Aes256Gcm(); RecipientCipher cipher = new RecipientCipher()) {
+      cipher.setEncryptionCipher(aseGcm);
+      cipher.setRandom(this.rng);
+
+      for (VirgilPublicKey recipient : recipients) {
+        cipher.addKeyRecipient(recipient.getIdentifier(), recipient.getPublicKey());
+      }
+
+      startEncryption(cipher, inputOutput, signingOptions);
+
+      return processEncryption(cipher, inputOutput, signingOptions);
+    } catch (IOException exception) {
+      throw new EncryptionException(exception);
+    }
+  }
+
+  byte[] decrypt(InputOutput inputOutput, VerifyingOptions verifyingOptions,
+                 VirgilPrivateKey privateKey) throws VerificationException, DecryptionException {
+
+    try (RecipientCipher cipher = new RecipientCipher()) {
+      cipher.setRandom(this.rng);
+
+      cipher.startDecryptionWithKey(privateKey.getIdentifier(), privateKey.getPrivateKey(), new byte[0]);
+
+      byte[] result = processDecryption(cipher, inputOutput);
+
+      finishDecryption(cipher, inputOutput, result, verifyingOptions);
+
+      return result;
+    } catch (IOException exception) {
+      throw new DecryptionException(exception);
     }
   }
 
@@ -1041,6 +882,7 @@ public class VirgilCrypto {
    * @param data       Data to sign.
    * @param privateKey Private key used to generate signature.
    * @return The calculated signature data.
+   *
    * @throws SigningException If crypto sign operation failed.
    */
   public byte[] generateSignature(byte[] data, VirgilPrivateKey privateKey)
@@ -1442,6 +1284,280 @@ public class VirgilCrypto {
     return defaultKeyType;
   }
 
+  /**
+   * Gets message from provided {@link FoundationException}'s error code.
+   *
+   * @param exception To extract code from.
+   * @return Error message corresponding to error code.
+   */
+  private String processErrorCode(FoundationException exception) {
+    int errorCode = exception.getStatusCode();
+
+    if (errorCode == ERROR_CODE_WRONG_PRIVATE_KEY) {
+      return "Given Private key does not corresponds to any of "
+              + "Public keys that were used for encryption.";
+    } else {
+      return exception.getMessage();
+    }
+  }
+
+  private void startEncryption(RecipientCipher cipher, InputOutput inputOutput) throws SigningException {
+    startEncryption(cipher, inputOutput, null);
+  }
+
+  private void startEncryption(RecipientCipher cipher, InputOutput inputOutput,
+                               SigningOptions signingOptions) throws SigningException {
+    if (signingOptions != null) {
+      switch (signingOptions.mode) {
+        case SIGN_AND_ENCRYPT:
+          if (inputOutput instanceof IOData) {
+            byte[] signature = generateSignature(((IOData) inputOutput).getInput(), signingOptions.getPrivateKey());
+            cipher.customParams().addData(VirgilCrypto.CUSTOM_PARAM_SIGNATURE, signature);
+            cipher.customParams().addData(VirgilCrypto.CUSTOM_PARAM_SIGNER_ID,
+                    signingOptions.privateKey.getIdentifier());
+          } else if (inputOutput instanceof IOStream) {
+            throw new IllegalStateException("signAndEncrypt is not supported for streams.");
+          } else {
+            throw new IllegalStateException("Only IOData and IOStream are supported.");
+          }
+          break;
+        case SIGN_THEN_ENCRYPT:
+          cipher.setSignerHash(new Sha512());
+          cipher.addSigner(signingOptions.getPrivateKey().getIdentifier(),
+                  signingOptions.getPrivateKey().getPrivateKey());
+
+          int size;
+
+          if (inputOutput instanceof IOData) {
+            size = ((IOData) inputOutput).getInput().length;
+          } else if (inputOutput instanceof IOStream) {
+            if (((IOStream) inputOutput).getStreamSize() == IOStream.STREAM_SIZE_UNDEFINED) {
+              throw new IllegalStateException("signThenEncrypt for streams with unknown size is not supported.");
+            } else {
+              size = ((IOStream) inputOutput).getStreamSize();
+            }
+          } else {
+            throw new IllegalStateException("Only IOData and IOStream are supported.");
+          }
+
+          cipher.startSignedEncryption(size);
+          break;
+      }
+    } else {
+      cipher.startEncryption();
+    }
+  }
+
+  private byte[] processEncryption(RecipientCipher cipher,
+                                   InputOutput inputOutput) throws IOException, EncryptionException {
+
+    return processEncryption(cipher, inputOutput, null);
+  }
+
+  private byte[] processEncryption(RecipientCipher cipher, InputOutput inputOutput, SigningOptions signingOptions)
+          throws IOException, EncryptionException {
+
+    if (inputOutput instanceof IOData) {
+      byte[] messageInfo = cipher.packMessageInfo();
+      byte[] processEncryption = cipher.processEncryption(((IOData) inputOutput).getInput());
+      byte[] finishEncryption = cipher.finishEncryption();
+
+      byte[] result = concatenate(messageInfo, processEncryption, finishEncryption);
+
+      if (signingOptions != null && signingOptions.mode == SigningMode.SIGN_THEN_ENCRYPT) {
+        byte[] messageInfoFooter = cipher.packMessageInfoFooter();
+        result = concatenate(result, messageInfoFooter);
+      }
+
+      return result;
+    } else if (inputOutput instanceof IOStream) {
+      InputStream inputStream = ((IOStream) inputOutput).getInputStream();
+      int streamSize = ((IOStream) inputOutput).getStreamSize();
+      OutputStream outputStream = ((IOStream) inputOutput).getOutputStream();
+
+      byte[] messageInfo = cipher.packMessageInfo();
+      outputStream.write(messageInfo);
+
+      while (inputStream.available() > 0) {
+        byte[] data;
+
+        if (inputStream.available() >= CHUNK_SIZE) {
+          data = new byte[CHUNK_SIZE];
+        } else {
+          data = new byte[inputStream.available()];
+        }
+        streamSize -= inputStream.read(data);
+
+        byte[] encryptedData = cipher.processEncryption(data);
+        outputStream.write(encryptedData);
+      }
+
+      if (streamSize != 0) {
+        throw new EncryptionException("Invalid stream size");
+      }
+
+      byte[] finish = cipher.finishEncryption();
+      outputStream.write(finish);
+
+      if (signingOptions != null && signingOptions.mode == SigningMode.SIGN_THEN_ENCRYPT) {
+        byte[] messageInfoFooter = cipher.packMessageInfoFooter();
+        outputStream.write(messageInfoFooter);
+      }
+
+      return null;
+    } else {
+      throw new IllegalStateException("Only IOData and IOStream are supported.");
+    }
+  }
+
+  private byte[] processDecryption(RecipientCipher cipher, InputOutput inputOutput) throws IOException {
+    if (inputOutput instanceof IOData) {
+      byte[] processDecryption = cipher.processDecryption(((IOData) inputOutput).getInput());
+      byte[] finishDecryption = cipher.finishDecryption();
+
+      return concatenate(processDecryption, finishDecryption);
+    } else if (inputOutput instanceof IOStream) {
+      InputStream inputStream = ((IOStream) inputOutput).getInputStream();
+      OutputStream outputStream = ((IOStream) inputOutput).getOutputStream();
+
+      while (inputStream.available() > 0) {
+        byte[] data;
+
+        if (inputStream.available() >= CHUNK_SIZE) {
+          data = new byte[CHUNK_SIZE];
+          inputStream.read(data);
+        } else {
+          data = new byte[inputStream.available()];
+          inputStream.read(data);
+        }
+
+        byte[] decryptedChunk = cipher.processDecryption(data);
+        outputStream.write(decryptedChunk);
+      }
+
+      byte[] finish = cipher.finishDecryption();
+      outputStream.write(finish);
+
+      return null;
+    } else {
+      throw new IllegalStateException("Only IOData and IOStream are supported.");
+    }
+  }
+
+  private void verifyPlainSignature(RecipientCipher cipher, InputOutput inputOutput,
+                                    List<VirgilPublicKey> publicKeys) throws VerificationException {
+    verifyPlainSignature(cipher, inputOutput, null, publicKeys);
+  }
+
+  private void verifyPlainSignature(RecipientCipher cipher, InputOutput inputOutput, byte[] result,
+                                    List<VirgilPublicKey> publicKeys) throws VerificationException {
+    if (inputOutput instanceof IOStream) {
+      throw new IllegalStateException("ignAndEncrypt is not supported for streams.");
+    }
+
+    VirgilPublicKey signerPublicKey;
+
+    if (publicKeys.size() == 1) {
+      signerPublicKey = publicKeys.get(0);
+    } else {
+      byte[] signerId;
+
+      try {
+        signerId = cipher.customParams().findData(VirgilCrypto.CUSTOM_PARAM_SIGNER_ID);
+      } catch (Throwable throwable) {
+        throw new VerificationException("Signer has not been found.");
+      }
+
+      VirgilPublicKey publicKey = null;
+      for (VirgilPublicKey publicKeyIterator : publicKeys) {
+        if (publicKeyIterator.getIdentifier().equals(signerId)) {
+          publicKey = publicKeyIterator;
+        }
+      }
+
+      if (publicKey == null) {
+        throw new VerificationException("Signer has not been found.");
+      }
+
+      signerPublicKey = publicKey;
+    }
+
+    byte[] signature;
+
+    try {
+      signature = cipher.customParams().findData(VirgilCrypto.CUSTOM_PARAM_SIGNATURE);
+    } catch (Throwable throwable) {
+      throw new VerificationException("Signature has not been found.");
+    }
+
+    if (!verifySignature(signature, result, signerPublicKey)) {
+      throw new VerificationException("Signature has not been verified.");
+    }
+  }
+
+  private void verifyEncryptedSignature(RecipientCipher cipher,
+                                        List<VirgilPublicKey> publicKeys) throws VerificationException {
+    if (!cipher.isDataSigned()) {
+      throw new VerificationException("Data is not signed.");
+    }
+
+    SignerInfoList signerInfoList = cipher.signerInfos();
+
+    if (!signerInfoList.hasItem() && signerInfoList.hasNext()) {
+      throw new VerificationException("Data is not signed.");
+    }
+
+    SignerInfo signerInfo = signerInfoList.item();
+
+    VirgilPublicKey signerPublicKey = null;
+    for (VirgilPublicKey publicKeyIterator : publicKeys) {
+      if (Arrays.equals(publicKeyIterator.getIdentifier(), signerInfo.signerId())) {
+        signerPublicKey = publicKeyIterator;
+      }
+    }
+
+    if (signerPublicKey == null) {
+      throw new VerificationException("Signer has not been found.");
+    }
+
+    if (!cipher.verifySignerInfo(signerInfo, signerPublicKey.getPublicKey())) {
+      throw new VerificationException("Signature has not been verified.");
+    }
+  }
+
+  private void finishDecryption(RecipientCipher cipher, InputOutput inputOutput) throws VerificationException {
+    finishDecryption(cipher, inputOutput, null, null);
+  }
+
+  private void finishDecryption(RecipientCipher cipher, InputOutput inputOutput,
+                                byte[] result) throws VerificationException {
+
+    finishDecryption(cipher, inputOutput, result, null);
+  }
+
+  private void finishDecryption(RecipientCipher cipher, InputOutput inputOutput, byte[] result,
+                                VerifyingOptions verifyingOptions) throws VerificationException {
+    if (verifyingOptions == null) {
+      return;
+    }
+
+    VerifyingMode mode = verifyingOptions.mode;
+
+    if (mode == VerifyingMode.ANY) {
+      mode = cipher.isDataSigned() ? VerifyingMode.DECRYPT_THEN_VERIFY : VerifyingMode.DECRYPT_AND_VERIFY;
+    }
+
+    switch (mode) {
+      case DECRYPT_AND_VERIFY:
+        verifyPlainSignature(cipher, inputOutput, result, verifyingOptions.publicKeys);
+        break;
+
+      case DECRYPT_THEN_VERIFY:
+        verifyEncryptedSignature(cipher, verifyingOptions.publicKeys);
+        break;
+    }
+  }
+
   private byte[] computePublicKeyIdentifier(PublicKey publicKey) throws CryptoException {
     try (KeyAsn1Serializer serializer = new KeyAsn1Serializer()) {
       serializer.setupDefaults();
@@ -1457,8 +1573,7 @@ public class VirgilCrypto {
           hash = Arrays.copyOfRange(hash, 0, 8);
         }
         return hash;
-      }
-      finally {
+      } finally {
         if (keyAlg instanceof AutoCloseable) {
           ((AutoCloseable) keyAlg).close();
         }
@@ -1469,20 +1584,22 @@ public class VirgilCrypto {
     }
   }
 
-//  /**
-//   * Concatenate two byte arrays.
-//   *
-//   * @param first  the first array.
-//   * @param second the second array.
-//   * @return a byte array.
-//   */
-//  private byte[] concatenate(byte[] first, byte[] second) {
-//    byte[] result = new byte[first.length + second.length];
-//    System.arraycopy(first, 0, result, 0, first.length);
-//    System.arraycopy(second, 0, result, first.length, second.length);
-//
-//    return result;
-//  }
+  /**
+   * Encrypts data using provided {@link RecipientCipher}.
+   *
+   * @param data   Data to encrypt.
+   * @param cipher To encrypt provided data.
+   * @return Encrypted data.
+   */
+  private byte[] encryptData(byte[] data, RecipientCipher cipher) {
+    cipher.startEncryption();
+
+    byte[] messageInfo = cipher.packMessageInfo();
+    byte[] processEncryption = cipher.processEncryption(data);
+    byte[] finish = cipher.finishEncryption();
+
+    return concatenate(messageInfo, processEncryption, finish);
+  }
 
   private byte[] concatenate(byte[]... arrays) {
     int totalLength = 0;
