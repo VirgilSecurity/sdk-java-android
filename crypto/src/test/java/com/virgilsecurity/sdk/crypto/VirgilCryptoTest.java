@@ -98,7 +98,7 @@ public class VirgilCryptoTest {
     values.remove(KeyType.CURVE25519);
     values.remove(KeyType.RSA_2048);
     values.remove(KeyType.RSA_4096);
-    values.remove(KeyType.RSA_8192); // TODO add SECP
+    values.remove(KeyType.RSA_8192);
 
     return values.stream().map(key -> Arguments.of(new VirgilCrypto(key)));
   }
@@ -454,4 +454,82 @@ public class VirgilCryptoTest {
     }
   }
 
+  @CryptoTest
+  public void auth_encrypt_should_match(VirgilCrypto crypto) throws CryptoException {
+    VirgilKeyPair keyPair1 = crypto.generateKeyPair();
+    VirgilKeyPair keyPair2 = crypto.generateKeyPair();
+    VirgilKeyPair keyPair3 = crypto.generateKeyPair();
+
+    byte[] encrypted = crypto.authEncrypt(TEXT.getBytes(), keyPair1.getPrivateKey(), keyPair2.getPublicKey());
+    byte[] decrypted = crypto.authDecrypt(encrypted, keyPair2.getPrivateKey(), keyPair1.getPublicKey());
+
+    assertArrayEquals(TEXT.getBytes(), decrypted);
+
+    assertThrows(DecryptionException.class, () -> {
+      crypto.authDecrypt(encrypted, keyPair3.getPrivateKey(), keyPair1.getPublicKey());
+    });
+
+    assertThrows(DecryptionException.class, () -> {
+      crypto.authDecrypt(encrypted, keyPair2.getPrivateKey(), keyPair3.getPublicKey());
+    });
+  }
+
+  @CryptoTest
+  public void auth_encrypt_stream_should_match(VirgilCrypto crypto) throws IOException, CryptoException {
+    VirgilKeyPair keyPair1 = crypto.generateKeyPair();
+    VirgilKeyPair keyPair2 = crypto.generateKeyPair();
+    VirgilKeyPair keyPair3 = crypto.generateKeyPair();
+
+    ArrayList<VirgilPublicKey> publicKeys = new ArrayList<>();
+    publicKeys.add(keyPair1.getPublicKey());
+    publicKeys.add(keyPair2.getPublicKey());
+
+    byte[] encrypted;
+    try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+         ByteArrayInputStream inputStream = new ByteArrayInputStream(TEXT.getBytes())) {
+
+      int streamSize = inputStream.available();
+
+      crypto.authEncrypt(inputStream, streamSize, outputStream, keyPair1.getPrivateKey(), publicKeys);
+      encrypted = outputStream.toByteArray();
+    }
+    assertNotNull(encrypted);
+
+    try (ByteArrayInputStream inputStream1 = new ByteArrayInputStream(encrypted);
+         ByteArrayInputStream inputStream2 = new ByteArrayInputStream(encrypted);
+         ByteArrayInputStream inputStream3 = new ByteArrayInputStream(encrypted);
+         ByteArrayOutputStream outputStream1 = new ByteArrayOutputStream();
+         ByteArrayOutputStream outputStream2 = new ByteArrayOutputStream();
+         ByteArrayOutputStream outputStream3 = new ByteArrayOutputStream()) {
+
+      crypto.authDecrypt(inputStream1, outputStream1, keyPair1.getPrivateKey(), publicKeys);
+      byte[] decrypted = outputStream1.toByteArray();
+
+      assertArrayEquals(TEXT.getBytes(), decrypted);
+
+      assertThrows(DecryptionException.class, () -> {
+        crypto.authDecrypt(inputStream2, outputStream2, keyPair3.getPrivateKey(), publicKeys);
+      });
+
+      assertThrows(DecryptionException.class, () -> {
+        crypto.authDecrypt(inputStream3, outputStream3, keyPair2.getPrivateKey(), keyPair3.getPublicKey());
+      });
+    }
+  }
+
+  @CryptoTest
+  public void auth_decrypt_deprecated_should_work(VirgilCrypto crypto) throws CryptoException {
+    VirgilKeyPair keyPair1 = crypto.generateKeyPair();
+    VirgilKeyPair keyPair2 = crypto.generateKeyPair();
+
+    byte[] encrypted1 = crypto.authEncrypt(TEXT.getBytes(), keyPair1.getPrivateKey(), keyPair2.getPublicKey());
+//    byte[] encrypted2 = crypto.authEncrypt(TEXT.getBytes(), keyPair1.getPrivateKey(), keyPair2.getPublicKey());
+    byte[] encrypted2 = crypto.signThenEncrypt(TEXT.getBytes(), keyPair1.getPrivateKey(), keyPair2.getPublicKey());
+
+    byte[] decrypted1 = crypto.authDecrypt(encrypted1, keyPair2.getPrivateKey(), keyPair1.getPublicKey(), true);
+    assertArrayEquals(TEXT.getBytes(), decrypted1);
+
+    byte[] decrypted2 = crypto.authDecrypt(encrypted2, keyPair2.getPrivateKey(), keyPair1.getPublicKey(), true);
+    assertArrayEquals(TEXT.getBytes(), decrypted2);
+  }
 }

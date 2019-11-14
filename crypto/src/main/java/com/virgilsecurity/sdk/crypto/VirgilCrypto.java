@@ -860,7 +860,7 @@ public class VirgilCrypto {
       finishDecryption(cipher, inputOutput, result, verifyingOptions);
 
       return result;
-    } catch (IOException exception) {
+    } catch (IOException | FoundationException exception) {
       throw new DecryptionException(exception);
     }
   }
