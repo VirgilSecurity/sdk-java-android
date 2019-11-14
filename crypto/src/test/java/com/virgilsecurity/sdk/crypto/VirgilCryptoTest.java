@@ -517,7 +517,7 @@ public class VirgilCryptoTest {
     }
   }
 
-  @CryptoTest
+  @SignCryptoTest
   public void auth_decrypt_deprecated_should_work(VirgilCrypto crypto) throws CryptoException {
     VirgilKeyPair keyPair1 = crypto.generateKeyPair();
     VirgilKeyPair keyPair2 = crypto.generateKeyPair();

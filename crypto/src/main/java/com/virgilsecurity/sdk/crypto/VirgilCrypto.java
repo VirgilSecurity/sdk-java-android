@@ -831,8 +831,8 @@ public class VirgilCrypto {
   byte[] encrypt(InputOutput inputOutput, SigningOptions signingOptions,
                  List<VirgilPublicKey> recipients) throws SigningException, EncryptionException {
 
-    try (Aes256Gcm aseGcm = new Aes256Gcm(); RecipientCipher cipher = new RecipientCipher()) {
-      cipher.setEncryptionCipher(aseGcm);
+    try (Aes256Gcm aesGcm = new Aes256Gcm(); RecipientCipher cipher = new RecipientCipher()) {
+      cipher.setEncryptionCipher(aesGcm);
       cipher.setRandom(this.rng);
 
       for (VirgilPublicKey recipient : recipients) {
@@ -1320,6 +1320,7 @@ public class VirgilCrypto {
           } else {
             throw new IllegalStateException("Only IOData and IOStream are supported.");
           }
+          cipher.startEncryption();
           break;
         case SIGN_THEN_ENCRYPT:
           cipher.setSignerHash(new Sha512());
