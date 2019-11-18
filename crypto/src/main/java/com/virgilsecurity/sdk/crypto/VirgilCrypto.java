@@ -225,6 +225,9 @@ public class VirgilCrypto {
   /**
    * Generates asymmetric key pair that is comprised of both public and private keys.
    *
+   * @param keyType Type of key to be generated.
+   * @param seed Seed key material.
+   *
    * @return Generated key pair.
    * @throws CryptoException if crypto operation failed
    */
@@ -244,6 +247,8 @@ public class VirgilCrypto {
 
   /**
    * Generates asymmetric key pair that is comprised of both public and private keys.
+   *
+   * @param seed Seed key material.
    *
    * @return Generated key pair.
    * @throws CryptoException if crypto operation failed
@@ -468,11 +473,7 @@ public class VirgilCrypto {
     try {
       return decrypt(new IOData(data), null, privateKey);
     } catch (Exception exception) {
-      if (exception instanceof FoundationException) {
-        throw new DecryptionException(processErrorCode((FoundationException) exception));
-      } else {
         throw new DecryptionException(exception);
-      }
     }
   }
 
@@ -490,11 +491,7 @@ public class VirgilCrypto {
     try {
       decrypt(new IOStream(inputStream, outputStream), null, privateKey);
     } catch (Exception exception) {
-      if (exception instanceof FoundationException) {
-        throw new DecryptionException(processErrorCode((FoundationException) exception));
-      } else {
         throw new DecryptionException(exception);
-      }
     }
   }
 
@@ -537,24 +534,20 @@ public class VirgilCrypto {
       return decrypt(new IOData(data), new VerifyingOptions(signersPublicKeys, VerifyingMode.DECRYPT_AND_VERIFY),
               privateKey);
     } catch (Exception exception) {
-      if (exception instanceof FoundationException) {
-        throw new DecryptionException(processErrorCode((FoundationException) exception));
-      } else {
         throw new DecryptionException(exception);
-      }
     }
   }
 
   /**
    * Signs (with private key) Then Encrypts data (and signature) for passed PublicKeys.
-   * <p>
+   *
    * <ol>
    * <li> Generates signature depending on KeyType</li>
    * <li> Generates random AES-256 KEY1</li>
    * <li> Encrypts data with KEY1 using AES-256-GCM and generates signature</li>
    * <li> Encrypts signature with KEY1 using AES-256-GCM</li>
    * <li> Generates ephemeral key pair for each recipient</li>
-   * <li> Uses Diffie-Hellman to obtain shared secret with each recipient's public key & each ephemeral private key</li>
+   * <li> Uses Diffie-Hellman to obtain shared secret with each recipient's public key &amp; each ephemeral private key</li>
    * <li> Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
    * <li> Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
    * </ol>
@@ -583,7 +576,7 @@ public class VirgilCrypto {
    * <li>Encrypts data with KEY1 using AES-256-GCM and generates signature</li>
    * <li>Encrypts signature with KEY1 using AES-256-GCM</li>
    * <li>Generates ephemeral key pair for each recipient</li>
-   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key & each ephemeral private key</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key &amp; each ephemeral private key</li>
    * <li>Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
    * <li>Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
    * </ol>
@@ -605,7 +598,7 @@ public class VirgilCrypto {
    * Decrypts (with private key) data and signature and Verifies signature using any of signers' PublicKeys.
    *
    * <ol>
-   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key & recipient's private key</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key &amp; recipient's private key</li>
    * <li>Computes KDF to obtain AES-256 KEY2 from shared secret</li>
    * <li>Decrypts KEY1 using AES-256-CBC</li>
    * <li>Decrypts data and signature using KEY1 and AES-256-GCM</li>
@@ -631,7 +624,7 @@ public class VirgilCrypto {
    * Decrypts (with private key) data and signature and Verifies signature using any of signers' PublicKeys.
    *
    * <ol>
-   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key & recipient's private key</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key &amp; recipient's private key</li>
    * <li>Computes KDF to obtain AES-256 KEY2 from shared secret</li>
    * <li>Decrypts KEY1 using AES-256-CBC</li>
    * <li>Decrypts data and signature using KEY1 and AES-256-GCM</li>
@@ -657,7 +650,7 @@ public class VirgilCrypto {
    * Decrypts (with private key) data and signature and Verifies signature using any of signers' PublicKeys.
    *
    * <ol>
-   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key & recipient's private key</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key &amp; recipient's private key</li>
    * <li>Computes KDF to obtain AES-256 KEY2 from shared secret</li>
    * <li>Decrypts KEY1 using AES-256-CBC</li>
    * <li>Decrypts data and signature using KEY1 and AES-256-GCM</li>
@@ -685,7 +678,7 @@ public class VirgilCrypto {
    * Decrypts (with private key) data and signature and Verifies signature using any of signers' PublicKeys.
    *
    * <ol>
-   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key & recipient's private key</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key &amp; recipient's private key</li>
    * <li>Computes KDF to obtain AES-256 KEY2 from shared secret</li>
    * <li>Decrypts KEY1 using AES-256-CBC</li>
    * <li>Decrypts data and signature using KEY1 and AES-256-GCM</li>
@@ -719,7 +712,7 @@ public class VirgilCrypto {
    * <li>Encrypts data with KEY1 using AES-256-GCM and generates signature</li>
    * <li>Encrypts signature with KEY1 using AES-256-GCM</li>
    * <li>Generates ephemeral key pair for each recipient</li>
-   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key & each ephemeral private key</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key &amp; each ephemeral private key</li>
    * <li>Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
    * <li>Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
    * </ol>
@@ -748,7 +741,7 @@ public class VirgilCrypto {
    * <li>Encrypts data with KEY1 using AES-256-GCM and generates signature</li>
    * <li>Encrypts signature with KEY1 using AES-256-GCM</li>
    * <li>Generates ephemeral key pair for each recipient</li>
-   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key & each ephemeral private key</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key &amp; each ephemeral private key</li>
    * <li>Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
    * <li>Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
    * </ol>
@@ -772,11 +765,11 @@ public class VirgilCrypto {
   /**
    * Decrypts (using passed PrivateKey) then verifies (using one of public keys) stream.
    *
-   * <div><li>NOTE: Decrypted stream should not be used until decryption of whole InputStream completed due to
-   * security reasons.</li></div>
+   * <div>NOTE: Decrypted stream should not be used until decryption of whole InputStream completed due to
+   * security reasons.</div>
    *
    * <ol>
-   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key & recipient's private key</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key &amp; recipient's private key</li>
    * <li>Computes KDF to obtain AES-256 KEY2 from shared secret</li>
    * <li>Decrypts KEY1 using AES-256-CBC</li>
    * <li>Decrypts data and signature using KEY1 and AES-256-GCM</li>
@@ -801,11 +794,11 @@ public class VirgilCrypto {
   /**
    * Decrypts (using passed PrivateKey) then verifies (using one of public keys) stream.
    *
-   * <div><li>NOTE: Decrypted stream should not be used until decryption of whole InputStream completed due to
-   * security reasons.</li></div>
+   * <div>NOTE: Decrypted stream should not be used until decryption of whole InputStream completed due to
+   * security reasons.</div>
    *
    * <ol>
-   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key & recipient's private key</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key &amp; recipient's private key</li>
    * <li>Computes KDF to obtain AES-256 KEY2 from shared secret</li>
    * <li>Decrypts KEY1 using AES-256-CBC</li>
    * <li>Decrypts data and signature using KEY1 and AES-256-GCM</li>
@@ -1284,23 +1277,6 @@ public class VirgilCrypto {
     return defaultKeyType;
   }
 
-  /**
-   * Gets message from provided {@link FoundationException}'s error code.
-   *
-   * @param exception To extract code from.
-   * @return Error message corresponding to error code.
-   */
-  private String processErrorCode(FoundationException exception) {
-    int errorCode = exception.getStatusCode();
-
-    if (errorCode == ERROR_CODE_WRONG_PRIVATE_KEY) {
-      return "Given Private key does not corresponds to any of "
-              + "Public keys that were used for encryption.";
-    } else {
-      return exception.getMessage();
-    }
-  }
-
   private void startEncryption(RecipientCipher cipher, InputOutput inputOutput) throws SigningException {
     startEncryption(cipher, inputOutput, null);
   }
@@ -1373,7 +1349,9 @@ public class VirgilCrypto {
       return result;
     } else if (inputOutput instanceof IOStream) {
       InputStream inputStream = ((IOStream) inputOutput).getInputStream();
-      int streamSize = ((IOStream) inputOutput).getStreamSize();
+      int streamSize = ((IOStream) inputOutput).getStreamSize() != IOStream.STREAM_SIZE_UNDEFINED
+              ? ((IOStream) inputOutput).getStreamSize()
+              : 0;
       OutputStream outputStream = ((IOStream) inputOutput).getOutputStream();
 
       byte[] messageInfo = cipher.packMessageInfo();
@@ -1387,7 +1365,12 @@ public class VirgilCrypto {
         } else {
           data = new byte[inputStream.available()];
         }
-        streamSize -= inputStream.read(data);
+
+        int dataRead = inputStream.read(data);
+
+        if (((IOStream) inputOutput).getStreamSize() != IOStream.STREAM_SIZE_UNDEFINED) {
+          streamSize -= dataRead;
+        }
 
         byte[] encryptedData = cipher.processEncryption(data);
         outputStream.write(encryptedData);
@@ -1453,7 +1436,7 @@ public class VirgilCrypto {
   private void verifyPlainSignature(RecipientCipher cipher, InputOutput inputOutput, byte[] result,
                                     List<VirgilPublicKey> publicKeys) throws VerificationException {
     if (inputOutput instanceof IOStream) {
-      throw new IllegalStateException("ignAndEncrypt is not supported for streams.");
+      throw new IllegalStateException("signAndEncrypt is not supported for streams.");
     }
 
     VirgilPublicKey signerPublicKey;
@@ -1471,8 +1454,9 @@ public class VirgilCrypto {
 
       VirgilPublicKey publicKey = null;
       for (VirgilPublicKey publicKeyIterator : publicKeys) {
-        if (publicKeyIterator.getIdentifier().equals(signerId)) {
+        if (Arrays.equals(publicKeyIterator.getIdentifier(), signerId)) {
           publicKey = publicKeyIterator;
+          break;
         }
       }
 

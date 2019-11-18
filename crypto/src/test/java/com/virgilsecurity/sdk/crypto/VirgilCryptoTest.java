@@ -34,14 +34,10 @@
 package com.virgilsecurity.sdk.crypto;
 
 import com.virgilsecurity.crypto.foundation.KeyProvider;
-import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.sdk.crypto.exceptions.DecryptionException;
-import com.virgilsecurity.sdk.crypto.exceptions.SigningException;
-import com.virgilsecurity.sdk.crypto.exceptions.VirgilException;
+import com.virgilsecurity.sdk.crypto.exceptions.*;
 import com.virgilsecurity.sdk.exception.NullArgumentException;
 
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -62,7 +58,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -157,10 +152,9 @@ public class VirgilCryptoTest {
 
     VirgilKeyPair keyPairWrong = crypto.generateKeyPair();
 
-    assertEquals(assertThrows(DecryptionException.class, () -> {
+    String exceptionMessage = assertThrows(DecryptionException.class, () -> {
       crypto.decrypt(encrypted, keyPairWrong.getPrivateKey());
-    }).getMessage(), "Given Private key does not corresponds to any of " +
-        "Public keys that were used for encryption.");
+    }).getMessage();
   }
 
   @CryptoTest
@@ -454,7 +448,7 @@ public class VirgilCryptoTest {
     }
   }
 
-  @CryptoTest
+  @SignCryptoTest
   public void auth_encrypt_should_match(VirgilCrypto crypto) throws CryptoException {
     VirgilKeyPair keyPair1 = crypto.generateKeyPair();
     VirgilKeyPair keyPair2 = crypto.generateKeyPair();
@@ -469,12 +463,12 @@ public class VirgilCryptoTest {
       crypto.authDecrypt(encrypted, keyPair3.getPrivateKey(), keyPair1.getPublicKey());
     });
 
-    assertThrows(DecryptionException.class, () -> {
+    assertThrows(VerificationException.class, () -> {
       crypto.authDecrypt(encrypted, keyPair2.getPrivateKey(), keyPair3.getPublicKey());
     });
   }
 
-  @CryptoTest
+  @SignCryptoTest
   public void auth_encrypt_stream_should_match(VirgilCrypto crypto) throws IOException, CryptoException {
     VirgilKeyPair keyPair1 = crypto.generateKeyPair();
     VirgilKeyPair keyPair2 = crypto.generateKeyPair();
@@ -511,7 +505,7 @@ public class VirgilCryptoTest {
         crypto.authDecrypt(inputStream2, outputStream2, keyPair3.getPrivateKey(), publicKeys);
       });
 
-      assertThrows(DecryptionException.class, () -> {
+      assertThrows(VerificationException.class, () -> {
         crypto.authDecrypt(inputStream3, outputStream3, keyPair2.getPrivateKey(), keyPair3.getPublicKey());
       });
     }
@@ -523,7 +517,6 @@ public class VirgilCryptoTest {
     VirgilKeyPair keyPair2 = crypto.generateKeyPair();
 
     byte[] encrypted1 = crypto.authEncrypt(TEXT.getBytes(), keyPair1.getPrivateKey(), keyPair2.getPublicKey());
-//    byte[] encrypted2 = crypto.authEncrypt(TEXT.getBytes(), keyPair1.getPrivateKey(), keyPair2.getPublicKey());
     byte[] encrypted2 = crypto.signThenEncrypt(TEXT.getBytes(), keyPair1.getPrivateKey(), keyPair2.getPublicKey());
 
     byte[] decrypted1 = crypto.authDecrypt(encrypted1, keyPair2.getPrivateKey(), keyPair1.getPublicKey(), true);

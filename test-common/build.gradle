@@ -22,9 +22,6 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-group 'com.virgilsecurity'
-version '0.1'
-
 publishing {
     publications {
         mavenJava(MavenPublication) {

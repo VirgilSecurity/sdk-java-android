@@ -37,10 +37,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.virgilsecurity.crypto.foundation.Base64;
-import com.virgilsecurity.crypto.foundation.FoundationException;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
+import com.virgilsecurity.sdk.crypto.exceptions.DecryptionException;
+import com.virgilsecurity.sdk.crypto.exceptions.VerificationException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -242,16 +242,12 @@ public class VirgilCryptoCompatibilityTest {
     byte[] dataHash512 = crypto.computeHash(data, HashAlgorithm.SHA512);
     assertArrayEquals(dataSha512, dataHash512);
 
-    try {
+    assertThrows(DecryptionException.class, () -> {
       crypto.authDecrypt(cipherData, keyPair2.getPrivateKey(), publicKey);
-    } catch (FoundationException exception) {
-      assertEquals(exception.getStatusCode(), FoundationException.ERROR_KEY_RECIPIENT_IS_NOT_FOUND);
-    }
+    });
 
-    try {
+    assertThrows(VerificationException.class, () -> {
       crypto.authDecrypt(cipherData, privateKey1, keyPair2.getPublicKey());
-    } catch (CryptoException exception) {
-      assertEquals(exception.getMessage(), "CryptoException.NOT");
-    }
+    });
   }
 }

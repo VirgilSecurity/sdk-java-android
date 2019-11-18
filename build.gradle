@@ -138,9 +138,17 @@ def getGradleOrSystemProperty(String name, Project project) {
     return property
 }
 
+// Artifacts packages
+final String BASE_VIRGIL_PACKAGE = 'com.virgilsecurity'
+final String SDK_PACKAGE = BASE_VIRGIL_PACKAGE + '.sdk'
+
+// Packages versions
+final String SDK_VERSION = '6.0.1'
+final String TEST_COMMON_VERSION = '0.1'
+
 subprojects {
-    group 'com.virgilsecurity.sdk'
-    version '6.0'
+    group SDK_PACKAGE
+    version SDK_VERSION
 
     apply plugin: 'maven-publish'
     apply plugin: 'checkstyle'
@@ -163,6 +171,11 @@ subprojects {
 
     def isAndroid = (it.name == 'crypto-android' || it.name == 'android-utils')
 
+    if (it.name == 'test-common') {
+        group BASE_VIRGIL_PACKAGE
+        version TEST_COMMON_VERSION
+    }
+    
     if (!isAndroid) {
         apply plugin: 'java-library'
 

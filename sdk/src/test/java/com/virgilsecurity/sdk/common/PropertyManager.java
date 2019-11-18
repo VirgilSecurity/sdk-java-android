@@ -44,7 +44,6 @@ import com.virgilsecurity.testcommon.utils.PropertyUtils;
 public class PropertyManager {
 
   private static final String ENVIRONMENT_SYS_VAR = "environment";
-  private static final String USER_DIR = "environment";
   private static final String APP_ID = "APP_ID";
   private static final String APP_PRIVATE_KEY = "APP_PRIVATE_KEY";
   private static final String APP_PUBLIC_KEY = "APP_PUBLIC_KEY";
