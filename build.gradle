@@ -36,7 +36,7 @@ buildscript {
     ext.versions = [
 
             // Virgil
-            virgilCrypto      : '0.10.2',
+            virgilCrypto      : '0.11.1',
 
             // Common
             commonsLang       : '3.9',
@@ -108,7 +108,7 @@ def authentication_password = hasProperty('authentication_password') ? authentic
 
 subprojects {
     group 'com.virgilsecurity.sdk'
-    version '6.0'
+    version '6.0.1'
 
     apply plugin: 'maven-publish'
     apply plugin: 'checkstyle'
