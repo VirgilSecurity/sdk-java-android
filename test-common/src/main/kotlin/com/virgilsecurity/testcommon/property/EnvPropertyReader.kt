@@ -75,12 +75,12 @@ class EnvPropertyReader private constructor(environment: Environment, filePath: 
         this.properties = propertiesMap
     }
 
-    data class Builder(
-        private var environment: Environment = Environment.PRO,
-        private var filePath: String? = null,
-        private var fileName: String = ENV_FILE_NAME,
+    class Builder {
+
+        private var environment: Environment = Environment.PRO
+        private var filePath: String? = null
+        private var fileName: String = ENV_FILE_NAME
         private var isSubmodule: Boolean = false
-    ) {
 
         /**
          * Set custom [environment] which will be read from file with credentials. Default [environment] is

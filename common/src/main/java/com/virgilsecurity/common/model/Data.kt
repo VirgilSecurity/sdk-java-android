@@ -50,11 +50,11 @@ class Data(val data: ByteArray) { // TODO Consider another name for parameter, s
     /**
      * This function serializes current object to Base64 String format. String is UTF_8 encoded.
      */
-    fun toBase64String(): String {
-        return Base64.encode(data)
+    fun toBase64String(): String { // FIXME add sources to artifact
+        return Base64.encode(data) // TODO add String extension, to use like "text".toData()
     }
 
-    override fun equals(other: Any?): Boolean {
+    override fun equals(other: Any?): Boolean { // TODO maybe move to byte[] or ByteArray extension.. to use crypto functions natively, and not like encrypt(data.data)
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
         val data1 = other as Data?
