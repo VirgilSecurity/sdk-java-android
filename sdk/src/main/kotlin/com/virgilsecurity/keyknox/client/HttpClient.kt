@@ -34,10 +34,10 @@
 package com.virgilsecurity.keyknox.client
 
 import com.google.gson.JsonObject
-import com.virgilsecurity.keyknox.build.VersionVirgilAgent
 import com.virgilsecurity.keyknox.exception.KeyknoxServiceException
 import com.virgilsecurity.keyknox.utils.Loggable
 import com.virgilsecurity.keyknox.utils.Serializer
+import com.virgilsecurity.sdk.VirgilInfo
 import com.virgilsecurity.sdk.common.ErrorResponse
 import com.virgilsecurity.sdk.jwt.TokenContext
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider
@@ -55,14 +55,24 @@ class HttpClient : HttpClientProtocol, Loggable {
     private val virgilAgentHeader: String
     private val accessTokenProvider: AccessTokenProvider
 
-    constructor(accessTokenProvider: AccessTokenProvider) : this(accessTokenProvider, VIRGIL_AGENT_PRODUCT, VersionVirgilAgent.VERSION)
+    constructor(accessTokenProvider: AccessTokenProvider) : this(
+        accessTokenProvider,
+        VIRGIL_AGENT_PRODUCT,
+        VirgilInfo.VERSION
+    )
 
     constructor(accessTokenProvider: AccessTokenProvider, product: String, version: String) {
         this.accessTokenProvider = accessTokenProvider
         virgilAgentHeader = "$product;$VIRGIL_AGENT_FAMILY;${OsUtils.getOsAgentName()};$version"
     }
 
-    override fun send(url: URL, method: Method, tokenContext: TokenContext, body: Any?, headers: Map<String, String>?): Response {
+    override fun send(
+        url: URL,
+        method: Method,
+        tokenContext: TokenContext,
+        body: Any?,
+        headers: Map<String, String>?
+    ): Response {
         try {
             logger().fine("${method.name} to $url")
             val accessToken = accessTokenProvider.getToken(tokenContext)

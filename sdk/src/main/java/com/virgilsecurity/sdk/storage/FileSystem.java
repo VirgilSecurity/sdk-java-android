@@ -48,14 +48,14 @@ public interface FileSystem {
     /**
      * Delete all in root directory.
      */
-    boolean delete() throws FileSystemException;
+    boolean delete() throws FileSystemException; // FIXME should not be concrete exceptions
 
     /**
      * Delete data file in root directory.
      *
      * @param filename File name.
      */
-    boolean delete(String filename) throws NotAFileException;
+    boolean delete(String filename) throws NotAFileException; // FIXME already another type of Exception
 
     /**
      * Delete data file.

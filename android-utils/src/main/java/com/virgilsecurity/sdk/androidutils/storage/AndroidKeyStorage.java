@@ -127,7 +127,7 @@ public class AndroidKeyStorage implements KeyStorage {
          *
          * @return Builder object to continue setting up AndroidKeyStorage instance.
          */
-        public Builder onPath(String rootPath) { // TODO test null/empty path
+        public Builder onPath(String rootPath) {
             this.rootPath = rootPath;
 
             return this;

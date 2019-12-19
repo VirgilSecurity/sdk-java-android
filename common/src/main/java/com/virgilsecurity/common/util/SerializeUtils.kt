@@ -54,10 +54,10 @@ class SerializeUtils {
 
         @JvmStatic @JvmOverloads
         fun <T> deserialize(data: Data, clazz: Class<T>, charset: Charset = StandardCharsets.UTF_8) =
-            gson.fromJson(String(data.data, charset), clazz)
+            gson.fromJson(String(data.value, charset), clazz)
 
         @JvmStatic @JvmOverloads
         fun <T> deserialize(data: Data, type: TypeToken<T>, charset: Charset = StandardCharsets.UTF_8) =
-            gson.fromJson(String(data.data, charset), type.type) as T
+            gson.fromJson(String(data.value, charset), type.type) as T
     }
 }

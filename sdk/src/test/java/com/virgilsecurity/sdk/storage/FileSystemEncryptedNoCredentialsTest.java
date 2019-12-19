@@ -48,7 +48,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.nio.file.InvalidPathException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -175,7 +174,7 @@ class FileSystemEncryptedNoCredentialsTest {
         Data dataRead = fileSystemEncrypted.read(alias);
         assertEquals(data, dataRead);
 
-        VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(dataRead.getData()).getPrivateKey();
+        VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(dataRead.getValue()).getPrivateKey();
         assertEquals(keyPair.getPrivateKey(), privateKeyImported);
     }
 
@@ -186,7 +185,7 @@ class FileSystemEncryptedNoCredentialsTest {
         Data dataRead = fileSystemEncrypted.read(alias, subdirectory);
         assertEquals(data, dataRead);
 
-        VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(dataRead.getData()).getPrivateKey();
+        VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(dataRead.getValue()).getPrivateKey();
         assertEquals(keyPair.getPrivateKey(), privateKeyImported);
     }
 
@@ -212,7 +211,7 @@ class FileSystemEncryptedNoCredentialsTest {
         }
 
         // Should NOT fail because file is NOT encrypted with credentials
-        VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(dataRead.getData()).getPrivateKey();
+        VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(dataRead.getValue()).getPrivateKey();
         assertEquals(keyPair.getPrivateKey(), privateKeyImported);
     }
 

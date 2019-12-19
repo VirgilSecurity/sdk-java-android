@@ -33,10 +33,10 @@
 
 package com.virgilsecurity.keyknox.utils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import com.virgilsecurity.sdk.utils.OsUtils;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * OsUtilsTest class.

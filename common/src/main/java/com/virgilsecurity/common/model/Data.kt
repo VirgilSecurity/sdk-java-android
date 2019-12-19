@@ -41,28 +41,26 @@ import java.util.*
 /**
  * Data class that represents binary data with convenient transformations to/from Base64 string.
  */
-class Data(val data: ByteArray) { // TODO Consider another name for parameter, so it won't be like data.data
-
-    init {
-        requireNotNull(data) { "\'data\' cannot be null" } // TODO if we remove requireNotNull - can we pass null from java?
-    }
+class Data(val value: ByteArray) {
 
     /**
      * This function serializes current object to Base64 String format. String is UTF_8 encoded.
      */
     fun toBase64String(): String { // FIXME add sources to artifact
-        return Base64.encode(data) // TODO add String extension, to use like "text".toData()
+        return Base64.encode(value)
     }
 
-    override fun equals(other: Any?): Boolean { // TODO maybe move to byte[] or ByteArray extension.. to use crypto functions natively, and not like encrypt(data.data)
+    fun asString(charset: Charset = Charsets.UTF_8): String = String(value, charset)
+
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
         val data1 = other as Data?
-        return Arrays.equals(data, data1!!.data)
+        return Arrays.equals(value, data1!!.value)
     }
 
     override fun hashCode(): Int {
-        return Arrays.hashCode(data)
+        return Arrays.hashCode(value)
     }
 
     companion object {

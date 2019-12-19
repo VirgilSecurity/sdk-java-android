@@ -31,51 +31,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.common.model
+@file:JvmName("ByteConversionUtils")
+package com.virgilsecurity.common.extension
 
-import com.virgilsecurity.common.util.toHexString
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import java.nio.charset.StandardCharsets
-import kotlin.experimental.and
+import com.virgilsecurity.common.model.Data
+import java.nio.charset.Charset
+import java.util.*
 
-class DataTest {
+/**
+ * ByteArrayExt class.
+ */
 
-    private val TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    private val DATA = TEXT.toByteArray(StandardCharsets.UTF_8)
-    private val BASE64_DATA = java.util.Base64.getEncoder().encode(DATA)
-    private val BASE64_TEXT = java.util.Base64.getEncoder().encodeToString(DATA)
-    private lateinit var data: Data
+/**
+ * Converts a [ByteArray] to a [Data] in a convenient way.
+ */
+fun ByteArray.toData() = Data(this)
 
-    @BeforeEach
-    fun setup() {
-        this.data = Data(DATA)
-    }
-
-    @Test
-    fun fromBase64String() {
-        assertArrayEquals(DATA, Data.fromBase64String(BASE64_TEXT).value)
-    }
-
-    @Test
-    fun toBase64String() {
-        assertEquals(BASE64_TEXT, data.toBase64String())
-    }
-
-    @Test
-    fun toHexString() {
-        assertEquals(bytesToHex(DATA), data.toHexString())
-    }
-
-    private val hexArray = "0123456789ABCDEF".toLowerCase().toCharArray()
-    fun bytesToHex(bytes: ByteArray): String {
-        val hexChars = CharArray(bytes.size * 2)
-        for (j in bytes.indices) {
-            val v = (bytes[j] and 0xFF.toByte()).toInt()
-            hexChars[j * 2] = hexArray[v ushr 4]
-            hexChars[j * 2 + 1] = hexArray[v and 0x0F]
-        }
-        return String(hexChars)
-    }
-}
+/**
+ * Converts a [String] to a [Data] in a convenient way. If no [Charset] is provided - [Charsets.UTF_8] is used.
+ */
+fun String.toData(charset: Charset = Charsets.UTF_8) = Data(this.toByteArray(charset))

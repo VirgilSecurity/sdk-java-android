@@ -303,8 +303,7 @@ public class VirgilCrypto {
   }
 
   /**
-   * Encrypts data for passed PublicKey. // TODO review methods docs for uppercase letters in the
-   * beginning.
+   * Encrypts data for passed PublicKey.
    * <ol>
    * <li>Generates random AES-256 KEY1</li>
    * <li>Encrypts data with KEY1 using AES-256-GCM</li>

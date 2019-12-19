@@ -88,7 +88,6 @@ public class Validator { // TODO Move to common
   public static void checkNullAgrument(Object o, String message) {
     if (o == null) {
       throw new NullArgumentException(message);
-      // TODO: 1/18/18 replace in all places and check for references to other packages
     }
   }
 

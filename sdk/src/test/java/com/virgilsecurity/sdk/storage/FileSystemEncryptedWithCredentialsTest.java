@@ -50,7 +50,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.nio.file.InvalidPathException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -207,7 +206,7 @@ class FileSystemEncryptedWithCredentialsTest {
 
         // Should fail because file is encrypted with credentials
         // TODO add assertThrows with corresponding java exception
-        byte[] keyData = dataRead.getData();
+        byte[] keyData = dataRead.getValue();
         VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(keyData).getPrivateKey();
         assertEquals(keyPair.getPrivateKey(), privateKeyImported);
     }

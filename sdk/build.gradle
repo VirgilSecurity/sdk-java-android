@@ -1,6 +1,11 @@
+apply plugin: 'kotlin'
+
 dependencies {
     api project(":common")
     api project(":crypto")
+
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$versions.kotlinVersion"
 
     testImplementation "org.junit.jupiter:junit-jupiter:$versions.junit"
     testImplementation "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"
@@ -22,12 +27,13 @@ task generateVirgilInfo(type: Copy) {
     includeEmptyDirs = false
 }
 
+compileKotlin.dependsOn(generateVirgilInfo)
 compileJava.dependsOn(generateVirgilInfo)
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            from components.java
+            from components.kotlin
             pom {
                 name = 'Virgil SDK'
             }

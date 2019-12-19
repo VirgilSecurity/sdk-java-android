@@ -132,10 +132,10 @@ public class FileSystemEncrypted implements FileSystem {
         byte[] dataToWrite;
 
         if (credentials != null) {
-            dataToWrite = credentials.getCrypto().signThenEncrypt(data.getData(),
+            dataToWrite = credentials.getCrypto().signThenEncrypt(data.getValue(),
                     credentials.getKeyPair().getPrivateKey(), credentials.getKeyPair().getPublicKey());
         } else {
-            dataToWrite = data.getData();
+            dataToWrite = data.getValue();
         }
 
         try (FileOutputStream os = new FileOutputStream(file)) {
@@ -183,7 +183,7 @@ public class FileSystemEncrypted implements FileSystem {
             byte[] dataResult;
 
             if (credentials != null) {
-                dataResult = credentials.getCrypto().decryptThenVerify(data,
+                dataResult = credentials.getCrypto().decryptThenVerify(data, // FIXME authDecrypt
                         credentials.getKeyPair().getPrivateKey(), credentials.getKeyPair().getPublicKey());
             } else {
                 dataResult = data;
@@ -274,7 +274,7 @@ public class FileSystemEncrypted implements FileSystem {
             file = new File(this.rootPath, filename);
         }
 
-        return file.delete();
+        return file.delete(); // TODO maybe throw exception instead of bool return
     }
 
     /**

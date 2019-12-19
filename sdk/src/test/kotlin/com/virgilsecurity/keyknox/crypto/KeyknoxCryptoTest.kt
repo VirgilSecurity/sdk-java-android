@@ -78,8 +78,11 @@ class KeyknoxCryptoTest {
     @Test
     @Throws(CryptoException::class)
     fun encrypt_emptyPublicKeys() {
-        assertThrows<IllegalArgumentException> {
+        try {
             this.crypto.encrypt(TEST_DATA, privateKey, ArrayList())
+        } catch (exception: Exception) {
+            if (exception !is IllegalArgumentException)
+                fail<IllegalArgumentException>()
         }
     }
 
@@ -126,8 +129,11 @@ class KeyknoxCryptoTest {
     @Test
     @Throws(CryptoException::class)
     fun decrypt_emptyPublicKeys() {
-        assertThrows<IllegalArgumentException> {
+        try {
             this.crypto.decrypt(encryptTestData(), privateKey, ArrayList())
+        } catch (exception: Exception) {
+            if (exception !is IllegalArgumentException)
+                fail<IllegalArgumentException>()
         }
     }
 
@@ -135,8 +141,11 @@ class KeyknoxCryptoTest {
     @Throws(CryptoException::class)
     fun decrypt_noSigner() {
         val encryptedKeyknoxValue = encryptTestData()
-        assertThrows<SignerNotFoundException> {
+        try {
             this.crypto.decrypt(encryptedKeyknoxValue, privateKey, publicKeys)
+        } catch (exception: Exception) {
+            if (exception !is SignerNotFoundException)
+                fail<IllegalArgumentException>()
         }
     }
 

@@ -76,7 +76,7 @@ public class AndroidCipherTest {
                 KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-//                .setUnlockedDeviceRequired(true) // TODO check on device
+//                .setUnlockedDeviceRequired(true)
                 .setUserAuthenticationValidityDurationSeconds(5 * 60) // 5 minutes
                 .setUserAuthenticationRequired(false)
                 .build();

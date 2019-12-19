@@ -135,15 +135,6 @@ class KeyknoxManager(
     fun resetValue(params: KeyknoxResetParams? = null): DecryptedKeyknoxValue {
         val operation = { _: Boolean ->
             this.keyknoxClient.resetValue(params)
-
-//            if ((response.meta == null || response.meta.isEmpty())
-//                    && (response.value == null || response.value.isEmpty())) {
-//                response
-//            } else {
-//                throw TamperedServerResponseException()
-//            }
-
-            // TODO do we need this check above?
         }
         return run(operation)
     }
