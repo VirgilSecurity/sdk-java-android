@@ -48,8 +48,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link JwtGenerator}.
- *
- * @author Andrii Iakovenko
  */
 public class JwtGeneratorTest {
 

@@ -35,7 +35,7 @@ package com.virgilsecurity.sdk.crypto;
 
 import com.virgilsecurity.crypto.foundation.KeyProvider;
 import com.virgilsecurity.sdk.crypto.exceptions.*;
-import com.virgilsecurity.sdk.exception.NullArgumentException;
+import com.virgilsecurity.common.exception.NullArgumentException;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -65,8 +65,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link VirgilCrypto}.
- *
- * @author Andrii Iakovenko
  */
 public class VirgilCryptoTest {
 

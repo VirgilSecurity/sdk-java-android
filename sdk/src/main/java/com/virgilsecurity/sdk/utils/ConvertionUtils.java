@@ -38,7 +38,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import com.virgilsecurity.common.util.Base64;
+import com.virgilsecurity.crypto.foundation.Base64;
 import com.virgilsecurity.sdk.common.StringEncoding;
 
 import java.io.IOException;
@@ -52,9 +52,6 @@ import java.util.Scanner;
 
 /**
  * Utilities class for data conversion.
- *
- * @author Andrii Iakovenko
- * @author Danylo Oliinyk
  */
 public class ConvertionUtils {
 
@@ -119,8 +116,8 @@ public class ConvertionUtils {
    * @param value The string to be converted
    * @return the byte array
    */
-  public static byte[] base64ToBytes(String value) { // FIXME remove
-    return Base64.decode(value);
+  public static byte[] base64ToBytes(String value) {
+    return Base64.decode(value.getBytes());
   }
 
   /**
@@ -274,7 +271,7 @@ public class ConvertionUtils {
    * @return the base64-encoded string.
    */
   public static String toBase64String(byte[] bytes) {
-    return Base64.encode(bytes);
+    return new String(Base64.encode(bytes));
   }
 
   /**
@@ -285,7 +282,7 @@ public class ConvertionUtils {
    */
   public static String toBase64String(String value) {
     byte[] bytes = value.getBytes(UTF8_CHARSET);
-    return Base64.encode(bytes);
+    return new String(Base64.encode(bytes));
   }
 
   /**

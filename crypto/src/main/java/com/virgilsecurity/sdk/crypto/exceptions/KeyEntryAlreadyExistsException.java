@@ -31,28 +31,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.sdk.crypto;
+package com.virgilsecurity.sdk.crypto.exceptions;
 
 /**
- * Algorithms supported by Crypto.
- *
- * @author Andrii Iakovenko
+ * The exception that is thrown when an key pair is already exists.
  */
-public enum HashAlgorithm {
+public class KeyEntryAlreadyExistsException extends KeyStorageException {
+
+  private static final long serialVersionUID = 3298336334182492503L;
+
   /**
-   * SHA224 algorithm.
+   * Create a new instance of {@code KeyEntryAlreadyExistsException}.
    */
-  SHA224,
-  /**
-   * SHA256 algorithm.
-   */
-  SHA256,
-  /**
-   * SHA384 algorithm.
-   */
-  SHA384,
-  /**
-   * SHA512 algorithm.
-   */
-  SHA512
+  public KeyEntryAlreadyExistsException() {
+  }
+
 }

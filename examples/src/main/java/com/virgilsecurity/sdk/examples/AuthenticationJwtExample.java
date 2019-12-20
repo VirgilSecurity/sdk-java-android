@@ -50,7 +50,7 @@ import java.security.PrivateKey;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Andrii Iakovenko
+ * Class AuthenticationJwtExample.
  */
 public class AuthenticationJwtExample {
 

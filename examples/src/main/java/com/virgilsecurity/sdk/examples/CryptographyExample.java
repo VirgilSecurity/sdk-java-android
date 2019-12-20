@@ -42,7 +42,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author Andrii Iakovenko
+ * Class CryptographyExample.
  */
 public class CryptographyExample {
 

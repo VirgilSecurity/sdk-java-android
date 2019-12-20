@@ -36,7 +36,6 @@ package com.virgilsecurity.sdk.crypto;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.virgilsecurity.crypto.foundation.*;
-import com.virgilsecurity.crypto.utils.Base64;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,8 +49,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests which verify cross-platform compatibility.
- *
- * @author Andrii Iakovenko
  */
 public class CryptoFormatsTests {
 
@@ -144,7 +141,7 @@ public class CryptoFormatsTests {
   public void stc_31_importPrivateKey() throws CryptoException {
     // STC_31
     JsonObject json = sampleJson.getAsJsonObject("STC-31");
-    byte[] keyData = Base64.decode(json.get("private_key1").getAsString());
+    byte[] keyData = Base64.decode(json.get("private_key1").getAsString().getBytes());
     VirgilKeyPair keyPair = this.crypto.importPrivateKey(keyData);
     assertNotNull(keyPair.getPrivateKey());
 
@@ -155,7 +152,7 @@ public class CryptoFormatsTests {
   @Test
   public void stc_32() throws CryptoException {
     // STC_32
-    byte[] keyData = Base64.decode(sampleJson.get("STC-32").getAsString());
+    byte[] keyData = Base64.decode(sampleJson.get("STC-32").getAsString().getBytes());
     VirgilPublicKey publicKey = this.crypto.importPublicKey(keyData);
     assertNotNull(publicKey);
 

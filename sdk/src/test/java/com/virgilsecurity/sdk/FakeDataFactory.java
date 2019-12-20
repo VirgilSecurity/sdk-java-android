@@ -46,7 +46,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Andrii Iakovenko
+ * Class FakeDataFactory.
  */
 public class FakeDataFactory {
 

@@ -43,7 +43,7 @@ import com.virgilsecurity.sdk.utils.Tuple;
 import java.util.Map;
 
 /**
- * @author Andrii Iakovenko
+ * Class KeyStorageExample.
  */
 public class KeyStorageExample {
 

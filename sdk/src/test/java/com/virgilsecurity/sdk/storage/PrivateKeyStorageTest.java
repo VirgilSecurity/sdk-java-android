@@ -57,7 +57,6 @@ import static org.mockito.Mockito.*;
 /**
  * Unit tests for {@code VirgilKeyStorage}.
  *
- * @author Andrii Iakovenko
  * @see PrivateKeyStorage
  */
 @ExtendWith(MockitoExtension.class)

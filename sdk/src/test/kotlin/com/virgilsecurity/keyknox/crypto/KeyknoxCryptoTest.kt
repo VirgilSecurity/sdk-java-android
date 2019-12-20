@@ -48,7 +48,7 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 
 /**
- * @author Andrii Iakovenko
+ * Class KeyknoxCryptoTest.
  */
 class KeyknoxCryptoTest {
 

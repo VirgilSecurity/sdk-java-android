@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Andrii Iakovenko
+ * Class PublicKeyManagementExample.
  */
 public class PublicKeyManagementExample {
 

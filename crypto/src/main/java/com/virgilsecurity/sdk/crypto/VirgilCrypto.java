@@ -35,7 +35,7 @@ package com.virgilsecurity.sdk.crypto;
 
 import com.virgilsecurity.crypto.foundation.*;
 import com.virgilsecurity.sdk.crypto.exceptions.*;
-import com.virgilsecurity.sdk.exception.NullArgumentException;
+import com.virgilsecurity.common.exception.NullArgumentException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +49,6 @@ import java.util.List;
 /**
  * The Virgil's implementation of Crypto.
  *
- * @author Andrii Iakovenko
  * @see VirgilPublicKey
  * @see VirgilPrivateKey
  */
@@ -265,7 +264,7 @@ public class VirgilCrypto {
    * @return Generated key pair.
    * @throws CryptoException if crypto operation failed
    */
-  public VirgilKeyPair generateKeyPair(KeyType keyType) throws CryptoException { // FIXME Check all foundation RuntimeException are being caught
+  public VirgilKeyPair generateKeyPair(KeyType keyType) throws CryptoException { // TODO Check all foundation RuntimeException are being caught
     return generateKeyPair(keyType, this.rng);
   }
 

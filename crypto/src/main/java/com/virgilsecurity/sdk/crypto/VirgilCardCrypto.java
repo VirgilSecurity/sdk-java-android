@@ -34,7 +34,7 @@
 package com.virgilsecurity.sdk.crypto;
 
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.sdk.exception.NullArgumentException;
+import com.virgilsecurity.common.exception.NullArgumentException;
 
 /**
  * The {@link VirgilCardCrypto} class provides a cryptographic operations in applications, such as

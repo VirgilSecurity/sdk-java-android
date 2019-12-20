@@ -34,38 +34,30 @@
 package com.virgilsecurity.sdk.crypto.exceptions;
 
 /**
- * This exception should be throw if key is not supported by Crypto implementation.
- *
- * @author Andrii Iakovenko
+ * Signals that an exception of some sort has occurred during encryption.
  */
-public class KeyNotSupportedException extends CryptoException {
+public class EncryptionException extends CryptoException {
 
-  private static final long serialVersionUID = -93962084934375263L;
+  private static final long serialVersionUID = -4006283921503784462L;
 
   /**
-   * Create a new instance of {@code VirgilException}.
+   * Create a new instance of {@code EncryptionException}.
    */
-  public KeyNotSupportedException() {
+  public EncryptionException() {
   }
 
   /**
-   * Create a new instance of {@code VirgilException} with the specified detail message.
-   *
-   * @param message the detail message. The detail message is saved for later retrieval by the
-   *                {@link #getMessage()} method.
-   */
-  public KeyNotSupportedException(String message) {
-    super(message);
-  }
-
-  /**
-   * Create a new instance of {@code VirgilException}.
+   * Create a new instance of {@code EncryptionException}.
    *
    * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
    *              {@code null} value is permitted, and indicates that the cause is nonexistent or
    *              unknown.)
    */
-  public KeyNotSupportedException(Throwable cause) {
+  public EncryptionException(Throwable cause) {
     super(cause);
+  }
+
+  public EncryptionException(String message) {
+    super(message);
   }
 }

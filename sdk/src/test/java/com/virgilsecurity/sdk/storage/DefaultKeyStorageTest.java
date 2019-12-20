@@ -53,12 +53,11 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit tests for {@code VirgilKeyStorage}.
  *
- * @author Andrii Iakovenko
  * @see DefaultKeyStorageTest
  */
 public class DefaultKeyStorageTest {
   /**
-   * @author Andrii Iakovenko
+   * Class TestKeyEntry.
    */
   private class TestKeyEntry implements KeyEntry {
     private String keyName;

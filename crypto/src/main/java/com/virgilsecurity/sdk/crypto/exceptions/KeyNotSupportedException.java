@@ -31,24 +31,39 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.sdk.exception;
+package com.virgilsecurity.sdk.crypto.exceptions;
 
 /**
- * Thrown to indicate that an argument was <code>null</code> and should not have been.
- *
- * @author Andrii Iakovenko
+ * This exception should be throw if key is not supported by Crypto implementation.
  */
-public class NullArgumentException extends IllegalArgumentException {
+public class KeyNotSupportedException extends CryptoException {
 
-  private static final long serialVersionUID = -3048179118807192393L;
+  private static final long serialVersionUID = -93962084934375263L;
 
   /**
-   * Create a new instance of {@code NullArgumentException}.
-   *
-   * @param argName the name of the argument that was {@code null}.
+   * Create a new instance of {@code VirgilException}.
    */
-  public NullArgumentException(String argName) {
-    super((argName == null ? "Argument" : argName) + " must not be null.");
+  public KeyNotSupportedException() {
   }
 
+  /**
+   * Create a new instance of {@code VirgilException} with the specified detail message.
+   *
+   * @param message the detail message. The detail message is saved for later retrieval by the
+   *                {@link #getMessage()} method.
+   */
+  public KeyNotSupportedException(String message) {
+    super(message);
+  }
+
+  /**
+   * Create a new instance of {@code VirgilException}.
+   *
+   * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
+   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
+   *              unknown.)
+   */
+  public KeyNotSupportedException(Throwable cause) {
+    super(cause);
+  }
 }

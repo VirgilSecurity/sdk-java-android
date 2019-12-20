@@ -34,38 +34,16 @@
 package com.virgilsecurity.sdk.crypto.exceptions;
 
 /**
- * Signals that an exception of some sort has occurred during decryption.
- *
- * @author Andrii Iakovenko
+ * The exception that is thrown when an key pair is not found.
  */
-public class DecryptionException extends CryptoException {
+public class KeyEntryNotFoundException extends KeyStorageException {
 
-  private static final long serialVersionUID = -4006283921503784462L;
-
-  /**
-   * Create a new instance of {@code DecryptionException}.
-   */
-  public DecryptionException() {
-  }
+  private static final long serialVersionUID = 3298336334182492503L;
 
   /**
-   * Create a new instance of {@code DecryptionException}.
-   *
-   * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
-   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
-   *              unknown.)
+   * Create a new instance of {@code KeyEntryNotFoundException}.
    */
-  public DecryptionException(Throwable cause) {
-    super(cause);
+  public KeyEntryNotFoundException() {
   }
 
-  /**
-   * Create a new instance of {@code DecryptionException}.
-   *
-   * @param message the error message(A {@code null} value is permitted, and indicates that the
-   *                message is nonexistent or unknown.)
-   */
-  public DecryptionException(String message) {
-    super(message);
-  }
 }

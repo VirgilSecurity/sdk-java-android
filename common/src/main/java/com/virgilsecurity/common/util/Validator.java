@@ -31,17 +31,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.sdk.utils;
+package com.virgilsecurity.common.util;
 
-import com.virgilsecurity.sdk.exception.EmptyArgumentException;
-import com.virgilsecurity.sdk.exception.NullArgumentException;
+import com.virgilsecurity.common.exception.EmptyArgumentException;
+import com.virgilsecurity.common.exception.NullArgumentException;
 
 import java.util.List;
 
 /**
  * The {@linkplain Validator} is used for validation purposes to make code cleaner.
  */
-public class Validator { // TODO Move to common
+public class Validator {
 
   /**
    * Check whether provided byte[ ] is empty.

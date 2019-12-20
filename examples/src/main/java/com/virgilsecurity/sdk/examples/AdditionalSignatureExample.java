@@ -52,7 +52,7 @@ import java.security.PrivateKey;
 import java.util.Date;
 
 /**
- * @author Andrii Iakovenko
+ * Class AdditionalSignatureExample.
  */
 public class AdditionalSignatureExample {
 

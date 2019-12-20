@@ -50,8 +50,6 @@ import java.util.Set;
 
 /**
  * Virgil implementation of a storage facility for cryptographic keys.
- *
- * @author Andrii Iakovenko
  */
 public class JsonFileKeyStorage implements KeyStorage {
 

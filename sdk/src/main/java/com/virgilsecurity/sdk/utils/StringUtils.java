@@ -35,8 +35,6 @@ package com.virgilsecurity.sdk.utils;
 
 /**
  * Operations on {@link java.lang.String} that are {@code null} safe.
- *
- * @author Andrii Iakovenko
  */
 public class StringUtils {
 

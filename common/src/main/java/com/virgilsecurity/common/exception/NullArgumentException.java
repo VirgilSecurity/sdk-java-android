@@ -31,24 +31,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.sdk.exception;
+package com.virgilsecurity.common.exception;
 
 /**
- * This exception throw if instance is not fully initialized to make operation.
- *
- * @author Andrii Iakovenko
+ * Thrown to indicate that an argument was <code>null</code> and should not have been.
  */
-public class IncompleteInitializationException extends RuntimeException {
+public class NullArgumentException extends IllegalArgumentException {
 
-  private static final long serialVersionUID = 3068771212931746387L;
+  private static final long serialVersionUID = -3048179118807192393L;
 
   /**
-   * Create new instance of {@link IncompleteInitializationException}.
+   * Create a new instance of {@code NullArgumentException}.
    *
-   * @param message the detail message.
+   * @param argName the name of the argument that was {@code null}.
    */
-  public IncompleteInitializationException(String message) {
-    super(message);
+  public NullArgumentException(String argName) {
+    super((argName == null ? "Argument" : argName) + " must not be null.");
   }
 
 }

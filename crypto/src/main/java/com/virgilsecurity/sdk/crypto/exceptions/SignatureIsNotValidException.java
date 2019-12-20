@@ -34,38 +34,16 @@
 package com.virgilsecurity.sdk.crypto.exceptions;
 
 /**
- * Represents errors occurred during interaction with SDK components.
- *
- * @author Andrii Iakovenko
+ * Signals that an exception of some sort has occurred during verification.
  */
-public class KeyStorageException extends RuntimeException {
+public class SignatureIsNotValidException extends CryptoException {
 
-  private static final long serialVersionUID = 6911846070390159175L;
-
-  /**
-   * Create a new instance of {@code KeyStorageException}.
-   */
-  public KeyStorageException() {
-  }
+  private static final long serialVersionUID = 1L;
 
   /**
-   * Create a new instance of {@code KeyStorageException} with the specified detail message.
-   *
-   * @param message the detail message. The detail message is saved for later retrieval by the
-   *                {@link #getMessage()} method.
+   * Create a new instance of {@code SignatureIsNotValidException}.
    */
-  public KeyStorageException(String message) {
-    super(message);
-  }
-
-  /**
-   * Create a new instance of {@code KeyStorageException}.
-   *
-   * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
-   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
-   *              unknown.)
-   */
-  public KeyStorageException(Throwable cause) {
-    super(cause);
+  public SignatureIsNotValidException() {
+    super("Digital signature is not valid");
   }
 }

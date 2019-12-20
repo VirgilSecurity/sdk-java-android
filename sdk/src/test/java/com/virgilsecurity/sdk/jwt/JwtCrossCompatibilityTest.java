@@ -60,8 +60,6 @@ import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link Jwt} which verify cross-platform compatibility.
- *
- * @author Andrii Iakovenko
  */
 @ExtendWith(MockitoExtension.class)
 public class JwtCrossCompatibilityTest {

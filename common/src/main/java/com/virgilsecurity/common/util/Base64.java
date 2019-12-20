@@ -37,8 +37,6 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * This is utils class which implements Base64 encoding/decoding functionality.
- *
- * @author Andrii Iakovenko
  */
 public class Base64 { // TODO change with foundation Base64
 

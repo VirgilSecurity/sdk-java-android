@@ -31,12 +31,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.sdk.exception;
+package com.virgilsecurity.common.exception;
 
 /**
  * Thrown to indicate that an argument was <code>null</code> or empty and should not have been.
- *
- * @author Andrii Iakovenko
  */
 public class EmptyArgumentException extends IllegalArgumentException {
 

@@ -38,7 +38,7 @@ import com.virgilsecurity.sdk.crypto.VirgilCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.sdk.exception.NullArgumentException;
+import com.virgilsecurity.common.exception.NullArgumentException;
 import com.virgilsecurity.sdk.storage.exceptions.DirectoryNotExistsException;
 import com.virgilsecurity.sdk.storage.exceptions.FileSystemException;
 import com.virgilsecurity.sdk.storage.exceptions.NotADirectoryException;

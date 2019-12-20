@@ -31,11 +31,38 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.sdk.client;
+package com.virgilsecurity.sdk.crypto.exceptions;
 
 /**
- * @author Andrii Iakovenko
+ * Signals that an exception of some sort has occurred during verification.
  */
-public enum HttpMethod {
-  GET, POST, PUT, DELETE
+public class VerificationException extends CryptoException {
+
+  private static final long serialVersionUID = -4006283921503784462L;
+
+  /**
+   * Create a new instance of {@code VerificationException}.
+   */
+  public VerificationException() {
+  }
+
+  /**
+   * Create a new instance of {@code VerificationException}.
+   *
+   * @param message the message which indicates the cause of Exception.
+   */
+  public VerificationException(String message) {
+    super(message);
+  }
+
+  /**
+   * Create a new instance of {@code VerificationException}.
+   *
+   * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
+   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
+   *              unknown.)
+   */
+  public VerificationException(Throwable cause) {
+    super(cause);
+  }
 }

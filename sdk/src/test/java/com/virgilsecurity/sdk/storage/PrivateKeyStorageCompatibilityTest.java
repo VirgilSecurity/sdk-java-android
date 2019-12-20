@@ -49,8 +49,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link PrivateKeyStorage} which verify cross-platform compatibility.
- *
- * @author Andrii Iakovenko
  */
 public class PrivateKeyStorageCompatibilityTest {
 

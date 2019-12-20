@@ -34,7 +34,7 @@
 package com.virgilsecurity.sdk;
 
 /**
- * @author Andrii Iakovenko
+ * Class VirgilInfo.
  */
 public class VirgilInfo {
 

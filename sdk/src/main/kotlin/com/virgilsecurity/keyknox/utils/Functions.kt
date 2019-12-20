@@ -33,18 +33,18 @@
 
 package com.virgilsecurity.keyknox.utils
 
-import com.virgilsecurity.common.util.Base64
+import com.virgilsecurity.crypto.foundation.Base64
 import com.virgilsecurity.sdk.utils.ConvertionUtils
 import java.util.*
 import java.util.logging.Logger
 
-inline fun base64Encode(array: ByteArray) = Base64.encode(array)
+inline fun base64Encode(array: ByteArray): String = String(Base64.encode(array))
 
-inline fun base64Encode(string: String) = ConvertionUtils.toBase64Bytes(string)
+inline fun base64Encode(string: String): ByteArray = ConvertionUtils.toBase64Bytes(string)
 
-inline fun base64Decode(array: ByteArray) = ConvertionUtils.base64ToString(array)
+inline fun base64Decode(array: ByteArray): String = ConvertionUtils.base64ToString(array)
 
-inline fun base64Decode(string: String) = Base64.decode(string)
+inline fun base64Decode(string: String): ByteArray = Base64.decode(string.toByteArray())
 
 fun ClosedRange<Int>.random() =
         Random().nextInt((endInclusive + 1) - start) + start

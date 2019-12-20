@@ -36,7 +36,7 @@ package com.virgilsecurity.sdk.jwt;
 import com.virgilsecurity.sdk.jwt.contract.AccessToken;
 import com.virgilsecurity.sdk.utils.Base64Url;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
-import com.virgilsecurity.sdk.utils.Validator;
+import com.virgilsecurity.common.util.Validator;
 
 import java.util.Arrays;
 import java.util.Date;

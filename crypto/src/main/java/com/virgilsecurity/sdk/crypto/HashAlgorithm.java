@@ -31,21 +31,26 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.sdk.crypto.exceptions;
+package com.virgilsecurity.sdk.crypto;
 
 /**
- * The exception that is thrown when an key pair is not found.
- *
- * @author Andrii Iakovenko
+ * Algorithms supported by Crypto.
  */
-public class KeyEntryNotFoundException extends KeyStorageException {
-
-  private static final long serialVersionUID = 3298336334182492503L;
-
+public enum HashAlgorithm {
   /**
-   * Create a new instance of {@code KeyEntryNotFoundException}.
+   * SHA224 algorithm.
    */
-  public KeyEntryNotFoundException() {
-  }
-
+  SHA224,
+  /**
+   * SHA256 algorithm.
+   */
+  SHA256,
+  /**
+   * SHA384 algorithm.
+   */
+  SHA384,
+  /**
+   * SHA512 algorithm.
+   */
+  SHA512
 }

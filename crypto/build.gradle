@@ -1,5 +1,6 @@
 dependencies {
     api project(":api")
+    api project(":common")
     api "com.google.code.gson:gson:$versions.gson"
 
     // Virgil

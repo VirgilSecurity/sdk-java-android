@@ -42,8 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link Base64Url}.
- *
- * @author Andrii Iakovenko
  */
 public class Base64UrlTest {
 

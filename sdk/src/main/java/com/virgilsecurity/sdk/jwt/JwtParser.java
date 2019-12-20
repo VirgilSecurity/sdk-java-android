@@ -34,7 +34,7 @@
 package com.virgilsecurity.sdk.jwt;
 
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
-import com.virgilsecurity.sdk.utils.Validator;
+import com.virgilsecurity.common.util.Validator;
 
 /**
  * The {@link JwtParser} class is used to parse Json Web Token from string representation and build

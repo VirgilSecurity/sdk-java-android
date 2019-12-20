@@ -34,7 +34,7 @@
 package com.virgilsecurity.sdk.crypto;
 
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.sdk.exception.NullArgumentException;
+import com.virgilsecurity.common.exception.NullArgumentException;
 
 /**
  * The Virgil access token signer.

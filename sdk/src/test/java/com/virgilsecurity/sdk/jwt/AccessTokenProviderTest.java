@@ -51,8 +51,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link AccessTokenProvider}.
- *
- * @author Danylo Oliinyk
  */
 public class AccessTokenProviderTest {
   private static final long SEVEN_SECONDS_MILLIS = 7 * 1000; // 7 seconds

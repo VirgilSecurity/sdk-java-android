@@ -58,8 +58,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link VirgilCrypto} which tests cross-platform compatibility.
- *
- * @author Andrii Iakovenko
  */
 public class VirgilCryptoCompatibilityTest {
 

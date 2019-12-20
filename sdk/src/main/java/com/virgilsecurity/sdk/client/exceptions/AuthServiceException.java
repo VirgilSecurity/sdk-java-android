@@ -35,8 +35,6 @@ package com.virgilsecurity.sdk.client.exceptions;
 
 /**
  * This exception occurred if authentication failed.
- *
- * @author Andrii Iakovenko
  */
 public class AuthServiceException extends VirgilServiceException {
 

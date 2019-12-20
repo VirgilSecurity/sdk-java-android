@@ -53,7 +53,6 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit tests for {@code VirgilKeyStorage}.
  *
- * @author Andrii Iakovenko
  * @see JsonFileKeyStorage
  */
 public class JsonFileKeyStorageTest {

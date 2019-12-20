@@ -31,42 +31,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.sdk.crypto.exceptions;
+package com.virgilsecurity.common.exception;
 
 /**
- * Signals that an exception of some sort has occurred during verification.
- *
- * @author Andrii Iakovenko
+ * This exception throw if instance is not fully initialized to make operation.
  */
-public class SigningException extends CryptoException {
+public class IncompleteInitializationException extends RuntimeException {
 
-  private static final long serialVersionUID = -4006283921503784462L;
-
-  /**
-   * Create a new instance of {@linkplain SigningException}.
-   */
-  public SigningException() {
-  }
+  private static final long serialVersionUID = 3068771212931746387L;
 
   /**
-   * Create new instance of {@linkplain SigningException}.
+   * Create new instance of {@link IncompleteInitializationException}.
    *
-   * @param message The detail message. The detail message is saved for later retrieval by the
-   *                {@link #getMessage()} method.
+   * @param message the detail message.
    */
-  public SigningException(String message) {
+  public IncompleteInitializationException(String message) {
     super(message);
-  }
-
-  /**
-   * Create a new instance of {@linkplain SigningException}.
-   *
-   * @param cause The cause (which is saved for later retrieval by the {@link #getCause()} method). (A
-   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
-   *              unknown.)
-   */
-  public SigningException(Throwable cause) {
-    super(cause);
   }
 
 }

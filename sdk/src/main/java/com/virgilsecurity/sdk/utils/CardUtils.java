@@ -48,8 +48,6 @@ import java.util.logging.Logger;
 
 /**
  * This is utils class which implements Card-specific functionality.
- *
- * @author Andrii Iakovenko.
  */
 public class CardUtils {
   private static final Logger LOGGER = Logger.getLogger(CardUtils.class.getName());

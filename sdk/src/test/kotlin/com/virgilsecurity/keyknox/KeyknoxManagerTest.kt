@@ -52,7 +52,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
- * @author Andrii Iakovenko
+ * Class KeyknoxManagerTest.
  */
 class KeyknoxManagerTest {
 

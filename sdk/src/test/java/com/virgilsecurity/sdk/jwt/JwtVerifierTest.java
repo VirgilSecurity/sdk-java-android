@@ -47,8 +47,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link JwtVerifier}.
- *
- * @author Andrii Iakovenko
  */
 public class JwtVerifierTest {
 

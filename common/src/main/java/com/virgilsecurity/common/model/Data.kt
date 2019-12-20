@@ -33,6 +33,7 @@
 
 package com.virgilsecurity.common.model
 
+import com.virgilsecurity.common.extension.toData
 import com.virgilsecurity.common.util.Base64
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
@@ -71,7 +72,7 @@ class Data(val value: ByteArray) {
         @JvmStatic fun fromBase64String(base64: String?): Data {
             requireNotNull(base64) { "\'base64\' cannot be null" }
 
-            return Data(Base64.decode(base64.toByteArray(StandardCharsets.UTF_8)))
+            return Base64.decode(base64.toByteArray(StandardCharsets.UTF_8)).toData()
         }
 
         /**
@@ -82,7 +83,7 @@ class Data(val value: ByteArray) {
             requireNotNull(base64) { "\'base64\' cannot be null" }
             requireNotNull(charset) { "\'charset\' cannot be null" }
 
-            return Data(Base64.decode(base64.toByteArray(charset)))
+            return Base64.decode(base64.toByteArray(charset)).toData()
         }
     }
 }

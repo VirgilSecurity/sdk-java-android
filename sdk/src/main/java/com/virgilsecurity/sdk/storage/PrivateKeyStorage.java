@@ -36,10 +36,9 @@ package com.virgilsecurity.sdk.storage;
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKeyExporter;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.sdk.exception.NullArgumentException;
+import com.virgilsecurity.common.exception.NullArgumentException;
 import com.virgilsecurity.sdk.utils.Tuple;
 
-import java.security.PrivateKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,8 +46,6 @@ import java.util.Set;
 
 /**
  * Virgil implementation of a storage facility for cryptographic keys.
- *
- * @author Andrii Iakovenko
  */
 public class PrivateKeyStorage {
 

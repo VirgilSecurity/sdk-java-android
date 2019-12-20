@@ -31,38 +31,49 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.sdk.client;
-
-import java.util.Map;
+package com.virgilsecurity.sdk.crypto.exceptions;
 
 /**
- * @author Andrii Iakovenko
+ * Represents errors occurred during interaction with SDK components.
  */
-public class HttpResponse {
+public class VirgilException extends Exception {
 
-  private String body;
-  private Map<String, String> headers;
+  private static final long serialVersionUID = -93962084934375263L;
 
-  public HttpResponse(String body, Map<String, String> headers) {
-    super();
-    this.body = body;
-    this.headers = headers;
+  /**
+   * Create a new instance of {@code VirgilException}.
+   */
+  public VirgilException() {
   }
 
-  public String getBody() {
-    return body;
+  /**
+   * Create a new instance of {@code VirgilException} with the specified detail message.
+   *
+   * @param message the detail message. The detail message is saved for later retrieval by the
+   *                {@link #getMessage()} method.
+   */
+  public VirgilException(String message) {
+    super(message);
   }
 
-  public void setBody(String body) {
-    this.body = body;
+  /**
+   * Create new instance of {@link VirgilException}.
+   *
+   * @param message the detail message
+   * @param cause   the cause
+   */
+  public VirgilException(String message, Throwable cause) {
+    super(message, cause);
   }
 
-  public Map<String, String> getHeaders() {
-    return headers;
+  /**
+   * Create a new instance of {@code VirgilException}.
+   *
+   * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
+   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
+   *              unknown.)
+   */
+  public VirgilException(Throwable cause) {
+    super(cause);
   }
-
-  public void setHeaders(Map<String, String> headers) {
-    this.headers = headers;
-  }
-
 }

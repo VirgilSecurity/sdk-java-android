@@ -34,18 +34,36 @@
 package com.virgilsecurity.sdk.crypto.exceptions;
 
 /**
- * Signals that an exception of some sort has occurred during verification.
- *
- * @author Andrii Iakovenko
+ * Signals that an exception of some sort has occurred during decryption.
  */
-public class SignatureIsNotValidException extends CryptoException {
+public class DecryptionException extends CryptoException {
 
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -4006283921503784462L;
 
   /**
-   * Create a new instance of {@code SignatureIsNotValidException}.
+   * Create a new instance of {@code DecryptionException}.
    */
-  public SignatureIsNotValidException() {
-    super("Digital signature is not valid");
+  public DecryptionException() {
+  }
+
+  /**
+   * Create a new instance of {@code DecryptionException}.
+   *
+   * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
+   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
+   *              unknown.)
+   */
+  public DecryptionException(Throwable cause) {
+    super(cause);
+  }
+
+  /**
+   * Create a new instance of {@code DecryptionException}.
+   *
+   * @param message the error message(A {@code null} value is permitted, and indicates that the
+   *                message is nonexistent or unknown.)
+   */
+  public DecryptionException(String message) {
+    super(message);
   }
 }

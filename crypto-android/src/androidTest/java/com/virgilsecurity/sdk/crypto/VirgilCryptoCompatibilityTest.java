@@ -54,8 +54,6 @@ import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link VirgilCrypto} which tests cross-platform compatibility.
- *
- * @author Andrii Iakovenko
  */
 @RunWith(Parameterized.class)
 public class VirgilCryptoCompatibilityTest {

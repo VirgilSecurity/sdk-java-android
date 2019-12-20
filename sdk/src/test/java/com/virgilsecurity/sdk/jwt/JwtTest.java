@@ -45,8 +45,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link Jwt}.
- *
- * @author Andrii Iakovenko
  */
 public class JwtTest {
   private static final long FUTURE_TIME_EXPIRATION = 6 * 1000; // 6 sec
