@@ -33,14 +33,10 @@
 
 package com.virgilsecurity.sdk.storage;
 
+import com.virgilsecurity.common.exception.NullArgumentException;
 import com.virgilsecurity.common.model.Data;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.common.exception.NullArgumentException;
-import com.virgilsecurity.sdk.storage.exceptions.CreateDirectoryException;
-import com.virgilsecurity.sdk.storage.exceptions.DirectoryNotExistsException;
-import com.virgilsecurity.sdk.storage.exceptions.FileSystemException;
-import com.virgilsecurity.sdk.storage.exceptions.NotADirectoryException;
-import com.virgilsecurity.sdk.storage.exceptions.NotAFileException;
+import com.virgilsecurity.sdk.storage.exceptions.*;
 
 import java.io.*;
 import java.util.Collections;
@@ -139,7 +135,7 @@ public class FileSystemEncrypted implements FileSystem {
         byte[] dataToWrite;
 
         if (credentials != null) {
-            dataToWrite = credentials.getCrypto().signThenEncrypt(data.getValue(),
+            dataToWrite = credentials.getCrypto().authEncrypt(data.getValue(),
                     credentials.getKeyPair().getPrivateKey(), credentials.getKeyPair().getPublicKey());
         } else {
             dataToWrite = data.getValue();
@@ -197,8 +193,8 @@ public class FileSystemEncrypted implements FileSystem {
             byte[] dataResult;
 
             if (credentials != null) {
-                dataResult = credentials.getCrypto().decryptThenVerify(data, // TODO authDecrypt and add migration for old users
-                        credentials.getKeyPair().getPrivateKey(), credentials.getKeyPair().getPublicKey());
+                dataResult = credentials.getCrypto().authDecrypt(data, credentials.getKeyPair().getPrivateKey(),
+                        credentials.getKeyPair().getPublicKey(), true);
             } else {
                 dataResult = data;
             }

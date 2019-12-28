@@ -64,7 +64,7 @@ class KeyknoxClientTest {
         this.path = UUID.randomUUID().toString()
         this.key = UUID.randomUUID().toString()
         this.virgilCrypto = VirgilCrypto(false)
-        val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+        val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
         this.privateKey = keyPair.privateKey
         this.publicKey = keyPair.publicKey
 

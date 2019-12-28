@@ -71,7 +71,7 @@ class KeyknoxManagerTest {
     fun setup() {
         this.virgilCrypto = VirgilCrypto(false)
         this.keyknoxCrypto = KeyknoxCrypto(this.virgilCrypto)
-        val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+        val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
         this.privateKey = keyPair.privateKey
         this.publicKey = keyPair.publicKey
         this.publicKeys = arrayListOf(this.publicKey)
@@ -122,7 +122,7 @@ class KeyknoxManagerTest {
         val pubKeys2 = mutableListOf<VirgilPublicKey>()
         var privKey: VirgilPrivateKey = this.privateKey
         for (i in 0..this.numberOfKeys) {
-            val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+            val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
             if (i == 0) {
                 privKey = keyPair.privateKey
             }
@@ -157,7 +157,7 @@ class KeyknoxManagerTest {
         val half = this.numberOfKeys / 2
         val last = this.numberOfKeys - 1
         for (i in 0..last) {
-            val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+            val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
             keyPairs.add(keyPair)
             pubKeys.add(keyPair.publicKey)
             if (i <= half) {
@@ -265,7 +265,7 @@ class KeyknoxManagerTest {
 
         val half = this.numberOfKeys / 2
         for (i in 0 until this.numberOfKeys) {
-            val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+            val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
 
             keyPairs.add(keyPair)
             if (i < half) {
@@ -363,8 +363,8 @@ class KeyknoxManagerTest {
     fun resetValue_invalidValue() {
         // KTC-15
         val data = base64Encode(UUID.randomUUID().toString())
-        val keyPair1 = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
-        val keyPair2 = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+        val keyPair1 = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
+        val keyPair2 = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
 
         val keyknoxManager1 = KeyknoxManager(this.keyknoxClient, this.keyknoxCrypto)
         val decryptedValue1 = keyknoxManager1.pushValue(null, data, null, arrayListOf(keyPair1.publicKey), keyPair1.privateKey)

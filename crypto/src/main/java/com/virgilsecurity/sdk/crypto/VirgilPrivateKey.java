@@ -57,7 +57,7 @@ public class VirgilPrivateKey implements Serializable {
   /**
    * The Private Key type.
    */
-  private KeyType keyType;
+  private KeyPairType keyPairType;
 
   /**
    * Create a new instance of {@code VirgilPrivateKey}.
@@ -70,14 +70,14 @@ public class VirgilPrivateKey implements Serializable {
    *
    * @param identifier The key identifier.
    * @param privateKey Underlying private key.
-   * @param keyType    The key type.
+   * @param keyPairType    The key type.
    */
   public VirgilPrivateKey(byte[] identifier,
                           com.virgilsecurity.crypto.foundation.PrivateKey privateKey,
-                          KeyType keyType) {
+                          KeyPairType keyPairType) {
     this.identifier = identifier;
     this.privateKey = privateKey;
-    this.keyType = keyType;
+    this.keyPairType = keyPairType;
   }
 
   /**
@@ -121,17 +121,17 @@ public class VirgilPrivateKey implements Serializable {
    *
    * @return the key type.
    */
-  public KeyType getKeyType() {
-    return keyType;
+  public KeyPairType getKeyPairType() {
+    return keyPairType;
   }
 
   /**
    * Sets key type.
    *
-   * @param keyType the key type.
+   * @param keyPairType the key type.
    */
-  public void setKeyType(KeyType keyType) {
-    this.keyType = keyType;
+  public void setKeyPairType(KeyPairType keyPairType) {
+    this.keyPairType = keyPairType;
   }
 
   @Override
@@ -144,12 +144,12 @@ public class VirgilPrivateKey implements Serializable {
     }
     VirgilPrivateKey that = (VirgilPrivateKey) o;
     return Arrays.equals(identifier, that.identifier)
-        && keyType == that.keyType;
+        && keyPairType == that.keyPairType;
   }
 
   @Override
   public int hashCode() {
-    int result = Objects.hash(privateKey, keyType);
+    int result = Objects.hash(privateKey, keyPairType);
     result = 31 * result + Arrays.hashCode(identifier);
     return result;
   }

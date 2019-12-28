@@ -71,7 +71,7 @@ class CloudKeyStorageTest {
         this.virgilCrypto = VirgilCrypto(false)
         this.keyknoxCrypto = KeyknoxCrypto()
 
-        val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+        val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
         this.privateKey = keyPair.privateKey
         this.publicKey = keyPair.publicKey
         this.publicKeys = arrayListOf(this.publicKey)
@@ -97,7 +97,7 @@ class CloudKeyStorageTest {
     @Test
     fun store() {
         // KTC-20
-        val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+        val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
         val privateKeyData = this.virgilCrypto.exportPrivateKey(keyPair.privateKey)
         val name = "test"
         val meta = mapOf("test_key" to "test_value")
@@ -121,7 +121,7 @@ class CloudKeyStorageTest {
     @Test
     fun store_twoTimes() {
         // KTC-20
-        val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+        val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
         val privateKeyData = this.virgilCrypto.exportPrivateKey(keyPair.privateKey)
         val name = "test"
         val name2 = "test2"
@@ -155,7 +155,7 @@ class CloudKeyStorageTest {
     @Test
     fun exists() {
         // KTC-21
-        val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+        val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
         val privateKeyData = this.virgilCrypto.exportPrivateKey(keyPair.privateKey)
         val name = "test"
 
@@ -187,7 +187,7 @@ class CloudKeyStorageTest {
 
         // Generate 100 key entries
         for (i in 0 until numberOfKeys) {
-            val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+            val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
             privateKeys.add(keyPair.privateKey)
 
             if (i in second..preLast) {
@@ -301,7 +301,7 @@ class CloudKeyStorageTest {
 
         // Generate 100 key entries
         for (i in 1..numberOfKeys) {
-            val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+            val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
             val name = "$i"
             val data = this.virgilCrypto.exportPrivateKey(keyPair.privateKey)
             val keyEntry = JsonKeyEntry(name, data)
@@ -355,7 +355,7 @@ class CloudKeyStorageTest {
 
         // Generate 100 key entries
         for (i in 1..numberOfKeys) {
-            val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+            val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
             val name = "$i"
             val data = this.virgilCrypto.exportPrivateKey(keyPair.privateKey)
             val keyEntry = JsonKeyEntry(name, data)
@@ -419,7 +419,7 @@ class CloudKeyStorageTest {
 
         // Generate 100 key entries
         for (i in 1..numberOfKeys) {
-            val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+            val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
             val name = "$i"
             val data = this.virgilCrypto.exportPrivateKey(keyPair.privateKey)
             val keyEntry = JsonKeyEntry(name, data)
@@ -463,7 +463,7 @@ class CloudKeyStorageTest {
 
         // Generate 100 key entries
         for (i in 1..numberOfKeys) {
-            val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+            val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
             val name = "$i"
             val data = this.virgilCrypto.exportPrivateKey(keyPair.privateKey)
             val keyEntry = JsonKeyEntry(name, data)
@@ -476,7 +476,7 @@ class CloudKeyStorageTest {
         // Store entries
         this.keyStorage.store(keyEntries)
 
-        val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+        val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
 
         this.keyStorage.updateRecipients(arrayListOf(keyPair.publicKey), keyPair.privateKey)
         assertEquals(numberOfKeys, this.keyStorage.retrieveAll().size)
@@ -514,7 +514,7 @@ class CloudKeyStorageTest {
 
         // Generate 100 key entries
         for (i in 1..numberOfKeys) {
-            val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+            val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
             val name = "$i"
             val data = this.virgilCrypto.exportPrivateKey(keyPair.privateKey)
             val keyEntry = JsonKeyEntry(name, data)
@@ -567,7 +567,7 @@ class CloudKeyStorageTest {
     @Test
     fun deleteAll_randomString() {
         // KTC-41
-        val keyPair = this.virgilCrypto.generateKeyPair(KeyType.ED25519)
+        val keyPair = this.virgilCrypto.generateKeyPair(KeyPairType.ED25519)
         val privateKeyData = this.virgilCrypto.exportPrivateKey(keyPair.privateKey)
         val name = "test"
 

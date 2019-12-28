@@ -31,73 +31,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.sdk.crypto;
-
-import com.virgilsecurity.crypto.foundation.AlgId;
+package com.virgilsecurity.sdk.crypto.exceptions;
 
 /**
- * KeyType class with key types supported by Crypto.
+ * UnknownCompoundKeyException class.
  */
-public enum KeyType {
+public class UnknownCompoundKeyException extends CryptoException {
 
-  /**
-   * Diffie–Hellman X25519.
-   */
-  CURVE25519(AlgId.CURVE25519),
-  /**
-   * EdDSA Ed25519.
-   */
-  ED25519(AlgId.ED25519),
-  /**
-   * SECP256R1 (NIST P-256).
-   */
-  SECP256R1(AlgId.SECP256R1),
-  /**
-   * RSA 2048 bit.
-   */
-  RSA_2048(2048),
-  /**
-   * RSA 4096 bit.
-   */
-  RSA_4096(4096),
-  /**
-   * RSA 8192 bit.
-   */
-  RSA_8192(8192);
-
-  private AlgId algId;
-  private int rsaBitLen;
-
-  KeyType(AlgId algId) {
-    this.algId = algId;
-  }
-
-  KeyType(int rsaBitLen) {
-    this.algId = AlgId.RSA;
-    this.rsaBitLen = rsaBitLen;
-  }
-
-  public AlgId getAlgId() {
-    return algId;
-  }
-
-  /**
-   * Get key len.
-   *
-   * @return Key length in bits if key of RSA, -1 otherwise.
-   */
-  public int getRsaBitLen() {
-    switch (this) {
-      case RSA_2048:
-      case RSA_4096:
-      case RSA_8192:
-        return rsaBitLen;
-      case CURVE25519:
-      case ED25519:
-      case SECP256R1:
-        return -1;
-      default:
-        return -1;
+    /**
+     * Instantiates a new Unknown compound key exception.
+     */
+    public UnknownCompoundKeyException() {
     }
-  }
+
+    /**
+     * Instantiates a new Unknown compound key exception.
+     *
+     * @param message The message
+     */
+    public UnknownCompoundKeyException(String message) {
+        super(message);
+    }
+
+    /**
+     * Instantiates a new Unknown compound key exception.
+     *
+     * @param cause The cause.
+     */
+    public UnknownCompoundKeyException(Throwable cause) {
+        super(cause);
+    }
+
+    /**
+     * Instantiates a new Unknown compound key exception.
+     *
+     * @param message The message.
+     * @param cause   The cause.
+     */
+    public UnknownCompoundKeyException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

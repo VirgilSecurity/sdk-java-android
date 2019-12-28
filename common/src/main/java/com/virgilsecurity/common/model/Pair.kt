@@ -31,51 +31,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.sdk.crypto.exceptions;
+package com.virgilsecurity.common.model
+
+import java.io.Serializable
+import kotlin.Pair
 
 /**
- * This class is the general class of exceptions produced by crypto library.
+ * Represents a generic pair of two values.
+ *
+ * There is no meaning attached to values in this class, it can be used for any purpose.
+ * Pair exhibits value semantics, i.e. two pairs are equal if both components are equal.
+ *
+ * @param A type of the first value.
+ * @param B type of the second value.
+ *
+ * @property first First value.
+ * @property second Second value.
+ *
+ * @constructor Creates a new instance of Pair.
  */
-public class CryptoException extends VirgilException {
+public data class Pair<out A, out B>(
+    public val first: A,
+    public val second: B
+) : Serializable {
 
-  private static final long serialVersionUID = 273960263469329797L;
-
-  /**
-   * Create a new instance of {@code CryptoException}.
-   */
-  public CryptoException() {
-  }
-
-  /**
-   * Create a new instance of {@code CryptoException} with the specified detail message.
-   *
-   * @param message the detail message. The detail message is saved for later retrieval by the
-   *                {@link #getMessage()} method.
-   */
-  public CryptoException(String message) {
-    super(message);
-  }
-
-  /**
-   * Create a new instance of {@code CryptoException}.
-   *
-   * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
-   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
-   *              unknown.)
-   */
-  public CryptoException(Throwable cause) {
-    super(cause);
-  }
-
-  /**
-   * Create a new instance of {@code CryptoException}.
-   *
-   * @param message the detail message
-   * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
-   *              {@code null} value is permitted, and indicates that the cause is nonexistent or
-   *              unknown.)
-   */
-  public CryptoException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    /**
+     * Returns string representation of the [Pair] including its [first] and [second] values.
+     */
+    public override fun toString(): String = "($first, $second)"
 }

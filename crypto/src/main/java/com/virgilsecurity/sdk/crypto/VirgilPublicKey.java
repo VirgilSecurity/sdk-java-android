@@ -57,7 +57,7 @@ public class VirgilPublicKey implements Serializable {
   /**
    * The Public key type.
    */
-  private KeyType keyType;
+  private KeyPairType keyPairType;
 
   /**
    * For serialization only!
@@ -72,14 +72,14 @@ public class VirgilPublicKey implements Serializable {
    *
    * @param identifier the public key identifier.
    * @param publicKey  the public key.
-   * @param keyType    the public key type.
+   * @param keyPairType    the public key type.
    */
   public VirgilPublicKey(byte[] identifier,
                          com.virgilsecurity.crypto.foundation.PublicKey publicKey,
-                         KeyType keyType) {
+                         KeyPairType keyPairType) {
     this.identifier = identifier;
     this.publicKey = publicKey;
-    this.keyType = keyType;
+    this.keyPairType = keyPairType;
   }
 
 
@@ -124,17 +124,17 @@ public class VirgilPublicKey implements Serializable {
    *
    * @return the key type.
    */
-  public KeyType getKeyType() {
-    return keyType;
+  public KeyPairType getKeyPairType() {
+    return keyPairType;
   }
 
   /**
    * Sets key type.
    *
-   * @param keyType the key type.
+   * @param keyPairType the key type.
    */
-  public void setKeyType(KeyType keyType) {
-    this.keyType = keyType;
+  public void setKeyPairType(KeyPairType keyPairType) {
+    this.keyPairType = keyPairType;
   }
 
   @Override
@@ -147,12 +147,12 @@ public class VirgilPublicKey implements Serializable {
     }
     VirgilPublicKey that = (VirgilPublicKey) o;
     return Arrays.equals(identifier, that.identifier)
-        && keyType == that.keyType;
+        && keyPairType == that.keyPairType;
   }
 
   @Override
   public int hashCode() {
-    int result = Objects.hash(publicKey, keyType);
+    int result = Objects.hash(publicKey, keyPairType);
     result = 31 * result + Arrays.hashCode(identifier);
     return result;
   }

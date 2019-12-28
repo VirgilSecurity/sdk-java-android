@@ -44,10 +44,10 @@ public class VirgilPrivateKeyExporter {
 
   /**
    * Create new instance of {@link VirgilPrivateKeyExporter} using {@link VirgilCrypto} with default
-   * {@link KeyType} - {@code FAST_EC_ED25519}.
+   * {@link KeyPairType} - {@code FAST_EC_ED25519}.
    */
   public VirgilPrivateKeyExporter() {
-    virgilCrypto = new VirgilCrypto(KeyType.ED25519);
+    virgilCrypto = new VirgilCrypto(KeyPairType.ED25519);
   }
 
   /**

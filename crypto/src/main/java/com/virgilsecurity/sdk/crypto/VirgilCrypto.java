@@ -33,9 +33,10 @@
 
 package com.virgilsecurity.sdk.crypto;
 
+import com.virgilsecurity.common.exception.NullArgumentException;
+import com.virgilsecurity.common.model.Pair;
 import com.virgilsecurity.crypto.foundation.*;
 import com.virgilsecurity.sdk.crypto.exceptions.*;
-import com.virgilsecurity.common.exception.NullArgumentException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,24 +56,16 @@ import java.util.List;
 public class VirgilCrypto {
 
   private static final Charset UTF8_CHARSET = StandardCharsets.UTF_8;
-  private static final int ERROR_CODE_WRONG_PRIVATE_KEY = -303;
-
   private static final int CHUNK_SIZE = 1024;
-  private static final int RSA_2048_LENGTH = 1024;
-  private static final int RSA_4096_LENGTH = 4096;
-  private static final int RSA_8192_LENGTH = 8192;
-
-  public static final byte[] CUSTOM_PARAM_SIGNATURE = "VIRGIL-DATA-SIGNATURE"
-      .getBytes(UTF8_CHARSET);
-  public static final byte[] CUSTOM_PARAM_SIGNER_ID = "VIRGIL-DATA-SIGNER-ID"
-      .getBytes(UTF8_CHARSET);
-
-  private static final String SIGNER_NOT_FOUND = "Signer not found";
   private static final String KEY_DOESNT_SUPPORT_VERIFICATION = "This key doesn\'t support verification";
   private static final String KEY_DOESNT_SUPPORT_SIGNING = "This key doesn\'t support signing";
 
+  public static final byte[] CUSTOM_PARAM_SIGNATURE = "VIRGIL-DATA-SIGNATURE".getBytes(UTF8_CHARSET);
+  public static final byte[] CUSTOM_PARAM_SIGNER_ID = "VIRGIL-DATA-SIGNER-ID".getBytes(UTF8_CHARSET);
+  public static final int PADDING_LENGTH = 160;
+
   private Random rng;
-  private KeyType defaultKeyType;
+  private KeyPairType defaultKeyPairType;
   private boolean useSHA256Fingerprints;
 
   interface InputOutput {
@@ -187,50 +180,50 @@ public class VirgilCrypto {
     rng.setupDefaults();
 
     this.rng = rng;
-    this.defaultKeyType = KeyType.ED25519;
+    this.defaultKeyPairType = KeyPairType.ED25519;
     this.useSHA256Fingerprints = useSHA256Fingerprints;
   }
 
   /**
    * Create new instance of {@link VirgilCrypto}.
    *
-   * @param keysType the {@link KeyType} to be used by default for generating key pair.
+   * @param keysType the {@link KeyPairType} to be used by default for generating key pair.
    */
-  public VirgilCrypto(KeyType keysType) {
+  public VirgilCrypto(KeyPairType keysType) {
     CtrDrbg rng = new CtrDrbg();
     rng.setupDefaults();
 
     this.rng = rng;
-    this.defaultKeyType = keysType;
+    this.defaultKeyPairType = keysType;
     this.useSHA256Fingerprints = false;
   }
 
   /**
    * Create new instance of {@link VirgilCrypto}.
    *
-   * @param keysType              the {@link KeyType} to be used by default for generating key pair.
+   * @param keysType              the {@link KeyPairType} to be used by default for generating key pair.
    * @param useSHA256Fingerprints set this flag to {@code true} to use SHA256 algorithm when calculating public key
    *                              identifier.
    */
-  public VirgilCrypto(KeyType keysType, boolean useSHA256Fingerprints) {
+  public VirgilCrypto(KeyPairType keysType, boolean useSHA256Fingerprints) {
     CtrDrbg rng = new CtrDrbg();
     rng.setupDefaults();
 
     this.rng = rng;
-    this.defaultKeyType = keysType;
+    this.defaultKeyPairType = keysType;
     this.useSHA256Fingerprints = useSHA256Fingerprints;
   }
 
   /**
    * Generates asymmetric key pair that is comprised of both public and private keys.
    *
-   * @param keyType Type of key to be generated.
+   * @param keyPairType Type of key to be generated.
    * @param seed Seed key material.
    *
    * @return Generated key pair.
    * @throws CryptoException if crypto operation failed
    */
-  public VirgilKeyPair generateKeyPair(KeyType keyType, byte[] seed) throws CryptoException {
+  public VirgilKeyPair generateKeyPair(KeyPairType keyPairType, byte[] seed) throws CryptoException {
     try (KeyMaterialRng keyMaterialRng = new KeyMaterialRng()) {
 
       if (!(seed.length >= keyMaterialRng.getKeyMaterialLenMin()
@@ -240,7 +233,7 @@ public class VirgilCrypto {
 
       keyMaterialRng.resetKeyMaterial(seed);
 
-      return generateKeyPair(keyType, keyMaterialRng);
+      return generateKeyPair(keyPairType, keyMaterialRng);
     }
   }
 
@@ -253,19 +246,19 @@ public class VirgilCrypto {
    * @throws CryptoException if crypto operation failed
    */
   public VirgilKeyPair generateKeyPair(byte[] seed) throws CryptoException {
-    return generateKeyPair(this.defaultKeyType, seed);
+    return generateKeyPair(this.defaultKeyPairType, seed);
   }
 
   /**
    * Generates asymmetric key pair that is comprised of both public and private keys by specified
    * type.
    *
-   * @param keyType Type of the generated keys. The possible values can be found in {@link KeyType}.
+   * @param keyPairType Type of the generated keys. The possible values can be found in {@link KeyPairType}.
    * @return Generated key pair.
    * @throws CryptoException if crypto operation failed
    */
-  public VirgilKeyPair generateKeyPair(KeyType keyType) throws CryptoException { // TODO Check all foundation RuntimeException are being caught
-    return generateKeyPair(keyType, this.rng);
+  public VirgilKeyPair generateKeyPair(KeyPairType keyPairType) throws CryptoException {
+    return generateKeyPair(keyPairType, this.rng);
   }
 
   /**
@@ -275,27 +268,36 @@ public class VirgilCrypto {
    * @throws CryptoException if crypto operation failed
    */
   public VirgilKeyPair generateKeyPair() throws CryptoException {
-    return generateKeyPair(this.defaultKeyType);
+    return generateKeyPair(this.defaultKeyPairType);
   }
 
-  private VirgilKeyPair generateKeyPair(KeyType keyType, Random rng) throws CryptoException {
+  private VirgilKeyPair generateKeyPair(KeyPairType keyPairType, Random rng) throws CryptoException {
     try (KeyProvider keyProvider = new KeyProvider()) {
 
-      if (keyType.getRsaBitLen() != -1) {
-        int rsaLength = keyType.getRsaBitLen();
+      if (keyPairType.getRsaBitLen() != -1) {
+        int rsaLength = keyPairType.getRsaBitLen();
         keyProvider.setRsaParams(rsaLength);
       }
 
       keyProvider.setRandom(rng);
       keyProvider.setupDefaults();
 
-      AlgId algId = keyType.getAlgId();
-      PrivateKey privateKey = keyProvider.generatePrivateKey(algId);
+      PrivateKey privateKey;
+
+      if (keyPairType.isCompound()) {
+        Pair<AlgId, AlgId> cipherKeysAlgIds = keyPairType.getCipherKeysAlgIds();
+        Pair<AlgId, AlgId> signerKeysAlgIds = keyPairType.getSignerKeysAlgIds();
+        privateKey = keyProvider.generateCompoundHybridPrivateKey(cipherKeysAlgIds.getFirst(),
+                cipherKeysAlgIds.getSecond(), signerKeysAlgIds.getFirst(), signerKeysAlgIds.getSecond());
+      } else {
+        privateKey = keyProvider.generatePrivateKey(keyPairType.getAlgId());
+      }
+
       PublicKey publicKey = privateKey.extractPublicKey();
       byte[] keyId = computePublicKeyIdentifier(publicKey);
 
-      VirgilPublicKey virgilPublicKey = new VirgilPublicKey(keyId, publicKey, keyType);
-      VirgilPrivateKey virgilPrivateKey = new VirgilPrivateKey(keyId, privateKey, keyType);
+      VirgilPublicKey virgilPublicKey = new VirgilPublicKey(keyId, publicKey, keyPairType);
+      VirgilPrivateKey virgilPrivateKey = new VirgilPrivateKey(keyId, privateKey, keyPairType);
 
       return new VirgilKeyPair(virgilPublicKey, virgilPrivateKey);
     }
@@ -315,11 +317,38 @@ public class VirgilCrypto {
    *
    * @param data      Raw data bytes for encryption.
    * @param publicKey Recipient's public key.
+   *
    * @return Encrypted bytes.
+   *
    * @throws EncryptionException If encryption failed.
    */
   public byte[] encrypt(byte[] data, VirgilPublicKey publicKey) throws EncryptionException {
-    return encrypt(data, Collections.singletonList(publicKey));
+    return encrypt(data, Collections.singletonList(publicKey), false);
+  }
+
+  /**
+   * Encrypts data for passed PublicKey.
+   * <ol>
+   * <li>Generates random AES-256 KEY1</li>
+   * <li>Encrypts data with KEY1 using AES-256-GCM</li>
+   * <li>Generates ephemeral key pair for each recipient</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key and each
+   * ephemeral private key</li>
+   * <li>Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
+   * <li>Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
+   * </ol>
+   *
+   * @param data      Raw data bytes for encryption.
+   * @param publicKey Recipient's public key.
+   * @param enablePadding If true, will add padding to plain text before encryption. This is recommended for data for
+   *                      which exposing length can cause security issues (e.g. text messages).
+   *
+   * @return Encrypted bytes.
+   *
+   * @throws EncryptionException If encryption failed.
+   */
+  public byte[] encrypt(byte[] data, VirgilPublicKey publicKey, boolean enablePadding) throws EncryptionException {
+    return encrypt(data, Collections.singletonList(publicKey), enablePadding);
   }
 
   /**
@@ -343,7 +372,37 @@ public class VirgilCrypto {
    */
   public byte[] encrypt(byte[] data, List<VirgilPublicKey> publicKeys) throws EncryptionException {
     try {
-      return encrypt(new IOData(data), null, publicKeys);
+      return encrypt(new IOData(data), null, publicKeys, false);
+    } catch (Exception exception) {
+      throw new EncryptionException(exception);
+    }
+  }
+
+  /**
+   * Encrypts data for passed PublicKeys.
+   * <ol>
+   * <li>Generates random AES-256 KEY1</li>
+   * <li>Encrypts data with KEY1 using AES-256-GCM</li>
+   * <li>Generates ephemeral key pair for each recipient</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key and each
+   * ephemeral private key</li>
+   * <li>Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
+   * <li>Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
+   * </ol>
+   *
+   * @param data       Raw data bytes for encryption.
+   * @param publicKeys List of recipients' public keys.
+   * @param enablePadding If true, will add padding to plain text before encryption. This is recommended for data for
+   *                      which exposing length can cause security issues (e.g. text messages).
+   *
+   * @return Encrypted bytes.
+   *
+   * @throws EncryptionException If encryption failed.
+   */
+  public byte[] encrypt(byte[] data, List<VirgilPublicKey> publicKeys,
+                        boolean enablePadding) throws EncryptionException {
+    try {
+      return encrypt(new IOData(data), null, publicKeys, enablePadding);
     } catch (Exception exception) {
       throw new EncryptionException(exception);
     }
@@ -369,7 +428,32 @@ public class VirgilCrypto {
    */
   public void encrypt(InputStream inputStream, OutputStream outputStream, VirgilPublicKey publicKey)
       throws EncryptionException {
-    encrypt(inputStream, outputStream, Collections.singletonList(publicKey));
+    encrypt(inputStream, outputStream, Collections.singletonList(publicKey), false);
+  }
+
+  /**
+   * Encrypts the specified stream using recipient's Public key.
+   * <ol>
+   * <li>Generates random AES-256 KEY1</li>
+   * <li>Encrypts data with KEY1 using AES-256-GCM</li>
+   * <li>Generates ephemeral key pair for each recipient</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key and each
+   * ephemeral private key</li>
+   * <li>Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
+   * <li>Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
+   * </ol>
+   *
+   * @param inputStream  Input stream for encrypted.
+   * @param outputStream Output stream for encrypted data.
+   * @param publicKey    Recipient's public key.
+   * @param enablePadding If true, will add padding to plain text before encryption. This is recommended for data for
+   *                      which exposing length can cause security issues (e.g. text messages).
+   *
+   * @throws EncryptionException if encryption failed
+   */
+  public void encrypt(InputStream inputStream, OutputStream outputStream, VirgilPublicKey publicKey,
+                      boolean enablePadding) throws EncryptionException {
+    encrypt(inputStream, outputStream, Collections.singletonList(publicKey), enablePadding);
   }
 
   /**
@@ -393,7 +477,36 @@ public class VirgilCrypto {
   public void encrypt(InputStream inputStream, OutputStream outputStream,
                       List<VirgilPublicKey> publicKeys) throws EncryptionException {
     try {
-      encrypt(new IOStream(inputStream, outputStream), null, publicKeys);
+      encrypt(new IOStream(inputStream, outputStream), null, publicKeys, false);
+    } catch (Exception exception) {
+      throw new EncryptionException(exception);
+    }
+  }
+
+  /**
+   * Encrypts data stream for passed PublicKeys.
+   * <ol>
+   * <li>Generates random AES-256 KEY1</li>
+   * <li>Encrypts data with KEY1 using AES-256-GCM</li>
+   * <li>Generates ephemeral key pair for each recipient</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key and each
+   * ephemeral private key</li>
+   * <li>Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
+   * <li>Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
+   * </ol>
+   *
+   * @param inputStream  Input stream to be encrypted.
+   * @param outputStream Output stream for encrypted data.
+   * @param publicKeys   List of recipients' public keys.
+   * @param enablePadding If true, will add padding to plain text before encryption. This is recommended for data for
+   *                      which exposing length can cause security issues (e.g. text messages).
+   *
+   * @throws EncryptionException if encryption failed
+   */
+  public void encrypt(InputStream inputStream, OutputStream outputStream,
+                      List<VirgilPublicKey> publicKeys, boolean enablePadding) throws EncryptionException {
+    try {
+      encrypt(new IOStream(inputStream, outputStream), null, publicKeys, enablePadding);
     } catch (Exception exception) {
       throw new EncryptionException(exception);
     }
@@ -416,7 +529,7 @@ public class VirgilCrypto {
   @Deprecated
   public byte[] signThenEncrypt(byte[] data, VirgilPrivateKey privateKey, VirgilPublicKey publicKey)
       throws CryptoException {
-    return signThenEncrypt(data, privateKey, Collections.singletonList(publicKey));
+    return signThenEncrypt(data, privateKey, Collections.singletonList(publicKey), false);
   }
 
   /**
@@ -447,7 +560,41 @@ public class VirgilCrypto {
   @Deprecated
   public byte[] signThenEncrypt(byte[] data, VirgilPrivateKey privateKey,
                                 List<VirgilPublicKey> publicKeys) throws CryptoException {
-    return encrypt(new IOData(data), new SigningOptions(privateKey, SigningMode.SIGN_AND_ENCRYPT), publicKeys);
+    return encrypt(new IOData(data), new SigningOptions(privateKey, SigningMode.SIGN_AND_ENCRYPT), publicKeys, false);
+  }
+
+  /**
+   * Signs (with Private key) Then Encrypts data for passed PublicKeys.
+   *
+   * @deprecated This method doesn't encrypt signature itself. Please, use
+   * {@link #authEncrypt(byte[], VirgilPrivateKey, List)} instead.
+   *
+   * <ol>
+   * <li>Generates signature depending on KeyType</li>
+   * <li>Generates random AES-256 KEY1</li>
+   * <li>Encrypts both data and signature with KEY1 using AES-256-GCM</li>
+   * <li>Generates ephemeral key pair for each recipient</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key and each
+   * ephemeral private key</li>
+   * <li>Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
+   * <li>Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
+   * </ol>
+   *
+   * @param data       The data to encrypt.
+   * @param privateKey The Private key to sign the data.
+   * @param publicKeys The list of Public key recipients to encrypt the data.
+   * @param enablePadding If true, will add padding to plain text before encryption. This is recommended for data for
+   *                      which exposing length can cause security issues (e.g. text messages).
+   *
+   * @return Signed and encrypted data bytes.
+   *
+   * @throws CryptoException If crypto sing or encrypt operation failed.
+   */
+  @Deprecated
+  public byte[] signThenEncrypt(byte[] data, VirgilPrivateKey privateKey,
+                                List<VirgilPublicKey> publicKeys, boolean enablePadding) throws CryptoException {
+    return encrypt(new IOData(data), new SigningOptions(privateKey, SigningMode.SIGN_AND_ENCRYPT), publicKeys,
+            enablePadding);
   }
 
   /**
@@ -562,7 +709,38 @@ public class VirgilCrypto {
   public byte[] authEncrypt(byte[] data, VirgilPrivateKey privateKey,
                             VirgilPublicKey recipient) throws SigningException, EncryptionException {
 
-    return authEncrypt(data, privateKey, Collections.singletonList(recipient));
+    return authEncrypt(data, privateKey, Collections.singletonList(recipient), true);
+  }
+
+  /**
+   * Signs (with private key) Then Encrypts data (and signature) for passed PublicKeys.
+   *
+   * <ol>
+   * <li> Generates signature depending on KeyType</li>
+   * <li> Generates random AES-256 KEY1</li>
+   * <li> Encrypts data with KEY1 using AES-256-GCM and generates signature</li>
+   * <li> Encrypts signature with KEY1 using AES-256-GCM</li>
+   * <li> Generates ephemeral key pair for each recipient</li>
+   * <li> Uses Diffie-Hellman to obtain shared secret with each recipient's public key &amp; each ephemeral private key</li>
+   * <li> Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
+   * <li> Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
+   * </ol>
+   *
+   * @param data Data to be signedThenEncrypted.
+   * @param privateKey Sender private key.
+   * @param recipient Recipient's public key.
+   * @param enablePadding If true, will add padding to plain text before encryption. This is recommended for data for
+   *                      which exposing length can cause security issues (e.g. text messages).
+   *
+   * @return SignedThenEncrypted data.
+   *
+   * @throws SigningException If crypto sign operation failed.
+   * @throws EncryptionException If encryption failed.
+   */
+  public byte[] authEncrypt(byte[] data, VirgilPrivateKey privateKey,
+                            VirgilPublicKey recipient, boolean enablePadding) throws SigningException, EncryptionException {
+
+    return authEncrypt(data, privateKey, Collections.singletonList(recipient), enablePadding);
   }
 
   /**
@@ -582,14 +760,48 @@ public class VirgilCrypto {
    * @param data       Data to be signedThenEncrypted.
    * @param privateKey Sender private key.
    * @param recipients Recipients' public keys.
+   *
    * @return SignedThenEncrypted data.
+   *
    * @throws SigningException    If crypto sign operation failed.
    * @throws EncryptionException If encryption failed.
    */
   public byte[] authEncrypt(byte[] data, VirgilPrivateKey privateKey,
                             List<VirgilPublicKey> recipients) throws EncryptionException, SigningException {
 
-    return encrypt(new IOData(data), new SigningOptions(privateKey, SigningMode.SIGN_THEN_ENCRYPT), recipients);
+    return encrypt(new IOData(data), new SigningOptions(privateKey, SigningMode.SIGN_THEN_ENCRYPT), recipients, true);
+  }
+
+  /**
+   * Signs (with private key) Then Encrypts data (and signature) for passed PublicKeys.
+   *
+   * <ol>
+   * <li>Generates signature depending on KeyType</li>
+   * <li>Generates random AES-256 KEY1</li>
+   * <li>Encrypts data with KEY1 using AES-256-GCM and generates signature</li>
+   * <li>Encrypts signature with KEY1 using AES-256-GCM</li>
+   * <li>Generates ephemeral key pair for each recipient</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key &amp; each ephemeral private key</li>
+   * <li>Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
+   * <li>Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
+   * </ol>
+   *
+   * @param data       Data to be signedThenEncrypted.
+   * @param privateKey Sender private key.
+   * @param recipients Recipients' public keys.
+   * @param enablePadding If true, will add padding to plain text before encryption. This is recommended for data for
+   *                      which exposing length can cause security issues (e.g. text messages).
+   *
+   * @return SignedThenEncrypted data.
+   *
+   * @throws SigningException    If crypto sign operation failed.
+   * @throws EncryptionException If encryption failed.
+   */
+  public byte[] authEncrypt(byte[] data, VirgilPrivateKey privateKey,
+                            List<VirgilPublicKey> recipients, boolean enablePadding) throws EncryptionException, SigningException {
+
+    return encrypt(new IOData(data), new SigningOptions(privateKey, SigningMode.SIGN_THEN_ENCRYPT), recipients,
+            enablePadding);
   }
 
   /**
@@ -720,6 +932,7 @@ public class VirgilCrypto {
    * @param outputStream Output stream.
    * @param privateKey   Private key to generate signatures.
    * @param recipient    Recipient's public key.
+   *
    * @throws SigningException    If crypto sign operation failed.
    * @throws EncryptionException If encryption failed.
    */
@@ -727,7 +940,39 @@ public class VirgilCrypto {
                           VirgilPrivateKey privateKey, VirgilPublicKey recipient)
           throws SigningException, EncryptionException {
 
-    authEncrypt(inputStream, streamSize, outputStream, privateKey, Collections.singletonList(recipient));
+    authEncrypt(inputStream, streamSize, outputStream, privateKey, Collections.singletonList(recipient), false);
+  }
+
+  /**
+   * Signs (with private key) Then Encrypts stream (and signature) for passed PublicKeys.
+   *
+   * <ol>
+   * <li>Generates signature depending on KeyType</li>
+   * <li>Generates random AES-256 KEY1</li>
+   * <li>Encrypts data with KEY1 using AES-256-GCM and generates signature</li>
+   * <li>Encrypts signature with KEY1 using AES-256-GCM</li>
+   * <li>Generates ephemeral key pair for each recipient</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key &amp; each ephemeral private key</li>
+   * <li>Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
+   * <li>Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
+   * </ol>
+   *
+   * @param inputStream  Input stream.
+   * @param streamSize   Input stream size.
+   * @param outputStream Output stream.
+   * @param privateKey   Private key to generate signatures.
+   * @param recipient    Recipient's public key.
+   * @param enablePadding If true, will add padding to plain text before encryption. This is recommended for data for
+   *                      which exposing length can cause security issues (e.g. text messages).
+   *
+   * @throws SigningException    If crypto sign operation failed.
+   * @throws EncryptionException If encryption failed.
+   */
+  public void authEncrypt(InputStream inputStream, int streamSize, OutputStream outputStream,
+                          VirgilPrivateKey privateKey, VirgilPublicKey recipient, boolean enablePadding)
+          throws SigningException, EncryptionException {
+
+    authEncrypt(inputStream, streamSize, outputStream, privateKey, Collections.singletonList(recipient), enablePadding);
   }
 
   /**
@@ -749,6 +994,7 @@ public class VirgilCrypto {
    * @param outputStream Output stream.
    * @param privateKey   Private key to generate signatures.
    * @param recipients   Recipients' public keys.
+   *
    * @throws SigningException    If crypto sign operation failed.
    * @throws EncryptionException If encryption failed.
    */
@@ -757,7 +1003,40 @@ public class VirgilCrypto {
           throws EncryptionException, SigningException {
 
     encrypt(new IOStream(inputStream, streamSize, outputStream),
-            new SigningOptions(privateKey, SigningMode.SIGN_THEN_ENCRYPT), recipients);
+            new SigningOptions(privateKey, SigningMode.SIGN_THEN_ENCRYPT), recipients, false);
+  }
+
+  /**
+   * Signs (with private key) Then Encrypts stream (and signature) for passed PublicKeys.
+   *
+   * <ol>
+   * <li>Generates signature depending on KeyType</li>
+   * <li>Generates random AES-256 KEY1</li>
+   * <li>Encrypts data with KEY1 using AES-256-GCM and generates signature</li>
+   * <li>Encrypts signature with KEY1 using AES-256-GCM</li>
+   * <li>Generates ephemeral key pair for each recipient</li>
+   * <li>Uses Diffie-Hellman to obtain shared secret with each recipient's public key &amp; each ephemeral private key</li>
+   * <li>Computes KDF to obtain AES-256 key from shared secret for each recipient</li>
+   * <li>Encrypts KEY1 with this key using AES-256-CBC for each recipient</li>
+   * </ol>
+   *
+   * @param inputStream  Input stream.
+   * @param streamSize   Input stream size.
+   * @param outputStream Output stream.
+   * @param privateKey   Private key to generate signatures.
+   * @param recipients   Recipients' public keys.
+   * @param enablePadding If true, will add padding to plain text before encryption. This is recommended for data for
+   *                      which exposing length can cause security issues (e.g. text messages).
+   *
+   * @throws SigningException    If crypto sign operation failed.
+   * @throws EncryptionException If encryption failed.
+   */
+  public void authEncrypt(InputStream inputStream, int streamSize, OutputStream outputStream,
+                          VirgilPrivateKey privateKey, List<VirgilPublicKey> recipients, boolean enablePadding)
+          throws EncryptionException, SigningException {
+
+    encrypt(new IOStream(inputStream, streamSize, outputStream),
+            new SigningOptions(privateKey, SigningMode.SIGN_THEN_ENCRYPT), recipients, enablePadding);
   }
 
   /**
@@ -820,11 +1099,19 @@ public class VirgilCrypto {
   }
 
   byte[] encrypt(InputOutput inputOutput, SigningOptions signingOptions,
-                 List<VirgilPublicKey> recipients) throws SigningException, EncryptionException {
+                 List<VirgilPublicKey> recipients, boolean enablePadding) throws SigningException, EncryptionException {
 
     try (Aes256Gcm aesGcm = new Aes256Gcm(); RecipientCipher cipher = new RecipientCipher()) {
       cipher.setEncryptionCipher(aesGcm);
       cipher.setRandom(this.rng);
+
+      if (enablePadding) {
+        RandomPadding padding = new RandomPadding();
+        padding.setRandom(this.rng);
+        cipher.setEncryptionPadding(padding);
+        PaddingParams paddingParams = new PaddingParams(PADDING_LENGTH, PADDING_LENGTH);
+        cipher.setPaddingParams(paddingParams);
+      }
 
       for (VirgilPublicKey recipient : recipients) {
         cipher.addKeyRecipient(recipient.getIdentifier(), recipient.getPublicKey());
@@ -843,6 +1130,9 @@ public class VirgilCrypto {
 
     try (RecipientCipher cipher = new RecipientCipher()) {
       cipher.setRandom(this.rng);
+
+      PaddingParams paddingParams = new PaddingParams(PADDING_LENGTH, PADDING_LENGTH);
+      cipher.setPaddingParams(paddingParams);
 
       cipher.startDecryptionWithKey(privateKey.getIdentifier(), privateKey.getPrivateKey(), new byte[0]);
 
@@ -872,12 +1162,12 @@ public class VirgilCrypto {
    *
    * @param data       Data to sign.
    * @param privateKey Private key used to generate signature.
+   *
    * @return The calculated signature data.
    *
    * @throws SigningException If crypto sign operation failed.
    */
-  public byte[] generateSignature(byte[] data, VirgilPrivateKey privateKey)
-      throws SigningException {
+  public byte[] generateSignature(byte[] data, VirgilPrivateKey privateKey) throws SigningException {
     if (data == null) {
       throw new NullArgumentException("data");
     }
@@ -892,6 +1182,7 @@ public class VirgilCrypto {
     }
 
     try (Signer signer = new Signer()) {
+      signer.setRandom(this.rng);
       signer.setHash(new Sha512());
 
       signer.reset();
@@ -935,7 +1226,9 @@ public class VirgilCrypto {
     }
 
     try (Signer signer = new Signer()) {
+      signer.setRandom(this.rng);
       signer.setHash(new Sha512());
+
       signer.reset();
 
       while (stream.available() > 0) {
@@ -1097,14 +1390,14 @@ public class VirgilCrypto {
       keyProvider.setupDefaults();
 
       PrivateKey privateKey = keyProvider.importPrivateKey(data);
-      KeyType keyType = getKeyType(privateKey);
+      KeyPairType keyPairType = KeyPairType.fromKey(privateKey);
 
       PublicKey publicKey = privateKey.extractPublicKey();
 
       byte[] keyId = computePublicKeyIdentifier(publicKey);
 
-      VirgilPublicKey virgilPublicKey = new VirgilPublicKey(keyId, publicKey, keyType);
-      VirgilPrivateKey virgilPrivateKey = new VirgilPrivateKey(keyId, privateKey, keyType);
+      VirgilPublicKey virgilPublicKey = new VirgilPublicKey(keyId, publicKey, keyPairType);
+      VirgilPrivateKey virgilPrivateKey = new VirgilPrivateKey(keyId, privateKey, keyPairType);
 
       return new VirgilKeyPair(virgilPublicKey, virgilPrivateKey);
     } catch (Exception e) {
@@ -1157,12 +1450,11 @@ public class VirgilCrypto {
       keyProvider.setupDefaults();
 
       PublicKey publicKey = keyProvider.importPublicKey(data);
-
-      KeyType keyType = getKeyType(publicKey);
+      KeyPairType keyPairType = KeyPairType.fromKey(publicKey);
 
       byte[] keyId = computePublicKeyIdentifier(publicKey);
 
-      return new VirgilPublicKey(keyId, publicKey, keyType);
+      return new VirgilPublicKey(keyId, publicKey, keyPairType);
     } catch (Exception e) {
       throw new CryptoException(e);
     }
@@ -1180,7 +1472,7 @@ public class VirgilCrypto {
     }
 
     return new VirgilPublicKey(privateKey.getIdentifier(),
-        privateKey.getPrivateKey().extractPublicKey(), privateKey.getKeyType());
+            privateKey.getPrivateKey().extractPublicKey(), privateKey.getKeyPairType());
   }
 
   /**
@@ -1271,8 +1563,8 @@ public class VirgilCrypto {
    *
    * @return the default key type
    */
-  public KeyType getDefaultKeyType() {
-    return defaultKeyType;
+  public KeyPairType getDefaultKeyPairType() {
+    return defaultKeyPairType;
   }
 
   private void startEncryption(RecipientCipher cipher, InputOutput inputOutput) throws SigningException {
@@ -1599,29 +1891,5 @@ public class VirgilCrypto {
     }
 
     return result;
-  }
-
-  private KeyType getKeyType(Key key) throws CryptoException {
-    switch (key.algId()) {
-      case ED25519:
-        return KeyType.ED25519;
-      case CURVE25519:
-        return KeyType.CURVE25519;
-      case SECP256R1:
-        return KeyType.SECP256R1;
-      case RSA:
-        switch (key.bitlen()) {
-          case RSA_2048_LENGTH:
-            return KeyType.RSA_2048;
-          case RSA_4096_LENGTH:
-            return KeyType.RSA_4096;
-          case RSA_8192_LENGTH:
-            return KeyType.RSA_8192;
-          default:
-            throw new CryptoException("Unsupported RSA length " + key.bitlen());
-        }
-      default:
-        throw new CryptoException("Unsupported algorithm " + key.algId().name());
-    }
   }
 }

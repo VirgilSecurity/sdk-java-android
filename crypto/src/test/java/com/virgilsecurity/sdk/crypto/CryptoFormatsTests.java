@@ -114,9 +114,9 @@ public class CryptoFormatsTests {
   public void stc_31_generateMultipleKeys() {
     // STC_31
     // generate multiple key pairs
-    for (KeyType keyType : KeyType.values()) {
+    for (KeyPairType keyPairType : KeyPairType.values()) {
       try {
-        VirgilKeyPair keyPair = this.crypto.generateKeyPair(keyType);
+        VirgilKeyPair keyPair = this.crypto.generateKeyPair(keyPairType);
         assertNotNull(keyPair);
         assertNotNull(keyPair.getPublicKey());
         assertNotNull(keyPair.getPrivateKey());
@@ -132,7 +132,7 @@ public class CryptoFormatsTests {
         byte[] exportedPublicKey = this.crypto.exportPublicKey(keyPair.getPublicKey());
         assertNotNull(exportedPublicKey);
       } catch (Exception e) {
-        fail("Failed test for key: " + keyType + ": " + e.getMessage());
+        fail("Failed test for key: " + keyPairType + ": " + e.getMessage());
       }
     }
   }

@@ -249,7 +249,7 @@ public class CryptographyExample {
 
   @SuppressWarnings("unused")
   private VirgilKeyPair specificGeneration() throws CryptoException {
-    VirgilCrypto crypto = new VirgilCrypto(KeyType.RSA_4096);
+    VirgilCrypto crypto = new VirgilCrypto(KeyPairType.RSA_4096);
     VirgilKeyPair keyPair = crypto.generateKeyPair();
 
     return keyPair;

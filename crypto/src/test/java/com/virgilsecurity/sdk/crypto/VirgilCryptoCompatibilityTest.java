@@ -222,7 +222,7 @@ public class VirgilCryptoCompatibilityTest {
   }
 
   @CryptoTest
-  public void sign_then_encrypt_should_match(VirgilCrypto crypto) throws CryptoException {
+  public void auth_encrypt_should_match(VirgilCrypto crypto) throws CryptoException {
     JsonObject json = sampleJson.getAsJsonObject("auth_encrypt");
 
     byte[] privateKey1Data = Base64.decode(json.get("private_key1").getAsString().getBytes());
@@ -247,5 +247,41 @@ public class VirgilCryptoCompatibilityTest {
     assertThrows(VerificationException.class, () -> {
       crypto.authDecrypt(cipherData, privateKey1, keyPair2.getPublicKey());
     });
+  }
+
+  @CryptoTest
+  public void auth_encrypt_PQ_should_match(VirgilCrypto crypto) throws CryptoException {
+    JsonObject json = sampleJson.getAsJsonObject("auth_encrypt_pq");
+
+    byte[] privateKeyData = Base64.decode(json.get("private_key").getAsString().getBytes());
+    byte[] publicKeyData = Base64.decode(json.get("public_key").getAsString().getBytes());
+    byte[] dataSha512 = Base64.decode(json.get("data_sha512").getAsString().getBytes());
+    byte[] cipherData = Base64.decode(json.get("cipher_data").getAsString().getBytes());
+
+    VirgilPrivateKey privateKey = crypto.importPrivateKey(privateKeyData).getPrivateKey();
+    VirgilPublicKey publicKey = crypto.importPublicKey(publicKeyData);
+
+    byte[] data = crypto.authDecrypt(cipherData, privateKey, publicKey);
+
+    byte[] dataHash512 = crypto.computeHash(data, HashAlgorithm.SHA512);
+    assertArrayEquals(dataSha512, dataHash512);
+  }
+
+  @CryptoTest
+  public void auth_encrypt_padding_should_match(VirgilCrypto crypto) throws CryptoException {
+    JsonObject json = sampleJson.getAsJsonObject("auth_encrypt_padding");
+
+    byte[] privateKeyData = Base64.decode(json.get("private_key").getAsString().getBytes());
+    byte[] publicKeyData = Base64.decode(json.get("public_key").getAsString().getBytes());
+    byte[] dataSha512 = Base64.decode(json.get("data_sha512").getAsString().getBytes());
+    byte[] cipherData = Base64.decode(json.get("cipher_data").getAsString().getBytes());
+
+    VirgilPrivateKey privateKey = crypto.importPrivateKey(privateKeyData).getPrivateKey();
+    VirgilPublicKey publicKey = crypto.importPublicKey(publicKeyData);
+
+    byte[] data = crypto.authDecrypt(cipherData, privateKey, publicKey);
+
+    byte[] dataHash512 = crypto.computeHash(data, HashAlgorithm.SHA512);
+    assertArrayEquals(dataSha512, dataHash512);
   }
 }
