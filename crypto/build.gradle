@@ -1,10 +1,13 @@
 dependencies {
-    api project(":api")
-    api project(":common")
-    api "com.google.code.gson:gson:$versions.gson"
+    // Internal dependencies
+    implementation project(":api")
+    implementation project(":common")
 
     // Virgil
     api "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"
+
+    // Gson
+    implementation "com.google.code.gson:gson:$versions.gson"
 
     // Tests
     testImplementation "org.junit.jupiter:junit-jupiter:$versions.junit"

@@ -1,2 +1,4 @@
 rootProject.name = 'Virgil SDK'
 include ':api', ':sdk', ':crypto', ':crypto-android', ':android-utils', 'examples', 'common', 'test-common'
+include 'sdk-android'
+

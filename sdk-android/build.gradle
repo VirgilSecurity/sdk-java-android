@@ -24,10 +24,10 @@ android {
 
 dependencies {
     // Internal dependencies
-    api(project(":crypto")) {
-        exclude group: 'com.virgilsecurity.crypto', module: 'foundation'
+    api(project(":sdk")) {
+        exclude group: 'com.virgilsecurity.sdk', module: 'crypto'
     }
-    api "com.virgilsecurity.crypto:foundation-android:$versions.virgilCrypto"
+    implementation project(":crypto-android")
 
     // Gson
     implementation "com.google.code.gson:gson:$versions.gson"
@@ -62,9 +62,9 @@ publishing {
             artifact androidSourcesJar
 
             pom {
-                name = 'Virgil Crypto for Android'
+                name = 'Virgil SDK for Android'
             }
-            artifactId = "crypto-android"
+            artifactId = "sdk-android"
         }
     }
 }
