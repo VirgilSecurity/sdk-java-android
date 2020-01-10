@@ -1,7 +1,7 @@
 dependencies {
     // Internal dependencies
-    implementation project(":api")
-    implementation project(":common")
+    api project(":api")
+    api project(":common")
 
     // Virgil
     api "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"

@@ -2,7 +2,7 @@ apply plugin: 'kotlin'
 
 dependencies {
     // Internal dependencies
-    implementation project(":common")
+    api project(":common")
     implementation project(":crypto")
     api project(":api")
 

@@ -58,9 +58,9 @@ android {
 
 dependencies {
     // Internal dependencies
-    implementation project(":api")
+    api project(":api")
     implementation project(":crypto-android")
-    implementation project(":common")
+    api project(":common")
 
     // Support
     implementation "com.android.support:appcompat-v7:$versions.appCompat"
