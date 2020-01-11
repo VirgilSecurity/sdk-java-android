@@ -3,8 +3,10 @@ apply plugin: 'kotlin'
 dependencies {
     // Internal dependencies
     api project(":common")
-    implementation project(":crypto")
+    api project(":crypto")
     api project(":api")
+
+    compileOnly "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$versions.kotlinVersion"
@@ -19,9 +21,7 @@ dependencies {
     testImplementation "org.mockito:mockito-junit-jupiter:$versions.mockitoJunit"
 
     testImplementation project(":test-common")
-
     testImplementation "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"
-    testImplementation "com.virgilsecurity.crypto:ratchet:$versions.virgilCrypto"
 }
 
 sourceSets.main.java.srcDirs = ["${buildDir}/generated/", "src/main/java"]

@@ -1,6 +1,4 @@
 dependencies {
     // Internal dependencies
     implementation project(":sdk")
-    implementation project(":crypto")
-    implementation project(":api")
 }

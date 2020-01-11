@@ -4,7 +4,7 @@ dependencies {
     api project(":common")
 
     // Virgil
-    api "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"
+    implementation "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"
 
     // Gson
     implementation "com.google.code.gson:gson:$versions.gson"
