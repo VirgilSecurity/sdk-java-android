@@ -34,9 +34,9 @@
 package com.virgilsecurity.sdk.cards.model;
 
 import com.google.gson.annotations.SerializedName;
+import com.virgilsecurity.common.util.Validator;
 import com.virgilsecurity.sdk.client.exceptions.SignatureNotUniqueException;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
-import com.virgilsecurity.common.util.Validator;
 
 import java.util.ArrayList;
 import java.util.Arrays;

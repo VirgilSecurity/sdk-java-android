@@ -33,10 +33,10 @@
 
 package com.virgilsecurity.sdk.storage;
 
+import com.virgilsecurity.common.exception.NullArgumentException;
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKeyExporter;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.common.exception.NullArgumentException;
 import com.virgilsecurity.sdk.utils.Tuple;
 
 import java.util.Date;

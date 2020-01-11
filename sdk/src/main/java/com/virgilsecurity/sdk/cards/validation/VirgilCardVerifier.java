@@ -33,6 +33,7 @@
 
 package com.virgilsecurity.sdk.cards.validation;
 
+import com.virgilsecurity.common.util.Validator;
 import com.virgilsecurity.sdk.cards.Card;
 import com.virgilsecurity.sdk.cards.CardSignature;
 import com.virgilsecurity.sdk.cards.SignerType;
@@ -40,7 +41,6 @@ import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilPublicKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
-import com.virgilsecurity.common.util.Validator;
 
 import java.util.ArrayList;
 import java.util.List;

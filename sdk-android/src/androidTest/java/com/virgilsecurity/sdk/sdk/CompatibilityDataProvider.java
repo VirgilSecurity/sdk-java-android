@@ -35,6 +35,7 @@ package com.virgilsecurity.sdk.sdk;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

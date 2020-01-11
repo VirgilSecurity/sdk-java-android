@@ -122,7 +122,7 @@ class HttpClient : HttpClientProtocol, Loggable {
             }
         } catch (e: IOException) {
             logger().log(Level.SEVERE, "Connection error", e)
-            throw KeyknoxServiceException(-1)
+            throw KeyknoxServiceException(-1, message = e.message)
         }
     }
 

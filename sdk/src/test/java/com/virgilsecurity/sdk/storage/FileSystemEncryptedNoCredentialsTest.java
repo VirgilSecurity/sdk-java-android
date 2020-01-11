@@ -33,25 +33,31 @@
 
 package com.virgilsecurity.sdk.storage;
 
+import com.virgilsecurity.common.exception.NullArgumentException;
 import com.virgilsecurity.common.model.Data;
 import com.virgilsecurity.sdk.crypto.VirgilCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.common.exception.NullArgumentException;
 import com.virgilsecurity.sdk.storage.exceptions.DirectoryNotExistsException;
 import com.virgilsecurity.sdk.storage.exceptions.FileSystemException;
-import com.virgilsecurity.sdk.storage.exceptions.NotADirectoryException;
 import com.virgilsecurity.sdk.storage.exceptions.NotAFileException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * FileSystemEncryptedNoCredentialsTest class.

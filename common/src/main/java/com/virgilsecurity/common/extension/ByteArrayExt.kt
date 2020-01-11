@@ -36,7 +36,6 @@ package com.virgilsecurity.common.extension
 
 import com.virgilsecurity.common.model.Data
 import java.nio.charset.Charset
-import java.util.*
 
 /**
  * ByteArrayExt class.

@@ -40,7 +40,6 @@ import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.utils.Base64Url;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
 
-import java.security.PrivateKey;
 import java.util.Date;
 import java.util.Map;
 

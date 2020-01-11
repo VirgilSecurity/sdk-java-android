@@ -33,11 +33,11 @@
 
 package com.virgilsecurity.sdk.jwt.accessProviders;
 
+import com.virgilsecurity.common.util.Validator;
 import com.virgilsecurity.sdk.jwt.Jwt;
 import com.virgilsecurity.sdk.jwt.TokenContext;
 import com.virgilsecurity.sdk.jwt.contract.AccessToken;
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider;
-import com.virgilsecurity.common.util.Validator;
 
 /**
  * The {@link CallbackJwtProvider} class is implemented for usage of get token callback mechanism

@@ -33,8 +33,16 @@
 
 package com.virgilsecurity.sdk.examples;
 
-import com.virgilsecurity.sdk.crypto.*;
-import com.virgilsecurity.sdk.crypto.exceptions.*;
+import com.virgilsecurity.sdk.crypto.KeyPairType;
+import com.virgilsecurity.sdk.crypto.VirgilCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
+import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
+import com.virgilsecurity.sdk.crypto.VirgilPublicKey;
+import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
+import com.virgilsecurity.sdk.crypto.exceptions.DecryptionException;
+import com.virgilsecurity.sdk.crypto.exceptions.EncryptionException;
+import com.virgilsecurity.sdk.crypto.exceptions.SigningException;
+import com.virgilsecurity.sdk.crypto.exceptions.VerificationException;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
 
 import java.util.ArrayList;

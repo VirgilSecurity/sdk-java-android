@@ -34,7 +34,6 @@
 package com.virgilsecurity.common.model
 
 import java.io.Serializable
-import kotlin.Pair
 
 /**
  * Represents a generic pair of two values.

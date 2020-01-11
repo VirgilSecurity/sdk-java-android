@@ -35,6 +35,7 @@ package com.virgilsecurity.sdk.utils;
 
 import com.virgilsecurity.sdk.cards.model.RawSignedModel;
 import com.virgilsecurity.sdk.common.ClassForSerialization;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

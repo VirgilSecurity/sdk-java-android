@@ -43,7 +43,6 @@ import com.virgilsecurity.sdk.crypto.exceptions.CryptoException
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.nio.charset.StandardCharsets
 import java.util.*
 

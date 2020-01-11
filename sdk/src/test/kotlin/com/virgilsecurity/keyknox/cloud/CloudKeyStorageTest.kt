@@ -207,7 +207,13 @@ class CloudKeyStorageTest {
         this.keyStorage.store(name = "first", data = firstPrivateKeyData)
 
         // Store next 98 key entries
-        this.keyStorage.store(keyEntries)
+        try {
+            this.keyStorage.store(keyEntries)
+        }
+        catch (e: Exception) {
+            e.printStackTrace();
+            fail<String>(e.message)
+        }
 
         // 99 keys exist and equals to what was stored
         assertEquals(numberOfKeys - 1, this.keyStorage.retrieveAll().size)

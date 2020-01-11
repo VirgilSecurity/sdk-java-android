@@ -48,6 +48,7 @@ import com.virgilsecurity.sdk.jwt.Jwt;
 import com.virgilsecurity.sdk.jwt.JwtGenerator;
 import com.virgilsecurity.sdk.jwt.JwtVerifier;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -58,7 +59,10 @@ import java.util.concurrent.TimeUnit;
 
 import static com.virgilsecurity.sdk.sdk.CompatibilityDataProvider.JSON;
 import static com.virgilsecurity.sdk.sdk.CompatibilityDataProvider.STRING;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * VirgilSdkAndroidTest class.

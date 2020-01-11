@@ -34,13 +34,7 @@
 package com.virgilsecurity.sdk.storage;
 
 import com.virgilsecurity.common.model.Data;
-import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.sdk.storage.exceptions.DirectoryNotExistsException;
-import com.virgilsecurity.sdk.storage.exceptions.FileSystemException;
-import com.virgilsecurity.sdk.storage.exceptions.NotADirectoryException;
-import com.virgilsecurity.sdk.storage.exceptions.NotAFileException;
 
-import java.io.IOException;
 import java.util.Set;
 
 public interface FileSystem {

@@ -35,8 +35,17 @@ package com.virgilsecurity.sdk.crypto;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.virgilsecurity.crypto.foundation.*;
+import com.virgilsecurity.crypto.foundation.Base64;
+import com.virgilsecurity.crypto.foundation.CtrDrbg;
+import com.virgilsecurity.crypto.foundation.KeyAlg;
+import com.virgilsecurity.crypto.foundation.KeyAlgFactory;
+import com.virgilsecurity.crypto.foundation.KeyAsn1Serializer;
+import com.virgilsecurity.crypto.foundation.RawPublicKey;
+import com.virgilsecurity.crypto.foundation.Sha256;
+import com.virgilsecurity.crypto.foundation.Sha512;
+import com.virgilsecurity.crypto.foundation.Signer;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +54,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Unit tests which verify cross-platform compatibility.
