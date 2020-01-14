@@ -154,18 +154,6 @@ subprojects {
     apply plugin: 'checkstyle'
     apply from: '../tests-verbal-output.gradle'
 
-    task loadPublishProperties {
-        if (new File("${rootProject.projectDir.path}/publish.properties").exists()) {
-            Properties properties = new Properties()
-            properties.load(new FileInputStream("${rootProject.projectDir.path}/publish.properties"))
-            properties.entrySet().forEach {
-                project.ext.setProperty((String) it.key, (String) it.value)
-            }
-        }
-    }
-
-    publish.dependsOn(loadPublishProperties)
-
     def authentication_username = getGradleOrSystemProperty('authentication_username', project)
     def authentication_password = getGradleOrSystemProperty('authentication_password', project)
 
