@@ -74,11 +74,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class VirgilCryptoTest {
 
-  @Test
-  public void dsadsad() {
-    assertEquals(4, 2 + 2);
-  }
-
   private static final String TEXT = "This text is used for unit tests";
   private static final byte[] INVALID_SIGNATURE = new byte[] {48, 88, 48, 13, 6, 9, 96, -122, 72,
       1, 101, 3, 4, 2, 2, 5, 0, 4, 71, 48, 69, 2, 33, 0, -108, -6, -82, 29, -38, 103, -13, 42, 101,
@@ -111,7 +106,7 @@ public class VirgilCryptoTest {
     values.remove(KeyPairType.RSA_2048);
     values.remove(KeyPairType.RSA_4096);
     values.remove(KeyPairType.RSA_8192);
-    values.remove(KeyPairType.SECP256R1); // FIXME check whether this key type has random signatures with Sergey
+    values.remove(KeyPairType.SECP256R1);
     values.remove(KeyPairType.CURVE25519_ROUND5_ED25519_FALCON);
     values.remove(KeyPairType.CURVE25519);
 
@@ -161,20 +156,6 @@ public class VirgilCryptoTest {
 
       assertArrayEquals(TEXT.getBytes(), decrypted);
     }
-  }
-
-  @CryptoTest
-  public void decrypt_verbose_error(VirgilCrypto crypto) throws VirgilException {
-    VirgilKeyPair keyPair = crypto.generateKeyPair();
-    byte[] encrypted = crypto.encrypt(TEXT.getBytes(), keyPair.getPublicKey());
-    byte[] decrypted = crypto.decrypt(encrypted, keyPair.getPrivateKey());
-    assertArrayEquals(TEXT.getBytes(), decrypted);
-
-    VirgilKeyPair keyPairWrong = crypto.generateKeyPair();
-
-    String exceptionMessage = assertThrows(DecryptionException.class, () -> {
-      crypto.decrypt(encrypted, keyPairWrong.getPrivateKey());
-    }).getMessage();
   }
 
   @CryptoTest
@@ -391,14 +372,12 @@ public class VirgilCryptoTest {
   public void sign_stream_compareToByteArraySign(VirgilCrypto crypto) throws CryptoException {
     VirgilKeyPair keyPair = crypto.generateKeyPair();
     byte[] signature = crypto.generateSignature(TEXT.getBytes(), keyPair.getPrivateKey());
-//    byte[] signature2 = crypto.generateSignature(TEXT.getBytes(), keyPair.getPrivateKey());
     byte[] streamSignature = crypto.generateSignature(new ByteArrayInputStream(TEXT.getBytes()),
         keyPair.getPrivateKey());
 
     assertNotNull(signature);
     assertNotNull(streamSignature);
     assertArrayEquals(signature, streamSignature);
-//    assertArrayEquals(signature, signature2);
   }
 
   @SignCryptoTest

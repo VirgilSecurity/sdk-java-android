@@ -193,8 +193,9 @@ public enum KeyPairType {
   }
 
   /**
-   *  // TODO add a doc
-   * @return
+   * Checks whether key is compound.
+   *
+   * @return *true* if the key is compound, *false* otherwise.
    */
   boolean isCompound() {
     switch (this) {
@@ -214,9 +215,11 @@ public enum KeyPairType {
   }
 
   /**
-   * // TODO add a doc
+   * Gets signer keys algorithm Ids.
    *
-   * @return
+   * @return {@link Pair} of {@link AlgId}s for compound keys.
+   *
+   * @throws CryptoException if key is not compound.
    */
   Pair<AlgId, AlgId> getSignerKeysAlgIds() throws CryptoException {
     switch (this) {
@@ -237,9 +240,11 @@ public enum KeyPairType {
   }
 
   /**
-   * // TODO add a doc
+   * Gets cipher keys algorithm Ids.
    *
-   * @return
+   * @return {@link Pair} of {@link AlgId}s for compound keys.
+   *
+   * @throws CryptoException if key is not compound.
    */
   Pair<AlgId, AlgId> getCipherKeysAlgIds() throws CryptoException {
     switch (this) {
