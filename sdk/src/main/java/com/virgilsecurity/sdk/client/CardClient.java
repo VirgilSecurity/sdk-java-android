@@ -42,8 +42,6 @@ import java.util.List;
 
 /**
  * Interface representing operations with Virgil Cards service.
- *
- * @author Andrii Iakovenko
  */
 public interface CardClient {
 

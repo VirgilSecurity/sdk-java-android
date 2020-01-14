@@ -33,7 +33,14 @@
 
 package com.virgilsecurity.sdk.utils;
 
-import com.virgilsecurity.crypto.foundation.*;
+import com.virgilsecurity.crypto.foundation.CtrDrbg;
+import com.virgilsecurity.crypto.foundation.KeyAlg;
+import com.virgilsecurity.crypto.foundation.KeyAlgFactory;
+import com.virgilsecurity.crypto.foundation.KeyAsn1Serializer;
+import com.virgilsecurity.crypto.foundation.PrivateKey;
+import com.virgilsecurity.crypto.foundation.PublicKey;
+import com.virgilsecurity.crypto.foundation.RawPrivateKey;
+import com.virgilsecurity.crypto.foundation.RawPublicKey;
 import com.virgilsecurity.sdk.cards.Card;
 import com.virgilsecurity.sdk.cards.CardSignature;
 import com.virgilsecurity.sdk.cards.SignerType;

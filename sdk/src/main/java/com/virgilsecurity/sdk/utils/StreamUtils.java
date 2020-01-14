@@ -39,8 +39,6 @@ import java.io.OutputStream;
 
 /**
  * Operations on stream.
- *
- * @author Andrii Iakovenko
  */
 public class StreamUtils {
 

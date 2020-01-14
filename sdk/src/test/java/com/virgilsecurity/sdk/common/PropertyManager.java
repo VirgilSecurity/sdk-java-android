@@ -38,127 +38,69 @@ import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
 import com.virgilsecurity.sdk.crypto.VirgilPublicKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import com.virgilsecurity.testcommon.property.EnvPropertyReader;
+import com.virgilsecurity.testcommon.utils.PropertyUtils;
 
 public class PropertyManager {
 
-  private VirgilCrypto crypto;
-  private String accountId;
-  private String appId;
-  private VirgilPrivateKey apiPrivateKey;
-  private VirgilPublicKey apiPublicKey;
-  private String apiPublicKeyId;
-  private String cardsServiceId;
-  private VirgilPublicKey cardsServicePublicKey;
+  private static final String ENVIRONMENT_SYS_VAR = "environment";
+  private static final String APP_ID = "APP_ID";
+  private static final String APP_PRIVATE_KEY = "APP_PRIVATE_KEY";
+  private static final String APP_PUBLIC_KEY = "APP_PUBLIC_KEY";
+  private static final String APP_PUBLIC_KEY_ID = "APP_PUBLIC_KEY_ID";
+  private static final String CARDS_SERVICE_ADDRESS = "CARDS_SERVICE_ADDRESS";
+
+  private final EnvPropertyReader propertyReader;
+  private final VirgilCrypto crypto;
 
   /**
    * Create new instance of {@link PropertyManager}.
    */
   public PropertyManager() {
-    super();
+    String environment = PropertyUtils.getSystemProperty(ENVIRONMENT_SYS_VAR);
+
+    if (environment != null) {
+      this.propertyReader = new EnvPropertyReader.Builder()
+              .environment(EnvPropertyReader.Environment.fromType(environment))
+              .isDefaultSubmodule(true)
+              .build();
+    } else {
+      this.propertyReader = new EnvPropertyReader.Builder()
+              .isDefaultSubmodule(true)
+              .build();
+    }
+
     this.crypto = new VirgilCrypto();
   }
 
-  public String getAccountId() {
-    if (this.accountId == null) {
-      this.accountId = getPropertyByName("ACCOUNT_ID");
-      if (this.accountId == null) {
-        fail("Account ID is not defined");
-      }
-    }
-    return this.accountId;
-  }
-
-  public VirgilPrivateKey getApiPrivateKey() {
-    if (this.apiPrivateKey == null) {
-      try {
-        this.apiPrivateKey = this.crypto
-            .importPrivateKey(ConvertionUtils.base64ToBytes(getPropertyByName("API_PRIVATE_KEY")))
-            .getPrivateKey();
-      } catch (CryptoException e) {
-        fail("API Private Key is not defined");
-      }
-    }
-    return this.apiPrivateKey;
-  }
-
-  public VirgilPublicKey getApiPublicKey() {
-    if (this.apiPublicKey == null) {
-      try {
-        if (StringUtils.isNotBlank(getPropertyByName("API_PUBLIC_KEY"))) {
-          this.apiPublicKey = this.crypto
-              .importPublicKey(ConvertionUtils.base64ToBytes(getPropertyByName("API_PUBLIC_KEY")));
-        } else {
-          this.apiPublicKey = this.crypto.extractPublicKey(getApiPrivateKey());
-        }
-      } catch (CryptoException e) {
-        fail("API Public Key is not defined");
-      }
-    }
-    return this.apiPublicKey;
-  }
-
-  public String getApiPublicKeyAsString() {
-    return getPropertyByName("API_PUBLIC_KEY");
-  }
-
-  public String getApiPublicKeyId() {
-    if (this.apiPublicKeyId == null) {
-      this.apiPublicKeyId = getPropertyByName("API_PUBLIC_KEY_ID");
-      if (this.apiPublicKeyId == null) {
-        fail("API Public Key ID is not defined");
-      }
-    }
-    return this.apiPublicKeyId;
-  }
-
   public String getAppId() {
-    if (this.appId == null) {
-      this.appId = getPropertyByName("APP_ID");
-      if (this.appId == null) {
-        fail("App ID is not defined");
-      }
-    }
-    return this.appId;
+    return propertyReader.getProperty(APP_ID);
   }
 
-  public String getCardsServiceId() {
-    if (this.cardsServiceId == null) {
-      this.cardsServiceId = getPropertyByName("CARDS_SERVICE_ID");
-      if (this.cardsServiceId == null) {
-        fail("Cards Service ID is not defined");
-      }
+  public VirgilPrivateKey getAppPrivateKey() {
+    String privateKeyString = propertyReader.getProperty(APP_PRIVATE_KEY);
+    try {
+      return crypto.importPrivateKey(ConvertionUtils.base64ToBytes(privateKeyString)).getPrivateKey();
+    } catch (CryptoException e) {
+      throw new IllegalStateException(e);
     }
-    return this.cardsServiceId;
   }
 
-  public VirgilPublicKey getCardsServicePublicKey() {
-    if (this.cardsServicePublicKey == null) {
-      try {
-        this.cardsServicePublicKey = this.crypto.importPublicKey(
-            ConvertionUtils.base64ToBytes(getPropertyByName("CARDS_SERVICE_PUBLIC_KEY")));
-      } catch (CryptoException e) {
-        fail("Cards Service Public Key is not defined");
-      }
+  public VirgilPublicKey getAppPublicKey() {
+    String publicKeyString = propertyReader.getProperty(APP_PUBLIC_KEY);
+
+    try {
+      return crypto.importPublicKey(ConvertionUtils.base64ToBytes(publicKeyString));
+    } catch (CryptoException e) {
+      throw new IllegalStateException(e);
     }
-    return this.cardsServicePublicKey;
+  }
+
+  public String getAppPublicKeyId() {
+    return propertyReader.getProperty(APP_PUBLIC_KEY_ID);
   }
 
   public String getCardsServiceUrl() {
-    return getPropertyByName("CARDS_SERVICE_ADDRESS");
+    return propertyReader.getProperty(CARDS_SERVICE_ADDRESS);
   }
-
-  public String getPropertyByName(String propertyName) {
-    String result = System.getProperty(propertyName);
-    if (StringUtils.isBlank(result)) {
-      result = System.getenv(propertyName);
-    }
-    if (StringUtils.isBlank(result)) {
-      return null;
-    }
-    return result;
-  }
-
 }

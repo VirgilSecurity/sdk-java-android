@@ -33,26 +33,28 @@
 
 package com.virgilsecurity.sdk.examples;
 
+import com.virgilsecurity.common.util.Base64;
 import com.virgilsecurity.sdk.cards.Card;
 import com.virgilsecurity.sdk.cards.CardManager;
 import com.virgilsecurity.sdk.cards.model.RawSignedModel;
 import com.virgilsecurity.sdk.cards.validation.VirgilCardVerifier;
 import com.virgilsecurity.sdk.client.exceptions.VirgilServiceException;
 import com.virgilsecurity.sdk.common.TimeSpan;
-import com.virgilsecurity.sdk.crypto.*;
+import com.virgilsecurity.sdk.crypto.VirgilAccessTokenSigner;
+import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
+import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.jwt.JwtGenerator;
 import com.virgilsecurity.sdk.jwt.TokenContext;
 import com.virgilsecurity.sdk.jwt.accessProviders.CallbackJwtProvider;
-import com.virgilsecurity.sdk.jwt.accessProviders.CallbackJwtProvider.GetTokenCallback;
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider;
-import com.virgilsecurity.common.util.Base64;
 
-import java.security.PrivateKey;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Andrii Iakovenko
+ * Class GenerateCardExample.
  */
 public class GenerateCardExample {
 
@@ -106,7 +108,7 @@ public class GenerateCardExample {
 
     VirgilCrypto virgilCrypto = new VirgilCrypto();
     // Import API Private key from string
-    VirgilPrivateKey apiKey = virgilCrypto.importPrivateKey(Base64.decode(apiKeyBase64)).getPrivateKey();
+    VirgilPrivateKey apiKey = virgilCrypto.importPrivateKey(Base64.decode(apiKeyBase64.getBytes())).getPrivateKey();
     VirgilAccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner(virgilCrypto);
     JwtGenerator jwtGenerator = new JwtGenerator(appId, apiKey, apiKeyId,
         TimeSpan.fromTime(1, TimeUnit.DAYS), accessTokenSigner);

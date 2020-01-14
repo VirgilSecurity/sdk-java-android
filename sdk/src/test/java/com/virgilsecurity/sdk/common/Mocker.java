@@ -36,7 +36,12 @@ package com.virgilsecurity.sdk.common;
 import com.virgilsecurity.sdk.cards.ModelSigner;
 import com.virgilsecurity.sdk.cards.model.RawCardContent;
 import com.virgilsecurity.sdk.cards.model.RawSignedModel;
-import com.virgilsecurity.sdk.crypto.*;
+import com.virgilsecurity.sdk.crypto.VirgilAccessTokenSigner;
+import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
+import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
+import com.virgilsecurity.sdk.crypto.VirgilPublicKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.jwt.Jwt;
 import com.virgilsecurity.sdk.jwt.JwtGenerator;
@@ -64,7 +69,7 @@ public class Mocker extends PropertyManager {
     this.crypto = new VirgilCrypto();
     VirgilAccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner();
 
-    VirgilPrivateKey privateKey = getApiPrivateKey();
+    VirgilPrivateKey privateKey = getAppPrivateKey();
     VirgilPrivateKey privateKeyFake = null;
 
     try {
@@ -74,20 +79,20 @@ public class Mocker extends PropertyManager {
       fail("Mocker -> 'FAKE_PRIVATE_KEY_BASE64' seems to has wrong format");
     }
 
-    jwtGenerator = initJwtGenerator(getAppId(), privateKey, getApiPublicKeyId(),
+    jwtGenerator = initJwtGenerator(getAppId(), privateKey, getAppPublicKeyId(),
         TimeSpan.fromTime(1, TimeUnit.HOURS), accessTokenSigner);
 
-    jwtGeneratorSevenSeconds = initJwtGenerator(getAppId(), privateKey, getApiPublicKeyId(),
+    jwtGeneratorSevenSeconds = initJwtGenerator(getAppId(), privateKey, getAppPublicKeyId(),
         TimeSpan.fromTime(7, TimeUnit.SECONDS), accessTokenSigner);
 
-    jwtGeneratorFake = initJwtGenerator(getAppId(), privateKeyFake, getApiPublicKeyId(),
+    jwtGeneratorFake = initJwtGenerator(getAppId(), privateKeyFake, getAppPublicKeyId(),
         TimeSpan.fromTime(1, TimeUnit.HOURS), accessTokenSigner);
 
     TimeSpan timeSpanExpired = TimeSpan.fromTime(1, TimeUnit.SECONDS);
-    jwtGeneratorExpired = initJwtGenerator(getAppId(), privateKey, getApiPublicKeyId(),
+    jwtGeneratorExpired = initJwtGenerator(getAppId(), privateKey, getAppPublicKeyId(),
         timeSpanExpired, accessTokenSigner);
 
-    verifier = new JwtVerifier(getApiPublicKey(), getApiPublicKeyId(), accessTokenSigner);
+    verifier = new JwtVerifier(getAppPublicKey(), getAppPublicKeyId(), accessTokenSigner);
   }
 
   public Jwt generateAccessToken(String identity) throws CryptoException {
@@ -196,8 +201,8 @@ public class Mocker extends PropertyManager {
   }
 
   public JwtGenerator getJwtGeneratorForSeconds(int seconds) {
-    return jwtGeneratorSevenSeconds = initJwtGenerator(getAppId(), getApiPrivateKey(),
-        getApiPublicKeyId(), TimeSpan.fromTime(seconds, TimeUnit.SECONDS),
+    return jwtGeneratorSevenSeconds = initJwtGenerator(getAppId(), getAppPrivateKey(),
+        getAppPublicKeyId(), TimeSpan.fromTime(seconds, TimeUnit.SECONDS),
         new VirgilAccessTokenSigner());
   }
 

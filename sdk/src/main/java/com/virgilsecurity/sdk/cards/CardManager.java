@@ -33,6 +33,7 @@
 
 package com.virgilsecurity.sdk.cards;
 
+import com.virgilsecurity.common.util.Validator;
 import com.virgilsecurity.sdk.cards.model.RawCardContent;
 import com.virgilsecurity.sdk.cards.model.RawSignature;
 import com.virgilsecurity.sdk.cards.model.RawSignedModel;
@@ -48,12 +49,19 @@ import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.jwt.TokenContext;
 import com.virgilsecurity.sdk.jwt.contract.AccessToken;
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider;
-import com.virgilsecurity.sdk.utils.*;
+import com.virgilsecurity.sdk.utils.CardUtils;
+import com.virgilsecurity.sdk.utils.ConvertionUtils;
+import com.virgilsecurity.sdk.utils.StringUtils;
+import com.virgilsecurity.sdk.utils.Tuple;
 
 import java.net.HttpURLConnection;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -104,10 +112,10 @@ public class CardManager {
    * @param cardVerifier        The card verifier.
    */
   public CardManager(VirgilCardCrypto crypto, AccessTokenProvider accessTokenProvider, CardVerifier cardVerifier) {
-    Validator.checkNullAgrument(crypto, "CardManager -> 'crypto' should not be null");
-    Validator.checkNullAgrument(accessTokenProvider,
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(crypto, "CardManager -> 'crypto' should not be null");
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(accessTokenProvider,
         "CardManager -> 'accessTokenProvider' should not be null");
-    Validator.checkNullAgrument(cardVerifier, "CardManager -> 'cardVerifier' should not be null");
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(cardVerifier, "CardManager -> 'cardVerifier' should not be null");
 
     this.crypto = crypto;
     this.accessTokenProvider = accessTokenProvider;
@@ -127,11 +135,11 @@ public class CardManager {
    */
   public CardManager(VirgilCardCrypto crypto, AccessTokenProvider accessTokenProvider,
                      CardVerifier cardVerifier, VirgilCardClient cardClient) {
-    Validator.checkNullAgrument(crypto, "CardManager -> 'crypto' should not be null");
-    Validator.checkNullAgrument(accessTokenProvider,
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(crypto, "CardManager -> 'crypto' should not be null");
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(accessTokenProvider,
         "CardManager -> 'accessTokenProvider' should not be null");
-    Validator.checkNullAgrument(cardVerifier, "CardManager -> 'cardVerifier' should not be null");
-    Validator.checkNullAgrument(cardClient, "CardManager -> 'cardClient' should not be null");
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(cardVerifier, "CardManager -> 'cardVerifier' should not be null");
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(cardClient, "CardManager -> 'cardClient' should not be null");
 
     this.crypto = crypto;
     this.accessTokenProvider = accessTokenProvider;
@@ -155,12 +163,12 @@ public class CardManager {
   public CardManager(VirgilCardCrypto crypto, AccessTokenProvider accessTokenProvider,
                      CardVerifier cardVerifier, VirgilCardClient cardClient,
                      SignCallback signCallback, boolean retryOnUnauthorized) {
-    Validator.checkNullAgrument(crypto, "CardManager -> 'crypto' should not be null");
-    Validator.checkNullAgrument(accessTokenProvider,
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(crypto, "CardManager -> 'crypto' should not be null");
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(accessTokenProvider,
         "CardManager -> 'accessTokenProvider' should not be null");
-    Validator.checkNullAgrument(cardVerifier, "CardManager -> 'cardVerifier' should not be null");
-    Validator.checkNullAgrument(cardClient, "CardManager -> 'cardClient' should not be null");
-    Validator.checkNullAgrument(signCallback, "CardManager -> 'signCallback' should not be null");
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(cardVerifier, "CardManager -> 'cardVerifier' should not be null");
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(cardClient, "CardManager -> 'cardClient' should not be null");
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(signCallback, "CardManager -> 'signCallback' should not be null");
 
     this.crypto = crypto;
     this.accessTokenProvider = accessTokenProvider;
@@ -182,11 +190,11 @@ public class CardManager {
    */
   public CardManager(VirgilCardCrypto crypto, AccessTokenProvider accessTokenProvider,
                      CardVerifier cardVerifier, SignCallback signCallback) {
-    Validator.checkNullAgrument(crypto, "CardManager -> 'crypto' should not be null");
-    Validator.checkNullAgrument(accessTokenProvider,
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(crypto, "CardManager -> 'crypto' should not be null");
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(accessTokenProvider,
         "CardManager -> 'accessTokenProvider' should not be null");
-    Validator.checkNullAgrument(cardVerifier, "CardManager -> 'cardVerifier' should not be null");
-    Validator.checkNullAgrument(signCallback, "CardManager -> 'signCallback' should not be null");
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(cardVerifier, "CardManager -> 'cardVerifier' should not be null");
+    com.virgilsecurity.common.util.Validator.checkNullAgrument(signCallback, "CardManager -> 'signCallback' should not be null");
 
     this.crypto = crypto;
     this.accessTokenProvider = accessTokenProvider;

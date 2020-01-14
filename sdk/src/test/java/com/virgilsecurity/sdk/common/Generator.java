@@ -36,7 +36,11 @@ package com.virgilsecurity.sdk.common;
 import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 public class Generator {
   private static final String IDENTITY = "TEST-java-v5-";

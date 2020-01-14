@@ -52,11 +52,6 @@ Use this packages for Java projects:
 <dependencies>
     <dependency>
         <groupId>com.virgilsecurity.sdk</groupId>
-        <artifactId>crypto</artifactId>
-        <version><latest-version></version>
-    </dependency>
-    <dependency>
-        <groupId>com.virgilsecurity.sdk</groupId>
         <artifactId>sdk</artifactId>
         <version><latest-version></version>
     </dependency>
@@ -76,8 +71,7 @@ repositories {
 Use this packages for Android projects:
 
 ```
-    implementation "com.virgilsecurity.sdk:crypto-android:<latest-version>@aar'
-    implementation "com.virgilsecurity.sdk:sdk:<latest-version>"
+    implementation "com.virgilsecurity.sdk:sdk-android:<latest-version>"
 ```
 
 The **\<latest-version>** of the SDK can be found in the [Maven Central Repository](https://mvnrepository.com/artifact/com.virgilsecurity.sdk/sdk)  or in the header of current readme.

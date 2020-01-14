@@ -33,11 +33,11 @@
 
 package com.virgilsecurity.sdk.jwt.accessProviders;
 
+import com.virgilsecurity.common.util.Validator;
 import com.virgilsecurity.sdk.jwt.Jwt;
 import com.virgilsecurity.sdk.jwt.TokenContext;
 import com.virgilsecurity.sdk.jwt.contract.AccessToken;
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider;
-import com.virgilsecurity.sdk.utils.Validator;
 
 /**
  * The {@link ConstAccessTokenProvider} class is implemented for usage of constant Jwt stored as

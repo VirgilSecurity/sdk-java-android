@@ -36,7 +36,7 @@ buildscript {
     ext.versions = [
 
             // Virgil
-            virgilCrypto      : '0.10.2',
+            virgilCrypto      : '0.12.0',
 
             // Common
             commonsLang       : '3.9',
@@ -51,7 +51,7 @@ buildscript {
             androidx          : '1.1.1',
 
             // Kotlin
-            kotlinVersion     : '1.3.50',
+            kotlinVersion     : '1.3.61',
             coroutines        : '1.3.0-M1',
 
 
@@ -64,14 +64,14 @@ buildscript {
             mockito           : '3.0.0',
             mockitoJunit      : '3.0.0',
             mannodermaus      : '1.5.0.0',
-            mannodermausJunit5:'1.1.0',
+            mannodermausJunit5: '1.1.0',
 
             // Android Tests
             junitAndroid      : '4.12',
 
             // Publish
             mavenPublishPlugin: '3.6.2',
-            dokka             : '0.9.17'
+            dokka             : '0.10.0'
     ]
 
     repositories {
@@ -84,7 +84,9 @@ buildscript {
         classpath "com.android.tools.build:gradle:$versions.gradle"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:$versions.mannodermaus"
         classpath "digital.wup:android-maven-publish:$versions.mavenPublishPlugin"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlinVersion" }
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlinVersion"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:$versions.dokka"
+    }
 }
 
 plugins {
@@ -95,25 +97,86 @@ plugins {
 allprojects {
     repositories {
         mavenCentral()
-        maven {
-            url 'https://oss.sonatype.org/content/repositories/snapshots'
-        }
         google()
         jcenter()
     }
 }
 
-def authentication_username = hasProperty('authentication_username') ? authentication_username : System.getenv('authentication_username')
-def authentication_password = hasProperty('authentication_password') ? authentication_password : System.getenv('authentication_password')
+/**
+ * Gets property from system properties.
+ *
+ * @param name Of System property to get.
+ *
+ * @return System property or null if not found.
+ */
+def static getSystemProperty(String name) {
+    def property
+    if (System.getProperty(name) != null) {
+        property = System.getProperty(name)
+    } else {
+        property = System.getenv(name)
+    }
+
+    return property
+}
+
+/**
+ * Gets property from both - gradle properties and system properties.
+ *
+ * @param name Of property to get.
+ */
+def getGradleOrSystemProperty(String name, Project project) {
+    def property
+
+    if (project.hasProperty(name)) {
+        property = project.getProperty(name)
+    } else {
+        property = getSystemProperty(name)
+    }
+
+    return property
+}
+
+// Artifacts packages
+final String BASE_VIRGIL_PACKAGE = 'com.virgilsecurity'
+final String SDK_PACKAGE = BASE_VIRGIL_PACKAGE + '.sdk'
+
+// Packages versions
+final String SDK_VERSION = '6.1.0'
+final String TEST_COMMON_VERSION = '0.1'
 
 subprojects {
-    group 'com.virgilsecurity.sdk'
-    version '6.0'
+    group SDK_PACKAGE
+    version SDK_VERSION
 
+    apply plugin: 'org.jetbrains.dokka'
     apply plugin: 'maven-publish'
     apply plugin: 'checkstyle'
+    apply from: '../tests-verbal-output.gradle'
 
-    def isAndroid = (it.name == 'crypto-android' || it.name == 'android-utils')
+    task loadPublishProperties {
+        if (new File("${rootProject.projectDir.path}/publish.properties").exists()) {
+            Properties properties = new Properties()
+            properties.load(new FileInputStream("${rootProject.projectDir.path}/publish.properties"))
+            properties.entrySet().forEach {
+                project.ext.setProperty((String) it.key, (String) it.value)
+            }
+        }
+    }
+
+    publish.dependsOn(loadPublishProperties)
+
+    def authentication_username = getGradleOrSystemProperty('authentication_username', project)
+    def authentication_password = getGradleOrSystemProperty('authentication_password', project)
+
+    def isAndroid = (it.name == 'crypto-android'
+            || it.name == 'android-utils'
+            || it.name == 'sdk-android')
+
+    if (it.name == 'test-common') {
+        group BASE_VIRGIL_PACKAGE
+        version TEST_COMMON_VERSION
+    }
 
     if (!isAndroid) {
         apply plugin: 'java-library'
@@ -137,14 +200,19 @@ subprojects {
 
         apply plugin: 'signing'
 
+        dokka {
+            outputFormat = 'html'
+            outputDirectory = "$buildDir/javadoc"
+        }
+
         if (!isAndroid) {
             task sourcesJar(type: Jar) {
-                from sourceSets.main.allJava
+                from sourceSets.main.allSource
                 archiveClassifier = 'sources'
             }
 
-            task javadocJar(type: Jar) {
-                from javadoc
+            task javadocJar(type: Jar, dependsOn: 'dokka') {
+                from "$buildDir/javadoc"
                 archiveClassifier = 'javadoc'
             }
         }
@@ -211,8 +279,8 @@ subprojects {
         toolVersion '7.8.1'
         configFile rootProject.file('config/checkstyle/checkstyle.xml')
         configProperties = [
-                'checkstyle.header.file' : rootProject.file('config/checkstyle/java.header'),
-                'checkstyle.javadoc.severity' : 'error'
+                'checkstyle.header.file'     : rootProject.file('config/checkstyle/java.header'),
+                'checkstyle.javadoc.severity': 'error'
         ]
         ignoreFailures true
     }

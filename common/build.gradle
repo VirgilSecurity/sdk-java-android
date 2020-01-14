@@ -13,7 +13,7 @@ dependencies {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            from components.java
+            from components.kotlin
             pom {
                 name = 'Virgil SDK'
             }

@@ -34,13 +34,7 @@
 package com.virgilsecurity.sdk.storage;
 
 import com.virgilsecurity.common.model.Data;
-import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.sdk.storage.exceptions.DirectoryNotExistsException;
-import com.virgilsecurity.sdk.storage.exceptions.FileSystemException;
-import com.virgilsecurity.sdk.storage.exceptions.NotADirectoryException;
-import com.virgilsecurity.sdk.storage.exceptions.NotAFileException;
 
-import java.io.IOException;
 import java.util.Set;
 
 public interface FileSystem {
@@ -48,14 +42,14 @@ public interface FileSystem {
     /**
      * Delete all in root directory.
      */
-    boolean delete() throws FileSystemException;
+    boolean delete();
 
     /**
      * Delete data file in root directory.
      *
      * @param filename File name.
      */
-    boolean delete(String filename) throws NotAFileException;
+    boolean delete(String filename);
 
     /**
      * Delete data file.
@@ -63,14 +57,14 @@ public interface FileSystem {
      * @param filename   File name.
      * @param path Path to a directory with a file.
      */
-    boolean delete(String filename, String path) throws NotAFileException;
+    boolean delete(String filename, String path);
 
     /**
      * Delete a directory by the path.
      *
      * @param path Path to a directory.
      */
-    boolean deleteDirectory(String path) throws NotADirectoryException;
+    boolean deleteDirectory(String path);
 
     /**
      * Checks whether file exists in root directory.
@@ -78,7 +72,7 @@ public interface FileSystem {
      * @param filename Name of file.
      * @return {@code true} if file exists, otherwise {@code false}.
      */
-    boolean exists(String filename) throws NotAFileException;
+    boolean exists(String filename) throws Exception;
 
     /**
      * Checks whether subdirectory exists.
@@ -86,7 +80,7 @@ public interface FileSystem {
      * @param path path to the directory.
      * @return {@code true} if subdirectory exists, otherwise {@code false}.
      */
-    boolean directoryExists(String path) throws NotADirectoryException;
+    boolean directoryExists(String path) throws Exception;
 
     /**
      * Checks whether file exists.
@@ -95,7 +89,7 @@ public interface FileSystem {
      * @param path path to a directory.
      * @return {@code true} if file exists, otherwise {@code false}.
      */
-    boolean exists(String filename, String path) throws NotAFileException;
+    boolean exists(String filename, String path) throws Exception;
 
     /**
      * Returns file names in root directory.
@@ -110,7 +104,7 @@ public interface FileSystem {
      * @param path path to a directory.
      * @return Names of files in a directory.
      */
-    Set<String> listFiles(String path) throws DirectoryNotExistsException, NotADirectoryException;
+    Set<String> listFiles(String path) throws Exception;
 
     /**
      * Read data from file stored in root directory.
@@ -118,7 +112,7 @@ public interface FileSystem {
      * @param filename File name.
      * @return Data.
      */
-    Data read(String filename) throws IOException, CryptoException;
+    Data read(String filename) throws Exception;
 
     /**
      * Read data from a file which is stored in subdirectory.
@@ -126,7 +120,7 @@ public interface FileSystem {
      * @param path Path to subdirectory.
      * @return Data.
      */
-    Data read(String filename, String path) throws IOException, CryptoException;
+    Data read(String filename, String path) throws Exception;
 
     /**
      * Write data to file in root directory.
@@ -135,7 +129,7 @@ public interface FileSystem {
      * @param data Data to write.
      * @param filename File name.
      */
-    void write(Data data, String filename) throws IOException, CryptoException;
+    void write(Data data, String filename) throws Exception;
 
     /**
      * Write data to a file system.
@@ -143,9 +137,6 @@ public interface FileSystem {
      * @param data   Data to write.
      * @param filename   File name.
      * @param path Path to a directory with a file.
-     * @throws IOException
-     * @throws CryptoException
      */
-    void write(Data data, String filename, String path) throws IOException, CryptoException;
-
+    void write(Data data, String filename, String path) throws Exception;
 }

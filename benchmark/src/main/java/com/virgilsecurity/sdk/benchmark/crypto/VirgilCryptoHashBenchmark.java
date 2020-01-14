@@ -51,9 +51,6 @@ import org.openjdk.jmh.annotations.State;
 
 /**
  * Benchmark for VirgilCrypto hash operations.
- * 
- * @author Andrii Iakovenko
- *
  */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)

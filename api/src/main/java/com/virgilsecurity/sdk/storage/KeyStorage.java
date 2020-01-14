@@ -33,15 +33,10 @@
 
 package com.virgilsecurity.sdk.storage;
 
-import com.virgilsecurity.sdk.crypto.exceptions.KeyEntryAlreadyExistsException;
-import com.virgilsecurity.sdk.crypto.exceptions.KeyEntryNotFoundException;
-
 import java.util.Set;
 
 /**
  * This interface describes a storage facility for cryptographic keys.
- *
- * @author Andrii Iakovenko
  */
 public interface KeyStorage {
 
@@ -89,7 +84,6 @@ public interface KeyStorage {
    * Stores the private key (that has already been protected) to the given alias.
    *
    * @param keyEntry the key entry.
-   * @throws KeyEntryAlreadyExistsException if key with the same name is already stored
    */
   void store(KeyEntry keyEntry);
 
@@ -97,7 +91,6 @@ public interface KeyStorage {
    * Updates the private key (that has already been protected) to the given alias.
    *
    * @param keyEntry the key entry.
-   * @throws KeyEntryNotFoundException if key with the same name doesn't exists.
    */
   void update(KeyEntry keyEntry);
 

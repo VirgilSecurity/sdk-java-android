@@ -34,9 +34,9 @@
 package com.virgilsecurity.sdk.cards.model;
 
 import com.google.gson.annotations.SerializedName;
+import com.virgilsecurity.common.util.Validator;
 import com.virgilsecurity.sdk.client.exceptions.SignatureNotUniqueException;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
-import com.virgilsecurity.sdk.utils.Validator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -200,11 +200,7 @@ public class RawSignedModel {
       LOGGER.warning("RawSignedModel can hold up to 8 signatures only. While 'signatures' size is "
           + signatures.size());
       throw new IllegalArgumentException(
-          "RawSignedModel -> 'signatures' can hold up to 8 signatures only"); // TODO:
-      // 2/13/18
-      // add
-      // size
-      // test
+          "RawSignedModel -> 'signatures' can hold up to 8 signatures only"); // TODO: 2/13/18 add size test
     }
 
     if (!isAllSignaturesUnique(signatures)) {

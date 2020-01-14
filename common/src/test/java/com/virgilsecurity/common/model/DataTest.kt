@@ -34,7 +34,8 @@
 package com.virgilsecurity.common.model
 
 import com.virgilsecurity.common.util.toHexString
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets
@@ -55,7 +56,7 @@ class DataTest {
 
     @Test
     fun fromBase64String() {
-        assertArrayEquals(DATA, Data.fromBase64String(BASE64_TEXT).data)
+        assertArrayEquals(DATA, Data.fromBase64String(BASE64_TEXT).value)
     }
 
     @Test

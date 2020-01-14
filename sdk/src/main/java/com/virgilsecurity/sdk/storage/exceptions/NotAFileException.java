@@ -33,8 +33,6 @@
 
 package com.virgilsecurity.sdk.storage.exceptions;
 
-import java.io.IOException;
-
 /**
  * This exception occurred when some code tries to act with directory as with a file.
  */

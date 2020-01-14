@@ -1,3 +1,4 @@
 dependencies {
-    api project(":sdk")
+    // Internal dependencies
+    implementation project(":sdk")
 }
