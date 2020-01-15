@@ -36,7 +36,7 @@ package com.virgilsecurity.sdk.common;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * @author Andrii Iakovenko
+ * Class ErrorResponse.
  */
 public class ErrorResponse {
 

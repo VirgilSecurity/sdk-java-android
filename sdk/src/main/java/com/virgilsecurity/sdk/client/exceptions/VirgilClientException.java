@@ -37,8 +37,6 @@ import com.virgilsecurity.sdk.crypto.exceptions.VirgilException;
 
 /**
  * Represents errors occurred during interaction with SDK components.
- *
- * @author Andrii Iakovenko
  */
 public class VirgilClientException extends VirgilException {
 

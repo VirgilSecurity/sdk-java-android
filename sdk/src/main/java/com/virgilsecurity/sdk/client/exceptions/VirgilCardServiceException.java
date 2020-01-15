@@ -37,8 +37,6 @@ import com.virgilsecurity.sdk.common.HttpError;
 
 /**
  * Exception class for Virgil Cards Service operations.
- *
- * @author Andrii Iakovenko
  */
 public class VirgilCardServiceException extends VirgilServiceException {
 

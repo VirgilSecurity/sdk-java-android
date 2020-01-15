@@ -33,13 +33,12 @@
 
 package com.virgilsecurity.sdk.jwt;
 
+import com.virgilsecurity.common.exception.NullArgumentException;
 import com.virgilsecurity.sdk.crypto.VirgilAccessTokenSigner;
 import com.virgilsecurity.sdk.crypto.VirgilPublicKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.sdk.exception.NullArgumentException;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
 
-import java.security.PublicKey;
 import java.util.logging.Logger;
 
 /**

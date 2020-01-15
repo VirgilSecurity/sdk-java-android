@@ -35,8 +35,6 @@ package com.virgilsecurity.sdk.utils;
 
 /**
  * Represents a pair of typed Objects.
- *
- * @author Andrii Iakovenko
  */
 public class Tuple<A, B> {
 

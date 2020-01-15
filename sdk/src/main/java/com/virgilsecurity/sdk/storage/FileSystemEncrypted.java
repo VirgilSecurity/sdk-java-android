@@ -33,16 +33,20 @@
 
 package com.virgilsecurity.sdk.storage;
 
+import com.virgilsecurity.common.exception.NullArgumentException;
 import com.virgilsecurity.common.model.Data;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.sdk.exception.NullArgumentException;
 import com.virgilsecurity.sdk.storage.exceptions.CreateDirectoryException;
 import com.virgilsecurity.sdk.storage.exceptions.DirectoryNotExistsException;
 import com.virgilsecurity.sdk.storage.exceptions.FileSystemException;
 import com.virgilsecurity.sdk.storage.exceptions.NotADirectoryException;
 import com.virgilsecurity.sdk.storage.exceptions.NotAFileException;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -67,6 +71,8 @@ public class FileSystemEncrypted implements FileSystem {
      * @param credentials If {@code credentials} is not {@code null} - {@code FileSystemEncrypted} will encrypt files
      *                    with provided credentials. Otherwise if {@code credentials} is {@code null} files are stored
      *                    without encryption.
+     *
+     * @throws FileSystemException
      */
     public FileSystemEncrypted(String rootPath, FileSystemEncryptedCredentials credentials) throws FileSystemException {
         if (rootPath == null) {
@@ -83,6 +89,8 @@ public class FileSystemEncrypted implements FileSystem {
      * Instantiates FileSystemEncrypted class.
      *
      * @param rootPath Root path for storing files.
+     *
+     * @throws FileSystemException
      */
     public FileSystemEncrypted(String rootPath) throws FileSystemException {
         this(rootPath, null);
@@ -110,6 +118,9 @@ public class FileSystemEncrypted implements FileSystem {
      * @param data   Data to write.
      * @param filename   File name.
      * @param path Subdirectory.
+     *
+     * @throws IOException
+     * @throws CryptoException
      */
     public void write(Data data, String filename, String path) throws IOException, CryptoException {
         File file;
@@ -132,10 +143,10 @@ public class FileSystemEncrypted implements FileSystem {
         byte[] dataToWrite;
 
         if (credentials != null) {
-            dataToWrite = credentials.getCrypto().signThenEncrypt(data.getData(),
+            dataToWrite = credentials.getCrypto().authEncrypt(data.getValue(),
                     credentials.getKeyPair().getPrivateKey(), credentials.getKeyPair().getPublicKey());
         } else {
-            dataToWrite = data.getData();
+            dataToWrite = data.getValue();
         }
 
         try (FileOutputStream os = new FileOutputStream(file)) {
@@ -148,6 +159,9 @@ public class FileSystemEncrypted implements FileSystem {
      *
      * @param data Data to write.
      * @param filename File name.
+     *
+     * @throws IOException
+     * @throws CryptoException
      */
     public void write(Data data, String filename) throws IOException, CryptoException {
         write(data, filename, null);
@@ -156,7 +170,11 @@ public class FileSystemEncrypted implements FileSystem {
     /**
      * @param filename   File name.
      * @param path Subdirectory.
+     *
      * @return Data.
+     *
+     * @throws IOException
+     * @throws CryptoException
      */
     public Data read(String filename, String path) throws IOException, CryptoException {
         if (filename == null) {
@@ -183,8 +201,8 @@ public class FileSystemEncrypted implements FileSystem {
             byte[] dataResult;
 
             if (credentials != null) {
-                dataResult = credentials.getCrypto().decryptThenVerify(data,
-                        credentials.getKeyPair().getPrivateKey(), credentials.getKeyPair().getPublicKey());
+                dataResult = credentials.getCrypto().authDecrypt(data, credentials.getKeyPair().getPrivateKey(),
+                        credentials.getKeyPair().getPublicKey(), true);
             } else {
                 dataResult = data;
             }
@@ -197,6 +215,7 @@ public class FileSystemEncrypted implements FileSystem {
      * Read data.
      *
      * @param filename File name.
+     *
      * @return Data.
      *
      * @throws IOException
@@ -210,7 +229,11 @@ public class FileSystemEncrypted implements FileSystem {
      * Returns file names in subdirectory.
      *
      * @param path Subdirectory.
+     *
      * @return File names in subdirectory.
+     *
+     * @throws DirectoryNotExistsException
+     * @throws NotADirectoryException
      */
     public Set<String> listFiles(String path) throws DirectoryNotExistsException, NotADirectoryException {
         File directory;
@@ -262,7 +285,7 @@ public class FileSystemEncrypted implements FileSystem {
      * @param filename   File name.
      * @param path Path to a directory with a file.
      */
-    public boolean delete(String filename, String path) throws NotAFileException {
+    public boolean delete(String filename, String path) {
         if (filename == null) {
             throw new NullArgumentException("filename");
         }
@@ -282,7 +305,7 @@ public class FileSystemEncrypted implements FileSystem {
      *
      * @param filename File name.
      */
-    public boolean delete(String filename) throws NotAFileException {
+    public boolean delete(String filename) {
         return delete(filename, null);
     }
 
@@ -291,7 +314,7 @@ public class FileSystemEncrypted implements FileSystem {
      *
      * @param path Subdirectory.
      */
-    public boolean deleteDirectory(String path) throws NotADirectoryException {
+    public boolean deleteDirectory(String path) {
         File directory;
         if (path != null) {
             directory = new File(this.rootPath + File.separator + path);
@@ -305,7 +328,7 @@ public class FileSystemEncrypted implements FileSystem {
     /**
      * Delete all in root directory.
      */
-    public boolean delete() throws FileSystemException {
+    public boolean delete() {
         return deleteDirectory(null);
     } // TODO add tests
 
@@ -314,7 +337,10 @@ public class FileSystemEncrypted implements FileSystem {
      *
      * @param filename   Name of file.
      * @param path Subdirectory.
+     *
      * @return {@code true} if file exists, otherwise {@code false}.
+     *
+     * @throws NotAFileException
      */
     public boolean exists(String filename, String path) throws NotAFileException {
         if (filename == null) {
@@ -342,7 +368,10 @@ public class FileSystemEncrypted implements FileSystem {
      * Checks whether file exists.
      *
      * @param filename Name of file.
+     *
      * @return {@code true} if file exists, otherwise {@code false}.
+     *
+     * @throws NotAFileException
      */
     public boolean exists(String filename) throws NotAFileException {
         return exists(filename, null);
@@ -352,7 +381,10 @@ public class FileSystemEncrypted implements FileSystem {
      * Checks whether subdirectory exists.
      *
      * @param path Name of subdirectory.
+     *
      * @return {@code true} if subdirectory exists, otherwise {@code false}.
+     *
+     * @throws NotADirectoryException
      */
     public boolean directoryExists(String path) throws NotADirectoryException {
         if (path == null) {

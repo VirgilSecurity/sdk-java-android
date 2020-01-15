@@ -49,7 +49,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 /**
- * @author Andrii Iakovenko
+ * Class DefaultKeyStorage.
  */
 public class DefaultKeyStorage implements KeyStorage {
 

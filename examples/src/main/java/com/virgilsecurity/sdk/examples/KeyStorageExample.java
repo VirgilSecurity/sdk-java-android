@@ -33,7 +33,10 @@
 
 package com.virgilsecurity.sdk.examples;
 
-import com.virgilsecurity.sdk.crypto.*;
+import com.virgilsecurity.sdk.crypto.VirgilCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
+import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
+import com.virgilsecurity.sdk.crypto.VirgilPrivateKeyExporter;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.storage.JsonFileKeyStorage;
 import com.virgilsecurity.sdk.storage.KeyStorage;
@@ -43,7 +46,7 @@ import com.virgilsecurity.sdk.utils.Tuple;
 import java.util.Map;
 
 /**
- * @author Andrii Iakovenko
+ * Class KeyStorageExample.
  */
 public class KeyStorageExample {
 

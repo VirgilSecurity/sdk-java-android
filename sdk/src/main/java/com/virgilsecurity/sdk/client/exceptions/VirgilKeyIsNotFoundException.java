@@ -35,8 +35,6 @@ package com.virgilsecurity.sdk.client.exceptions;
 
 /**
  * This exception occurred when key couldn't be loaded from storage.
- *
- * @author Andrii Iakovenko
  */
 public class VirgilKeyIsNotFoundException extends VirgilClientException {
 

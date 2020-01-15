@@ -35,6 +35,7 @@ package com.virgilsecurity.sdk.utils;
 
 import com.virgilsecurity.sdk.cards.model.RawSignedModel;
 import com.virgilsecurity.sdk.common.ClassForSerialization;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -46,9 +47,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@linkplain ConvertionUtils}.
- *
- * @author Andrii Iakovenko
- * @author Danylo Oliinyk
  */
 public class ConvertionUtilsTest {
 

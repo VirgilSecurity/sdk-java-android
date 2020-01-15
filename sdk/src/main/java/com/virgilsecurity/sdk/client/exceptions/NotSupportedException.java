@@ -34,7 +34,7 @@
 package com.virgilsecurity.sdk.client.exceptions;
 
 /**
- * @author Andrii Iakovenko
+ * Class NotSupportedException.
  */
 public class NotSupportedException extends RuntimeException {
 

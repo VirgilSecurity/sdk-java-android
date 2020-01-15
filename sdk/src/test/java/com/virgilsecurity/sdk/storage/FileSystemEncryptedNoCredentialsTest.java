@@ -33,26 +33,31 @@
 
 package com.virgilsecurity.sdk.storage;
 
+import com.virgilsecurity.common.exception.NullArgumentException;
 import com.virgilsecurity.common.model.Data;
 import com.virgilsecurity.sdk.crypto.VirgilCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
-import com.virgilsecurity.sdk.exception.NullArgumentException;
 import com.virgilsecurity.sdk.storage.exceptions.DirectoryNotExistsException;
 import com.virgilsecurity.sdk.storage.exceptions.FileSystemException;
-import com.virgilsecurity.sdk.storage.exceptions.NotADirectoryException;
 import com.virgilsecurity.sdk.storage.exceptions.NotAFileException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
-import java.nio.file.InvalidPathException;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * FileSystemEncryptedNoCredentialsTest class.
@@ -83,7 +88,7 @@ class FileSystemEncryptedNoCredentialsTest {
     }
 
     @Test
-    void delete() throws IOException, CryptoException {
+    void delete() throws Exception {
         fileSystemEncrypted.write(data, alias);
         fileSystemEncrypted.delete(alias);
 
@@ -91,7 +96,7 @@ class FileSystemEncryptedNoCredentialsTest {
     }
 
     @Test
-    void delete_subdirectory() throws IOException, CryptoException {
+    void delete_subdirectory() throws Exception {
         fileSystemEncrypted.write(data, alias, subdirectory);
         fileSystemEncrypted.delete(alias, subdirectory);
 
@@ -99,7 +104,7 @@ class FileSystemEncryptedNoCredentialsTest {
     }
 
     @Test
-    void delete_nonExisting() throws NotAFileException {
+    void delete_nonExisting() {
         assertFalse(fileSystemEncrypted.delete(alias));
     }
 
@@ -123,7 +128,7 @@ class FileSystemEncryptedNoCredentialsTest {
     }
 
     @Test
-    void exists() throws IOException, CryptoException {
+    void exists() throws Exception {
         if (!tmpDir.exists()) {
             boolean created = tmpDir.mkdirs();
             assertTrue(created);
@@ -134,7 +139,7 @@ class FileSystemEncryptedNoCredentialsTest {
     }
 
     @Test
-    void exists_subdirectory() throws IOException, CryptoException {
+    void exists_subdirectory() throws Exception {
         if (!tmpDir.exists()) {
             boolean created = tmpDir.mkdirs();
             assertTrue(created);
@@ -159,39 +164,39 @@ class FileSystemEncryptedNoCredentialsTest {
     }
 
     @Test
-    void exists_randomName() throws IOException {
+    void exists_randomName() throws Exception {
         assertFalse(fileSystemEncrypted.exists(UUID.randomUUID().toString()));
     }
 
     @Test
-    void exists_randomName_subdirectory() throws IOException {
+    void exists_randomName_subdirectory() throws Exception {
         assertFalse(fileSystemEncrypted.exists(UUID.randomUUID().toString(), subdirectory));
     }
 
     @Test
-    void load() throws IOException, CryptoException {
+    void load() throws Exception {
         fileSystemEncrypted.write(data, alias);
 
         Data dataRead = fileSystemEncrypted.read(alias);
         assertEquals(data, dataRead);
 
-        VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(dataRead.getData()).getPrivateKey();
+        VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(dataRead.getValue()).getPrivateKey();
         assertEquals(keyPair.getPrivateKey(), privateKeyImported);
     }
 
     @Test
-    void load_subdirectory() throws IOException, CryptoException {
+    void load_subdirectory() throws Exception {
         fileSystemEncrypted.write(data, alias, subdirectory);
 
         Data dataRead = fileSystemEncrypted.read(alias, subdirectory);
         assertEquals(data, dataRead);
 
-        VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(dataRead.getData()).getPrivateKey();
+        VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(dataRead.getValue()).getPrivateKey();
         assertEquals(keyPair.getPrivateKey(), privateKeyImported);
     }
 
     @Test
-    void load_file_itself() throws IOException, CryptoException {
+    void load_file_itself() throws Exception {
         fileSystemEncrypted.write(data, alias);
 
         File fileToRead = new File(tmpDir.getAbsolutePath(), alias);
@@ -212,7 +217,7 @@ class FileSystemEncryptedNoCredentialsTest {
         }
 
         // Should NOT fail because file is NOT encrypted with credentials
-        VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(dataRead.getData()).getPrivateKey();
+        VirgilPrivateKey privateKeyImported = new VirgilCrypto().importPrivateKey(dataRead.getValue()).getPrivateKey();
         assertEquals(keyPair.getPrivateKey(), privateKeyImported);
     }
 
@@ -245,7 +250,7 @@ class FileSystemEncryptedNoCredentialsTest {
     }
 
     @Test
-    void names() throws IOException, CryptoException {
+    void names() throws Exception {
         fileSystemEncrypted.write(data, alias);
 
         Set<String> names = fileSystemEncrypted.listFiles();
@@ -255,7 +260,7 @@ class FileSystemEncryptedNoCredentialsTest {
     }
 
     @Test
-    void names_subdirectory() throws IOException, CryptoException {
+    void names_subdirectory() throws Exception {
         fileSystemEncrypted.write(data, alias, subdirectory);
 
         Set<String> names = fileSystemEncrypted.listFiles(subdirectory);
@@ -265,7 +270,7 @@ class FileSystemEncryptedNoCredentialsTest {
     }
 
     @Test
-    void names_empty() throws DirectoryNotExistsException, NotADirectoryException {
+    void names_empty() {
         Set<String> names = fileSystemEncrypted.listFiles();
         assertNotNull(names);
         assertTrue(names.isEmpty());
@@ -279,7 +284,7 @@ class FileSystemEncryptedNoCredentialsTest {
     }
 
     @Test
-    void names_empty_subdirectory_created() throws DirectoryNotExistsException, NotADirectoryException {
+    void names_empty_subdirectory_created() throws Exception {
         File fileWithSubdir = new File(tmpDir.getAbsolutePath() + File.separator + subdirectory);
         if (!fileWithSubdir.exists()) {
             boolean created = fileWithSubdir.mkdirs();
@@ -292,19 +297,19 @@ class FileSystemEncryptedNoCredentialsTest {
     }
 
     @Test
-    void store() throws IOException, CryptoException {
+    void store() throws Exception {
         fileSystemEncrypted.write(data, alias);
         assertTrue(fileSystemEncrypted.exists(alias));
     }
 
     @Test
-    void store_subdirectory() throws IOException, CryptoException {
+    void store_subdirectory() throws Exception {
         fileSystemEncrypted.write(data, alias, subdirectory);
         assertTrue(fileSystemEncrypted.exists(alias, subdirectory));
     }
 
     @Test
-    void store_duplicated() throws IOException, CryptoException {
+    void store_duplicated() throws Exception {
         fileSystemEncrypted.write(data, alias);
         fileSystemEncrypted.write(data, alias);
         assertTrue(fileSystemEncrypted.exists(alias));
@@ -312,7 +317,7 @@ class FileSystemEncryptedNoCredentialsTest {
     }
 
     @Test
-    void store_duplicated_subdirectory() throws IOException, CryptoException {
+    void store_duplicated_subdirectory() throws Exception {
         fileSystemEncrypted.write(data, alias, subdirectory);
         fileSystemEncrypted.write(data, alias, subdirectory);
         assertTrue(fileSystemEncrypted.exists(alias, subdirectory));

@@ -48,7 +48,7 @@ import com.virgilsecurity.sdk.utils.ConvertionUtils;
 import java.util.Arrays;
 
 /**
- * @author Andrii Iakovenko
+ * Class SetupCardManagerExample.
  */
 public class SetupCardManagerExample {
 

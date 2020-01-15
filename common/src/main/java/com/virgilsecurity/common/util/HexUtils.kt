@@ -30,6 +30,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 @file:JvmName("HexUtils")
 package com.virgilsecurity.common.util
 
@@ -37,4 +38,4 @@ import com.virgilsecurity.common.model.Data
 
 fun ByteArray.toHexString() = joinToString("") { "%02x".format(it) }
 
-fun Data.toHexString() = data.joinToString("") { "%02x".format(it) }
+fun Data.toHexString() = value.joinToString("") { "%02x".format(it) }

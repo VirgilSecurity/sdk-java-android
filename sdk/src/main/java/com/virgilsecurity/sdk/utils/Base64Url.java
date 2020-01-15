@@ -36,8 +36,6 @@ package com.virgilsecurity.sdk.utils;
 /**
  * This class provides Base64url encoding functionality. See
  * <a href="https://www.rfc-editor.org/rfc/pdfrfc/rfc7515.txt.pdf">Appendix C</a> for details.
- *
- * @author Andrii Iakovenko
  */
 public class Base64Url {
 

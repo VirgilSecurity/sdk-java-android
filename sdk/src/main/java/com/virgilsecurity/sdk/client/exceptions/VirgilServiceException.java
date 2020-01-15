@@ -37,8 +37,6 @@ import com.virgilsecurity.sdk.common.HttpError;
 
 /**
  * Base exception class for all Virgil Services operations.
- *
- * @author Andrii Iakovenko
  */
 public abstract class VirgilServiceException extends Exception {
 

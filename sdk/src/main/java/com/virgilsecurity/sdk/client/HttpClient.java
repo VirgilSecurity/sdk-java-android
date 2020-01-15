@@ -55,8 +55,6 @@ import java.util.logging.Logger;
 
 /**
  * HttpClient class intention is to handle http requests.
- *
- * @author Andrii Iakovenko
  */
 public class HttpClient {
 

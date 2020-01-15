@@ -59,9 +59,6 @@ import org.openjdk.jmh.annotations.State;
 
 /**
  * Benchmark for VirgilCrypto sign/verify operations.
- * 
- * @author Andrii Iakovenko
- *
  */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)

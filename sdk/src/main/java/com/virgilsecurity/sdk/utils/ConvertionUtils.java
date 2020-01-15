@@ -33,12 +33,22 @@
 
 package com.virgilsecurity.sdk.utils;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import com.virgilsecurity.common.util.Base64;
+import com.virgilsecurity.crypto.foundation.Base64;
 import com.virgilsecurity.sdk.common.StringEncoding;
 
 import java.io.IOException;
@@ -52,9 +62,6 @@ import java.util.Scanner;
 
 /**
  * Utilities class for data conversion.
- *
- * @author Andrii Iakovenko
- * @author Danylo Oliinyk
  */
 public class ConvertionUtils {
 
@@ -120,7 +127,7 @@ public class ConvertionUtils {
    * @return the byte array
    */
   public static byte[] base64ToBytes(String value) {
-    return Base64.decode(value);
+    return Base64.decode(value.getBytes());
   }
 
   /**
@@ -274,7 +281,7 @@ public class ConvertionUtils {
    * @return the base64-encoded string.
    */
   public static String toBase64String(byte[] bytes) {
-    return Base64.encode(bytes);
+    return new String(Base64.encode(bytes));
   }
 
   /**
@@ -285,7 +292,7 @@ public class ConvertionUtils {
    */
   public static String toBase64String(String value) {
     byte[] bytes = value.getBytes(UTF8_CHARSET);
-    return Base64.encode(bytes);
+    return new String(Base64.encode(bytes));
   }
 
   /**

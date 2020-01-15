@@ -31,7 +31,6 @@ eclipse-aar/
 ### Gradle ###
 .gradle
 build/
-gradle.properties
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -177,3 +176,5 @@ fabric.properties
 testsDev.sh
 testsStg.sh
 testsProd.sh
+env.json
+publish.properties

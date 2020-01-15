@@ -36,7 +36,10 @@ package com.virgilsecurity.sdk.androidutils.storage;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.security.keystore.UserNotAuthenticatedException;
+
 import com.google.gson.Gson;
+import com.virgilsecurity.common.exception.EmptyArgumentException;
+import com.virgilsecurity.common.exception.NullArgumentException;
 import com.virgilsecurity.sdk.crypto.VirgilCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
@@ -45,20 +48,34 @@ import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.crypto.exceptions.KeyEntryAlreadyExistsException;
 import com.virgilsecurity.sdk.crypto.exceptions.KeyEntryNotFoundException;
 import com.virgilsecurity.sdk.crypto.exceptions.KeyStorageException;
-import com.virgilsecurity.sdk.exception.EmptyArgumentException;
-import com.virgilsecurity.sdk.exception.NullArgumentException;
 import com.virgilsecurity.sdk.storage.KeyEntry;
 import com.virgilsecurity.sdk.storage.KeyStorage;
 
-import javax.crypto.*;
-import javax.crypto.spec.GCMParameterSpec;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.security.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 
 /**
  * AndroidKeyStorage class uses AndroidKeyStore to generate symmetric key with which it encrypts Virgil private key,
@@ -127,7 +144,7 @@ public class AndroidKeyStorage implements KeyStorage {
          *
          * @return Builder object to continue setting up AndroidKeyStorage instance.
          */
-        public Builder onPath(String rootPath) { // TODO test null/empty path
+        public Builder onPath(String rootPath) {
             this.rootPath = rootPath;
 
             return this;
