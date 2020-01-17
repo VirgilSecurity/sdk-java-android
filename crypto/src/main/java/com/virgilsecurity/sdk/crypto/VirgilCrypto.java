@@ -231,6 +231,17 @@ public class VirgilCrypto {
   /**
    * Create new instance of {@link VirgilCrypto}.
    *
+   * @param rng Random number generator.
+   */
+  public VirgilCrypto(Random rng) {
+    this.rng = rng;
+    this.defaultKeyPairType = KeyPairType.ED25519;
+    this.useSHA256Fingerprints = false;
+  }
+
+  /**
+   * Create new instance of {@link VirgilCrypto}.
+   *
    * @param keysType              the {@link KeyPairType} to be used by default for generating key pair.
    * @param useSHA256Fingerprints set this flag to {@code true} to use SHA256 algorithm when calculating public key
    *                              identifier.
@@ -239,6 +250,39 @@ public class VirgilCrypto {
     CtrDrbg rng = new CtrDrbg();
     rng.setupDefaults();
 
+    this.rng = rng;
+    this.defaultKeyPairType = keysType;
+    this.useSHA256Fingerprints = useSHA256Fingerprints;
+  }
+
+  /**
+   * @param rng      Random number generator.
+   * @param keysType the {@link KeyPairType} to be used by default for generating key pair.
+   */
+  public VirgilCrypto(Random rng, KeyPairType keysType) {
+    this.rng = rng;
+    this.defaultKeyPairType = keysType;
+    this.useSHA256Fingerprints = false;
+  }
+
+  /**
+   * @param rng                   Random number generator.
+   * @param useSHA256Fingerprints set this flag to {@code true} to use SHA256 algorithm when calculating public key
+   *                              identifier.
+   */
+  public VirgilCrypto(Random rng, boolean useSHA256Fingerprints) {
+    this.rng = rng;
+    this.defaultKeyPairType = KeyPairType.ED25519;
+    this.useSHA256Fingerprints = useSHA256Fingerprints;
+  }
+
+  /**
+   * @param rng                   Random number generator.
+   * @param keysType              the {@link KeyPairType} to be used by default for generating key pair.
+   * @param useSHA256Fingerprints set this flag to {@code true} to use SHA256 algorithm when calculating public key
+   *                              *                              identifier.
+   */
+  public VirgilCrypto(Random rng, KeyPairType keysType, boolean useSHA256Fingerprints) {
     this.rng = rng;
     this.defaultKeyPairType = keysType;
     this.useSHA256Fingerprints = useSHA256Fingerprints;
