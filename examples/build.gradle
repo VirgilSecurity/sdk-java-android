@@ -34,4 +34,6 @@
 dependencies {
     // Internal dependencies
     implementation project(":sdk")
+
+    compileOnly "com.virgilsecurity.crypto:foundation:$versions.virgilCrypto"
 }
