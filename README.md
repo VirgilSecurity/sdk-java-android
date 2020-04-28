@@ -30,7 +30,7 @@ The Virgil Core SDK allows developers to get up and running with Virgil API quic
 
 ## Installation
 
-The Virgil Core SDK is provided as set of packages named *com.virgilsecurity.sdk*. Packages are distributed via Maven repository.  Also in this guide, you find one more package - Virgil Crypto Library that is used by the SDK to perform cryptographic operations.
+The Virgil Core SDK is provided as set of packages named *com.virgilsecurity.sdk*. Packages are distributed via Maven repository.  Also in this guide, you'll find one more package - Virgil Crypto Library that is used by the SDK to perform cryptographic operations.
 
 ### Target
 
