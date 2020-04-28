@@ -21,7 +21,6 @@ In case you need additional security functionality for multi-device support, gro
 - Encrypt, sign, decrypt and verify data
 - Store private keys in secure local storage
 - Use [Virgil Crypto Library](https://github.com/VirgilSecurity/virgil-crypto-java)
-- Use your own crypto library
 
 ## Installation
 
@@ -193,34 +192,6 @@ Use the following lines of code to set up the Card Manager:
 ```java
 // initialize cardManager and specify accessTokenProvider, cardVerifier
 CardManager cardManager = new CardManager(cardCrypto, accessTokenProvider, cardVerifier);
-```
-
-### Set up Key Storage for private keys
-
-This subsection shows how to set up a `VSSKeyStorage` using Virgil SDK in order to save private keys after their generation.
-
-Here is an example of how to set up the `VSSKeyStorage` class:
-
-```java
-// initialize Crypto library
-VirgilCrypto crypto = new VirgilCrypto();
-// Generate a private key
-VirgilKeyPair keyPair = crypto.generateKeys();
-VirgilPrivateKey privateKey = keyPair.getPrivateKey();
-
-// Setup PrivateKeyStorage
-VirgilPrivateKeyExporter privateKeyExporter = new VirgilPrivateKeyExporter(crypto);
-KeyStorage keyStorage = new JsonFileKeyStorage();
-PrivateKeyStorage privateKeyStorage = new PrivateKeyStorage(privateKeyExporter, keyStorage);
-
-// Store a private key with a name, for example Alice
-privateKeyStorage.store(privateKey, "Alice", null);
-
-// To load Alice private key use the following code lines:
-Tuple<PrivateKey, Map<String, String>> privateKeyEntry = privateKeyStorage.load("Alice");
-
-// Delete a private key
-privateKeyStorage.delete("Alice");
 ```
 
 ## Usage Examples
