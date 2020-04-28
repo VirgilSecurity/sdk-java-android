@@ -67,6 +67,7 @@ dependencies {
 
     // Tests
     testImplementation "junit:junit:$versions.junitAndroid"
+    androidTestImplementation "com.virgilsecurity.crypto:foundation-android:$versions.virgilCrypto"
     androidTestImplementation "com.android.support.test:runner:$versions.testsRunner"
     androidTestImplementation "org.apache.commons:commons-lang3:$versions.commonsLang"
 }
