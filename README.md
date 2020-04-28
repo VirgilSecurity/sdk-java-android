@@ -5,7 +5,7 @@
 [![GitHub license](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://github.com/VirgilSecurity/virgil/blob/master/LICENSE)
 
 
-[Introduction](#introduction) | [SDK Features](#sdk-features) | [Crypto Library Purposes](#crypto-library-purposes) | [Installation](#installation) | [Configure SDK](#configure-sdk) | [Usage Examples](#usage-examples) | [Docs](#docs) | [Support](#support)
+[Introduction](#introduction) | [SDK Features](#sdk-features) | [Installation](#installation) | [Configure SDK](#configure-sdk) | [Usage Examples](#usage-examples) | [Docs](#docs) | [Support](#support)
 
 ## Introduction
 
@@ -25,7 +25,7 @@ In case you need additional security functionality for multi-device support, gro
 
 ## Installation
 
-The Virgil Core SDK is provided as set of packages named *com.virgilsecurity.sdk*. Packages are distributed via Maven repository.  Also in this guide, you'll find one more package - Virgil Crypto Library that is used by the SDK to perform cryptographic operations.
+The Virgil Core SDK is provided as set of packages named *com.virgilsecurity.sdk*. Packages are distributed via Maven repository. In this guide you'll also find one more package - Virgil Crypto Library, that is used by the SDK to perform cryptographic operations.
 
 ### Target
 
