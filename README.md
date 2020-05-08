@@ -1,34 +1,30 @@
-# Virgil Security SDK and Crypto stack Java/Android
+# Virgil Core SDK & Crypto Stack Java/Android
 
 [![Build Status](https://api.travis-ci.org/VirgilSecurity/virgil-sdk-java-android.svg?branch=master)](https://travis-ci.org/VirgilSecurity/virgil-sdk-java-android)
 [![Maven](https://img.shields.io/maven-central/v/com.virgilsecurity.sdk/sdk.svg)](https://search.maven.org/artifact/com.virgilsecurity.sdk/sdk)
 [![GitHub license](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://github.com/VirgilSecurity/virgil/blob/master/LICENSE)
 
-[Introduction](#introduction) | [SDK Features](#sdk-features) | [Library purposes](#library-purposes) | [Installation](#installation) | [Usage Examples](#usage-examples) | [Docs](#docs) | [Support](#support)
 
+[Introduction](#introduction) | [SDK Features](#sdk-features) | [Installation](#installation) | [Configure SDK](#configure-sdk) | [Usage Examples](#usage-examples) | [Docs](#docs) | [Support](#support)
 
 ## Introduction
 
-<a href="https://developer.virgilsecurity.com/docs"><img width="230px" src="https://cdn.virgilsecurity.com/assets/images/github/logos/virgil-logo-red.png" align="left" hspace="10" vspace="6"></a> [Virgil Security](https://virgilsecurity.com) provides a set of APIs for adding security to any application. In a few simple steps you can encrypt communication, securely store data, provide passwordless login, and ensure data integrity.
+<a href="https://developer.virgilsecurity.com/docs"><img width="230px" src="https://cdn.virgilsecurity.com/assets/images/github/logos/virgil-logo-red.png" align="left" hspace="10" vspace="6"></a> [Virgil Security](https://virgilsecurity.com) provides a set of APIs for adding security to any application. In a few simple steps you can encrypt communications, securely store data, and ensure data integrity. Virgil Security products are available for desktop, embedded (IoT), mobile, cloud, and web applications in a variety of modern programming languages.
 
-The Virgil SDK allows developers to get up and running with Virgil API quickly and add full end-to-end security to their existing digital solutions to become HIPAA and GDPR compliant and more.
+The Virgil Core SDK is a low-level library that allows developers to get up and running with [Virgil Cards Service API](https://developer.virgilsecurity.com/docs/platform/api-reference/cards-service/) quickly and add end-to-end security to their new or existing digital solutions.
+
+In case you need additional security functionality for multi-device support, group chats and more, try our high-level [Virgil E3Kit framework](https://github.com/VirgilSecurity/awesome-virgil#E3Kit).
 
 ## SDK Features
-- communicate with [Virgil Cards Service][_cards_service]
-- manage users' Public Keys
-- store private keys in secure local storage
-- use Virgil [Crypto library][_virgil_crypto]
-- use your own Crypto
-
-## Crypto Library purposes
-* Asymmetric Key Generation
-* Encryption/Decryption of data and streams
-* Generation/Verification of digital signatures
-* PFS (Perfect Forward Secrecy)
+- Communicate with [Virgil Cards Service](https://developer.virgilsecurity.com/docs/platform/api-reference/cards-service/)
+- Manage users' public keys
+- Encrypt, sign, decrypt and verify data
+- Store private keys in secure local storage
+- Use [Virgil Crypto Library](https://github.com/VirgilSecurity/virgil-crypto-java)
 
 ## Installation
 
-The Virgil SDK is provided as set of packages named *com.virgilsecurity.sdk*. Packages are distributed via Maven repository.  Also in this guide, you find one more package - Virgil Crypto Library that is used by the SDK to perform cryptographic operations.
+The Virgil Core SDK is provided as set of packages named *com.virgilsecurity.sdk*. Packages are distributed via Maven repository. In this guide you'll also find one more package - Virgil Crypto Library, that is used by the SDK to perform cryptographic operations.
 
 ### Target
 
@@ -74,14 +70,137 @@ Use this packages for Android projects:
     implementation "com.virgilsecurity.sdk:sdk-android:<latest-version>"
 ```
 
-The **\<latest-version>** of the SDK can be found in the [Maven Central Repository](https://mvnrepository.com/artifact/com.virgilsecurity.sdk/sdk)  or in the header of current readme.
+The **\<latest-version>** of the SDK can be found in the [Maven Central Repository](https://mvnrepository.com/artifact/com.virgilsecurity.sdk/sdk) or in the header of current readme.
+
+## Configure SDK
+
+This section contains guides on how to set up Virgil Core SDK modules for authenticating users, managing Virgil Cards and storing private keys.
+
+### Set up authentication
+
+Set up user authentication with tokens that are based on the [JSON Web Token standard](https://jwt.io/) with some Virgil modifications.
+
+In order to make calls to Virgil Services (for example, to publish user's Card on Virgil Cards Service), you need to have a JSON Web Token ("JWT") that contains the user's `identity`, which is a string that uniquely identifies each user in your application.
+
+Credentials that you'll need:
+
+|Parameter|Description|
+|--- |--- |
+|App ID|ID of your Application at [Virgil Dashboard](https://dashboard.virgilsecurity.com)|
+|App Key ID|A unique string value that identifies your account at the Virgil developer portal|
+|App Key|A Private Key that is used to sign API calls to Virgil Services. For security, you will only be shown the App Key when the key is created. Don't forget to save it in a secure location for the next step|
+
+#### Set up JWT provider on Client side
+
+Use these lines of code to specify which JWT generation source you prefer to use in your project:
+
+```java
+// Get generated token from server-side
+final String authenticatedQueryToServerSide =
+        "eyJraWQiOiI3MGI0NDdlMzIxZjNhMGZkIiwidHlwIjoiSldUIiwiYWxnIjoiVkVEUzUxMiIsImN0eSI6InZpcmdpbC1qd3Q7dj0xIn0.eyJleHAiOjE1MTg2OTg5MTcsImlzcyI6InZpcmdpbC1iZTAwZTEwZTRlMWY0YmY1OGY5YjRkYzg1ZDc5Yzc3YSIsInN1YiI6ImlkZW50aXR5LUFsaWNlIiwiaWF0IjoxNTE4NjEyNTE3fQ.MFEwDQYJYIZIAWUDBAIDBQAEQP4Yo3yjmt8WWJ5mqs3Yrqc_VzG6nBtrW2KIjP-kxiIJL_7Wv0pqty7PDbDoGhkX8CJa6UOdyn3rBWRvMK7p7Ak";
+
+// Setup AccessTokenProvider
+CallbackJwtProvider.GetTokenCallback getTokenCallback = new CallbackJwtProvider.GetTokenCallback() {
+
+        @Override
+        public String onGetToken(TokenContext tokenContext) {
+                return authenticatedQueryToServerSide;
+        }
+};
+// initialize JWT provider
+AccessTokenProvider accessTokenProvider =
+        new CallbackJwtProvider(getTokenCallback);
+```
+
+#### Generate JWT on Server side
+
+Next, you'll need to set up the `JwtGenerator` and generate a JWT using the Virgil SDK.
+
+Here is an example of how to generate a JWT:
+
+```java
+// App Key (you got this Key at Virgil Dashboard)
+String appKeyBase64 = "MC4CAQAwBQYDK2VwBCIEINlK4BhgsijAbNmUqU6us0ZU9MGi+HxdYCA6TdZeHjR4";
+byte[] appKeyData = ConvertionUtils.base64ToBytes(appKeyBase64);
+
+// Crypto library imports a private key into a necessary format
+VirgilCrypto crypto = new VirgilCrypto();
+PrivateKey appKey = crypto.importPrivateKey(appKeyData);
+
+// initialize accessTokenSigner that signs users JWTs
+AccessTokenSigner accessTokenSigner = new VirgilAccessTokenSigner();
+
+// use your App Credentials you got at Virgil Dashboard:
+String appId = "be00e10e4e1f4bf58f9b4dc85d79c77a"; // App ID
+String appKeyId = "70b447e321f3a0fd"; // App Key ID
+TimeSpan ttl = TimeSpan.fromTime(1, TimeUnit.HOURS); // 1 hour (JWT's lifetime)
+
+// setup JWT generator with necessary parameters:
+JwtGenerator jwtGenerator = new JwtGenerator(appId, appKey, appKeyId, ttl, accessTokenSigner);
+
+// generate JWT for a user
+// remember that you must provide each user with his unique JWT
+// each JWT contains unique user's identity (in this case - Alice)
+// identity can be any value: name, email, some id etc.
+String identity = "Alice";
+Jwt aliceJwt = jwtGenerator.generateToken(identity);
+
+// as result you get users JWT, it looks like this: "eyJraWQiOiI3MGI0NDdlMzIxZjNhMGZkIiwidHlwIjoiSldUIiwiYWxnIjoiVkVEUzUxMiIsImN0eSI6InZpcmdpbC1qd3Q7dj0xIn0.eyJleHAiOjE1MTg2OTg5MTcsImlzcyI6InZpcmdpbC1iZTAwZTEwZTRlMWY0YmY1OGY5YjRkYzg1ZDc5Yzc3YSIsInN1YiI6ImlkZW50aXR5LUFsaWNlIiwiaWF0IjoxNTE4NjEyNTE3fQ.MFEwDQYJYIZIAWUDBAIDBQAEQP4Yo3yjmt8WWJ5mqs3Yrqc_VzG6nBtrW2KIjP-kxiIJL_7Wv0pqty7PDbDoGhkX8CJa6UOdyn3rBWRvMK7p7Ak"
+// you can provide users with JWT at registration or authorization steps
+// Send a JWT to client-side
+String jwtString = aliceJwt.stringRepresentation();
+```
+
+For this subsection we've created a sample backend that demonstrates how you can set up your backend to generate the JWTs. To set up and run the sample backend locally, head over to your GitHub repo of choice:
+
+[Node.js](https://github.com/VirgilSecurity/sample-backend-nodejs) | [Golang](https://github.com/VirgilSecurity/sample-backend-go) | [PHP](https://github.com/VirgilSecurity/sample-backend-php) | [Java](https://github.com/VirgilSecurity/sample-backend-java) | [Python](https://github.com/VirgilSecurity/virgil-sdk-python/tree/master#sample-backend-for-jwt-generation)
+ and follow the instructions in README.
+ 
+### Set up Card Verifier
+
+Virgil Card Verifier helps you automatically verify signatures of a user's Card, for example when you get a Card from Virgil Cards Service.
+
+By default, `VirgilCardVerifier` verifies only two signatures - those of a Card owner and Virgil Cards Service.
+
+Set up `VirgilCardVerifier` with the following lines of code:
+
+```java
+// initialize Crypto library
+CardCrypto cardCrypto = new VirgilCardCrypto();
+
+VerifierCredentials yourBackendVerifierCredentials =
+        new VerifierCredentials("YOUR_BACKEND",
+                ConvertionUtils.base64ToBytes(PUBLIC_KEY_STR));
+
+Whitelist yourBackendWhiteList =
+        new Whitelist(Arrays.asList(yourBackendVerifierCredentials));
+
+CardVerifier cardVerifier = new VirgilCardVerifier(cardCrypto,
+        Arrays.asList(yourBackendWhiteList));
+```
+
+### Set up Card Manager
+
+This subsection shows how to set up a Card Manager module to help you manage users' public keys.
+
+With Card Manager you can:
+- specify an access Token (JWT) Provider.
+- specify a Card Verifier used to verify signatures of your users, your App Server, Virgil Services (optional).
+
+Use the following lines of code to set up the Card Manager:
+
+```java
+// initialize cardManager and specify accessTokenProvider, cardVerifier
+CardManager cardManager = new CardManager(cardCrypto, accessTokenProvider, cardVerifier);
+```
 
 ## Usage Examples
 
-Before starting practicing with the usage examples, make sure that the SDK is configured. Check out our [SDK configuration guides][_configure_sdk] for more information.
+Before you start practicing with the usage examples, make sure that the SDK is configured. See the [Configure SDK](#configure-sdk) section for more information.
 
-#### Generate and publish user's Cards with Public Keys inside on Cards Service
-Use the following lines of code to create and publish a user's Card with Public Key inside on Virgil Cards Service:
+### Generate and publish Virgil Cards at Cards Service
+
+Use the following lines of code to create a user's Card with a public key inside and publish it at Virgil Cards Service:
 
 ```java
 import com.virgilsecurity.crypto.VirgilCrypto;
@@ -103,11 +222,11 @@ try {
 }
 ```
 
-#### Sign then encrypt data
+### Sign then encrypt data
 
-Virgil SDK lets you use a user's Private key and his or her Cards to sign, then encrypt any kind of data.
+Virgil Core SDK allows you to use a user's private key and their Virgil Cards to sign and encrypt any kind of data.
 
-In the following example, we load a Private Key from a customized Key Storage and get recipient's Card from the Virgil Cards Services. Recipient's Card contains a Public Key on which we will encrypt the data and verify a signature.
+In the following example, we load a private key from a customized key storage and get recipient's Card from the Virgil Cards Service. Recipient's Card contains a public key which we will use to encrypt the data and verify a signature.
 
 ```java
 import com.virgilsecurity.crypto.VirgilCrypto;
@@ -143,8 +262,9 @@ try {
 }
 ```
 
-#### Decrypt then verify data
-Once the Users receive the signed and encrypted message, they can decrypt it with their own Private Key and verify signature with a Sender's Card:
+### Decrypt data and verify signature
+
+Once the user receives the signed and encrypted message, they can decrypt it with their own private key and verify the signature with the sender's Card:
 
 ```java
 import com.virgilsecurity.crypto.VirgilCrypto;
@@ -177,6 +297,33 @@ try {
 }
 ```
 
+### Get Card by its ID
+
+Use the following lines of code to get a user's card from Virgil Cloud by its ID:
+
+```java
+// using cardManager get a user's card from the Cards Service
+try {
+    Card card = cardManager.getCard("f4bf9f7fcbedaba0392f108c59d8f4a38b3838efb64877380171b54475c2ade8");
+    // Card is obtained
+} catch (CryptoException | VirgilServiceException e) {
+    // Error occured
+}
+```
+
+### Get Card by user's identity
+
+For a single user, use the following lines of code to get a user's Card by a user's `identity`:
+
+```java
+try {
+    List<Card> cards = cardManager.searchCards("Bob");
+    // Cards are obtained
+} catch (CryptoException | VirgilServiceException e) {
+    // Error occured
+}
+```
+
 ## Run benchmarks
 
 Build artifacts with a command
@@ -191,46 +338,18 @@ java -jar <path_to_jar>
 ```
 
 ## Docs
-Virgil Security has a powerful set of APIs, and the documentation below can get you started today.
 
-In order to use the Virgil SDK with your application, you will need to first configure your application. By default, the SDK will attempt to look for Virgil-specific settings in your application but you can change it during SDK configuration.
-
-* [Configure the SDK][_configure_sdk] documentation
-  * [Setup authentication][_setup_authentication] to make API calls to Virgil Services
-  * [Setup Card Manager][_card_manager] to manage user's Public Keys
-  * [Setup Card Verifier][_card_verifier] to verify signatures inside of user's Card
-  * [Setup Key storage][_key_storage] to store Private Keys
-  * [Setup your own Crypto library][_own_crypto] inside of the SDK
-* [More usage examples][_more_examples]
-  * [Create & publish a Card][_create_card] that has a Public Key on Virgil Cards Service
-  * [Search user's Card by user's identity][_search_card]
-  * [Get user's Card by its ID][_get_card]
-  * [Use Card for crypto operations][_use_card]
-* [Reference API][_reference_api]
-
+Virgil Security has a powerful set of APIs, and the [Developer Documentation](https://developer.virgilsecurity.com/) can get you started today.
 
 ## License
 
-This library is released under the [3-clause BSD License](LICENSE.md).
+This library is released under the [3-clause BSD License](LICENSE).
 
 ## Support
+
 Our developer support team is here to help you. Find out more information on our [Help Center](https://help.virgilsecurity.com/).
 
 You can find us on [Twitter](https://twitter.com/VirgilSecurity) or send us email support@VirgilSecurity.com.
 
 Also, get extra help from our support team on [Slack](https://virgilsecurity.com/join-community).
 
-[_virgil_crypto]: https://github.com/VirgilSecurity/virgil-crypto
-[_cards_service]: https://developer.virgilsecurity.com/docs/api-reference/card-service/v5
-[_use_card]: https://developer.virgilsecurity.com/docs/java/how-to/public-key-management/v5/use-card-for-crypto-operation
-[_get_card]: https://developer.virgilsecurity.com/docs/java/how-to/public-key-management/v5/get-card
-[_search_card]: https://developer.virgilsecurity.com/docs/java/how-to/public-key-management/v5/search-card
-[_create_card]: https://developer.virgilsecurity.com/docs/java/how-to/public-key-management/v5/create-card
-[_own_crypto]: https://developer.virgilsecurity.com/docs/java/how-to/setup/v5/setup-own-crypto-library
-[_key_storage]: https://developer.virgilsecurity.com/docs/java/how-to/setup/v5/setup-key-storage
-[_card_verifier]: https://developer.virgilsecurity.com/docs/java/how-to/setup/v5/setup-card-verifier
-[_card_manager]: https://developer.virgilsecurity.com/docs/java/how-to/setup/v5/setup-card-manager
-[_setup_authentication]: https://developer.virgilsecurity.com/docs/java/how-to/setup/v5/setup-authentication
-[_reference_api]: https://developer.virgilsecurity.com/docs/api-reference
-[_configure_sdk]: https://developer.virgilsecurity.com/docs/how-to#sdk-configuration
-[_more_examples]: https://developer.virgilsecurity.com/docs/how-to#public-key-management
