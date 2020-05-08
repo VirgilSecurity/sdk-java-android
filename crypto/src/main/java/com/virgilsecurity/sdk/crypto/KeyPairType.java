@@ -94,7 +94,7 @@ public enum KeyPairType {
 
     if (keyInfo.isCompound()) {
       if (keyInfo.compoundHybridCipherFirstKeyAlgId() == AlgId.CURVE25519
-              && keyInfo.compoundHybridCipherSecondKeyAlgId() == AlgId.ROUND5_ND_5KEM_5D
+              && keyInfo.compoundHybridCipherSecondKeyAlgId() == AlgId.ROUND5_ND_1CCA_5D
               && keyInfo.compoundHybridSignerFirstKeyAlgId() == AlgId.ED25519
               && keyInfo.compoundHybridSignerSecondKeyAlgId() == AlgId.FALCON) {
 
@@ -251,7 +251,7 @@ public enum KeyPairType {
       case CURVE25519_ED25519:
         return new Pair<>(AlgId.CURVE25519, AlgId.NONE);
       case CURVE25519_ROUND5_ED25519_FALCON:
-        return new Pair<>(AlgId.CURVE25519, AlgId.ROUND5_ND_5KEM_5D);
+        return new Pair<>(AlgId.CURVE25519, AlgId.ROUND5_ND_1CCA_5D);
       case CURVE25519:
       case ED25519:
       case RSA_2048:

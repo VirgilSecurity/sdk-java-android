@@ -36,7 +36,7 @@ buildscript {
     ext.versions = [
 
             // Virgil
-            virgilCrypto      : '0.14.0',
+            virgilCrypto      : '0.15.1',
 
             // Common
             commonsLang       : '3.9',
@@ -145,8 +145,8 @@ final String BASE_VIRGIL_PACKAGE = 'com.virgilsecurity'
 final String SDK_PACKAGE = BASE_VIRGIL_PACKAGE + '.sdk'
 
 // Packages versions
-final String SDK_VERSION = '7.2.0'
-final String TEST_COMMON_VERSION = '0.1.2'
+final String SDK_VERSION = '7.3.0'
+final String TEST_COMMON_VERSION = '0.1.3'
 
 subprojects {
     group SDK_PACKAGE

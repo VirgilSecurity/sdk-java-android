@@ -41,6 +41,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.virgilsecurity.crypto.foundation.Base64;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
+import com.virgilsecurity.sdk.crypto.exceptions.DecryptionException;
+import com.virgilsecurity.sdk.crypto.exceptions.VerificationException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +60,9 @@ import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Unit tests for {@link VirgilCrypto} which tests cross-platform compatibility.
@@ -127,8 +131,28 @@ public class VirgilCryptoCompatibilityTest {
   }
 
   @Test
+  public void sign_then_encrypt_decrypt_then_verify() throws CryptoException {
+    String text = "text to encrypt";
+    byte[] textData = "text to encrypt".getBytes();
+    VirgilKeyPair keyPair = crypto.generateKeyPair();
+    VirgilKeyPair keyPairTwo = crypto.generateKeyPair();
+
+    List<VirgilPublicKey> publicKeys = new ArrayList<>();
+    publicKeys.add(keyPair.getPublicKey());
+    publicKeys.add(keyPairTwo.getPublicKey());
+
+    byte[] encrypted = crypto.signThenEncrypt(textData, keyPair.getPrivateKey(), publicKeys);
+    assertNotNull(encrypted);
+
+    byte[] decrypted = crypto.decryptThenVerify(encrypted, keyPairTwo.getPrivateKey(), keyPair.getPublicKey());
+    String decryptedText = new String(decrypted);
+
+    assertEquals(text, decryptedText);
+  }
+
+  @Test
   public void decryptThenVerifyMultipleRecipients() throws CryptoException {
-    JsonObject json = sampleJson.getAsJsonObject("sign_then_encrypt_multiple_recipients");
+    JsonObject json = sampleJson.getAsJsonObject("sign_and_encrypt_multiple_recipients");
 
     List<VirgilKeyPair> keyPairs = new ArrayList<>();
     for (JsonElement el : json.getAsJsonArray("private_keys")) {
@@ -150,7 +174,7 @@ public class VirgilCryptoCompatibilityTest {
 
   @Test
   public void decryptThenVerifyMultipleSigners() throws CryptoException {
-    JsonObject json = sampleJson.getAsJsonObject("sign_then_encrypt_multiple_signers");
+    JsonObject json = sampleJson.getAsJsonObject("sign_and_encrypt_multiple_signers");
 
     byte[] privateKeyData = Base64.decode(json.get("private_key").getAsString().getBytes());
     byte[] originalData = Base64.decode(json.get("original_data").getAsString().getBytes());
@@ -178,7 +202,7 @@ public class VirgilCryptoCompatibilityTest {
 
   @Test
   public void decryptThenVerifySingleRecipient() throws CryptoException {
-    JsonObject json = sampleJson.getAsJsonObject("sign_then_encrypt_single_recipient");
+    JsonObject json = sampleJson.getAsJsonObject("sign_and_encrypt_single_recipient");
 
     byte[] privateKeyData = Base64.decode(json.get("private_key").getAsString().getBytes());
     byte[] originalData = Base64.decode(json.get("original_data").getAsString().getBytes());
@@ -208,5 +232,77 @@ public class VirgilCryptoCompatibilityTest {
 
     VirgilPublicKey publicKey = keyPair.getPublicKey();
     assertTrue(crypto.verifySignature(signature, originalData, publicKey));
+  }
+
+  @Test
+  public void auth_encrypt_should_match() throws CryptoException {
+    JsonObject json = sampleJson.getAsJsonObject("auth_encrypt");
+
+    byte[] privateKey1Data = Base64.decode(json.get("private_key1").getAsString().getBytes());
+    byte[] privateKey2Data = Base64.decode(json.get("private_key2").getAsString().getBytes());
+    byte[] publicKeyData = Base64.decode(json.get("public_key").getAsString().getBytes());
+    byte[] dataSha512 = Base64.decode(json.get("data_sha512").getAsString().getBytes());
+    byte[] cipherData = Base64.decode(json.get("cipher_data").getAsString().getBytes());
+
+    VirgilPrivateKey privateKey1 = crypto.importPrivateKey(privateKey1Data).getPrivateKey();
+    VirgilKeyPair keyPair2 = crypto.importPrivateKey(privateKey2Data);
+    VirgilPublicKey publicKey = crypto.importPublicKey(publicKeyData);
+
+    byte[] data = crypto.authDecrypt(cipherData, privateKey1, publicKey);
+
+    byte[] dataHash512 = crypto.computeHash(data, HashAlgorithm.SHA512);
+    assertArrayEquals(dataSha512, dataHash512);
+
+    try {
+      crypto.authDecrypt(cipherData, keyPair2.getPrivateKey(), publicKey);
+      fail();
+    }
+    catch (DecryptionException e) {
+      // OK
+    }
+
+    try {
+      crypto.authDecrypt(cipherData, privateKey1, keyPair2.getPublicKey());
+      fail();
+    }
+    catch (VerificationException e) {
+      //OK
+    }
+  }
+
+  @Test
+  public void auth_encrypt_PQ_should_match() throws CryptoException {
+    JsonObject json = sampleJson.getAsJsonObject("auth_encrypt_pq");
+
+    byte[] privateKeyData = Base64.decode(json.get("private_key").getAsString().getBytes());
+    byte[] publicKeyData = Base64.decode(json.get("public_key").getAsString().getBytes());
+    byte[] dataSha512 = Base64.decode(json.get("data_sha512").getAsString().getBytes());
+    byte[] cipherData = Base64.decode(json.get("cipher_data").getAsString().getBytes());
+
+    VirgilPrivateKey privateKey = crypto.importPrivateKey(privateKeyData).getPrivateKey();
+    VirgilPublicKey publicKey = crypto.importPublicKey(publicKeyData);
+
+    byte[] data = crypto.authDecrypt(cipherData, privateKey, publicKey);
+
+    byte[] dataHash512 = crypto.computeHash(data, HashAlgorithm.SHA512);
+    assertArrayEquals(dataSha512, dataHash512);
+  }
+
+  @Test
+  public void auth_encrypt_padding_should_match() throws CryptoException {
+    JsonObject json = sampleJson.getAsJsonObject("auth_encrypt_padding");
+
+    byte[] privateKeyData = Base64.decode(json.get("private_key").getAsString().getBytes());
+    byte[] publicKeyData = Base64.decode(json.get("public_key").getAsString().getBytes());
+    byte[] dataSha512 = Base64.decode(json.get("data_sha512").getAsString().getBytes());
+    byte[] cipherData = Base64.decode(json.get("cipher_data").getAsString().getBytes());
+
+    VirgilPrivateKey privateKey = crypto.importPrivateKey(privateKeyData).getPrivateKey();
+    VirgilPublicKey publicKey = crypto.importPublicKey(publicKeyData);
+
+    byte[] data = crypto.authDecrypt(cipherData, privateKey, publicKey);
+
+    byte[] dataHash512 = crypto.computeHash(data, HashAlgorithm.SHA512);
+    assertArrayEquals(dataSha512, dataHash512);
   }
 }
