@@ -145,7 +145,7 @@ final String BASE_VIRGIL_PACKAGE = 'com.virgilsecurity'
 final String SDK_PACKAGE = BASE_VIRGIL_PACKAGE + '.sdk'
 
 // Packages versions
-final String SDK_VERSION = '7.3.1'
+final String SDK_VERSION = '7.3.2'
 final String TEST_COMMON_VERSION = '0.1.3'
 
 subprojects {

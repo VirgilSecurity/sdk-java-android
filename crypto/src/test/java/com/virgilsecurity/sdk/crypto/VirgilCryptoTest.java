@@ -33,6 +33,7 @@
 
 package com.virgilsecurity.sdk.crypto;
 
+import com.virgilsecurity.SlowByteArrayInputStream;
 import com.virgilsecurity.common.exception.NullArgumentException;
 import com.virgilsecurity.crypto.foundation.KeyProvider;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
@@ -169,7 +170,7 @@ public class VirgilCryptoTest {
     }
     byte[] encrypted = crypto.encrypt(TEXT.getBytes(), recipients);
     for (VirgilPrivateKey privateKey : privateKeys) {
-      try (InputStream is = new ByteArrayInputStream(encrypted);
+      try (InputStream is = new SlowByteArrayInputStream(encrypted);
            ByteArrayOutputStream os = new ByteArrayOutputStream()) {
 
         crypto.decrypt(is, os, privateKey);
@@ -194,12 +195,12 @@ public class VirgilCryptoTest {
 
     for (VirgilPrivateKey privateKey : privateKeys) {
       try (ByteArrayOutputStream osOuter = new ByteArrayOutputStream();
-           ByteArrayInputStream isOuter = new ByteArrayInputStream(TEXT.getBytes())) {
+           ByteArrayInputStream isOuter = new SlowByteArrayInputStream(TEXT.getBytes())) {
         crypto.encrypt(isOuter, osOuter, recipients);
 
         byte[] encrypted = osOuter.toByteArray();
 
-        try (InputStream isInner = new ByteArrayInputStream(encrypted);
+        try (InputStream isInner = new SlowByteArrayInputStream(encrypted);
              ByteArrayOutputStream osInner = new ByteArrayOutputStream()) {
           crypto.decrypt(isInner, osInner, privateKey);
 
@@ -237,7 +238,7 @@ public class VirgilCryptoTest {
       recipients.add(crypto.generateKeyPair().getPublicKey());
     }
     try (OutputStream os = new ByteArrayOutputStream()) {
-      crypto.encrypt(new ByteArrayInputStream(TEXT.getBytes()), os, recipients);
+      crypto.encrypt(new SlowByteArrayInputStream(TEXT.getBytes()), os, recipients);
     }
   }
 
@@ -303,7 +304,7 @@ public class VirgilCryptoTest {
   @SignCryptoTest
   public void generateSignature_stream(VirgilCrypto crypto) throws CryptoException {
     VirgilKeyPair keyPair = crypto.generateKeyPair();
-    byte[] signature = crypto.generateSignature(new ByteArrayInputStream(TEXT.getBytes()),
+    byte[] signature = crypto.generateSignature(new SlowByteArrayInputStream(TEXT.getBytes()),
         keyPair.getPrivateKey());
 
     assertNotNull(signature);
@@ -312,7 +313,7 @@ public class VirgilCryptoTest {
   @CryptoTest
   public void generateSignature_stream_nullPrivateKey(VirgilCrypto crypto) throws SigningException {
     assertThrows(NullArgumentException.class, () -> {
-      crypto.generateSignature(new ByteArrayInputStream(TEXT.getBytes()), null);
+      crypto.generateSignature(new SlowByteArrayInputStream(TEXT.getBytes()), null);
     });
   }
 
@@ -372,7 +373,7 @@ public class VirgilCryptoTest {
   public void sign_stream_compareToByteArraySign(VirgilCrypto crypto) throws CryptoException {
     VirgilKeyPair keyPair = crypto.generateKeyPair();
     byte[] signature = crypto.generateSignature(TEXT.getBytes(), keyPair.getPrivateKey());
-    byte[] streamSignature = crypto.generateSignature(new ByteArrayInputStream(TEXT.getBytes()),
+    byte[] streamSignature = crypto.generateSignature(new SlowByteArrayInputStream(TEXT.getBytes()),
         keyPair.getPrivateKey());
 
     assertNotNull(signature);
@@ -403,7 +404,7 @@ public class VirgilCryptoTest {
   public void verifySignature_stream(VirgilCrypto crypto) throws CryptoException {
     VirgilKeyPair keyPair = crypto.generateKeyPair();
     byte[] signature = crypto.generateSignature(TEXT.getBytes(), keyPair.getPrivateKey());
-    boolean valid = crypto.verifySignature(signature, new ByteArrayInputStream(TEXT.getBytes()),
+    boolean valid = crypto.verifySignature(signature, new SlowByteArrayInputStream(TEXT.getBytes()),
         keyPair.getPublicKey());
 
     assertTrue(valid);
@@ -414,7 +415,7 @@ public class VirgilCryptoTest {
     VirgilKeyPair keyPair = crypto.generateKeyPair();
     crypto.generateSignature(TEXT.getBytes(), keyPair.getPrivateKey());
     boolean valid = crypto.verifySignature(INVALID_SIGNATURE,
-        new ByteArrayInputStream(TEXT.getBytes()), keyPair.getPublicKey());
+        new SlowByteArrayInputStream(TEXT.getBytes()), keyPair.getPublicKey());
 
     assertFalse(valid);
   }
@@ -480,20 +481,21 @@ public class VirgilCryptoTest {
     publicKeys.add(keyPair1.getPublicKey());
     publicKeys.add(keyPair2.getPublicKey());
 
+    byte[] data = TEXT.getBytes();
     byte[] encrypted;
     try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-         ByteArrayInputStream inputStream = new ByteArrayInputStream(TEXT.getBytes())) {
+         ByteArrayInputStream inputStream = new SlowByteArrayInputStream(data)) {
 
-      int streamSize = inputStream.available();
+      int streamSize = data.length;
 
       crypto.authEncrypt(inputStream, streamSize, outputStream, keyPair1.getPrivateKey(), publicKeys);
       encrypted = outputStream.toByteArray();
     }
     assertNotNull(encrypted);
 
-    try (ByteArrayInputStream inputStream1 = new ByteArrayInputStream(encrypted);
-         ByteArrayInputStream inputStream2 = new ByteArrayInputStream(encrypted);
-         ByteArrayInputStream inputStream3 = new ByteArrayInputStream(encrypted);
+    try (ByteArrayInputStream inputStream1 = new SlowByteArrayInputStream(encrypted);
+         ByteArrayInputStream inputStream2 = new SlowByteArrayInputStream(encrypted);
+         ByteArrayInputStream inputStream3 = new SlowByteArrayInputStream(encrypted);
          ByteArrayOutputStream outputStream1 = new ByteArrayOutputStream();
          ByteArrayOutputStream outputStream2 = new ByteArrayOutputStream();
          ByteArrayOutputStream outputStream3 = new ByteArrayOutputStream()) {
