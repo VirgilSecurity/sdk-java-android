@@ -87,6 +87,7 @@ public class VirgilCrypto {
 
   private static final Charset UTF8_CHARSET = StandardCharsets.UTF_8;
   private static final int CHUNK_SIZE = 1024;
+  private static final int EOF = -1;
   private static final String KEY_DOESNT_SUPPORT_VERIFICATION = "This key doesn\'t support verification";
   private static final String KEY_DOESNT_SUPPORT_SIGNING = "This key doesn\'t support signing";
 
@@ -1305,15 +1306,15 @@ public class VirgilCrypto {
 
       signer.reset();
 
-      while (stream.available() > 0) {
+      byte[] buffer = new byte[CHUNK_SIZE];
+      int dataRead;
+      while (EOF != (dataRead = stream.read(buffer))) {
         byte[] data;
 
-        if (stream.available() >= CHUNK_SIZE) {
-          data = new byte[CHUNK_SIZE];
-          stream.read(data);
+        if (dataRead == CHUNK_SIZE) {
+          data = buffer;
         } else {
-          data = new byte[stream.available()];
-          stream.read(data);
+          data = Arrays.copyOf(buffer, dataRead);
         }
 
         signer.appendData(data);
@@ -1398,15 +1399,15 @@ public class VirgilCrypto {
     try (Verifier verifier = new Verifier()) {
       verifier.reset(signature);
 
-      while (stream.available() > 0) {
+      byte[] buffer = new byte[CHUNK_SIZE];
+      int dataRead;
+      while (EOF != (dataRead = stream.read(buffer))) {
         byte[] data;
 
-        if (stream.available() >= CHUNK_SIZE) {
-          data = new byte[CHUNK_SIZE];
-          stream.read(data);
+        if (dataRead == CHUNK_SIZE) {
+          data = buffer;
         } else {
-          data = new byte[stream.available()];
-          stream.read(data);
+          data = Arrays.copyOf(buffer, dataRead);
         }
 
         verifier.appendData(data);
@@ -1721,16 +1722,16 @@ public class VirgilCrypto {
       byte[] messageInfo = cipher.packMessageInfo();
       outputStream.write(messageInfo);
 
-      while (inputStream.available() > 0) {
+      byte[] buffer = new byte[CHUNK_SIZE];
+      int dataRead;
+      while (EOF != (dataRead = inputStream.read(buffer))) {
         byte[] data;
 
-        if (inputStream.available() >= CHUNK_SIZE) {
-          data = new byte[CHUNK_SIZE];
+        if (dataRead == CHUNK_SIZE) {
+          data = buffer;
         } else {
-          data = new byte[inputStream.available()];
+          data = Arrays.copyOf(buffer, dataRead);
         }
-
-        int dataRead = inputStream.read(data);
 
         if (((IOStream) inputOutput).getStreamSize() != IOStream.STREAM_SIZE_UNDEFINED) {
           streamSize -= dataRead;
@@ -1768,15 +1769,15 @@ public class VirgilCrypto {
       InputStream inputStream = ((IOStream) inputOutput).getInputStream();
       OutputStream outputStream = ((IOStream) inputOutput).getOutputStream();
 
-      while (inputStream.available() > 0) {
+      byte[] buffer = new byte[CHUNK_SIZE];
+      int dataRead;
+      while (EOF != (dataRead = inputStream.read(buffer))) {
         byte[] data;
 
-        if (inputStream.available() >= CHUNK_SIZE) {
-          data = new byte[CHUNK_SIZE];
-          inputStream.read(data);
+        if (dataRead == CHUNK_SIZE) {
+          data = buffer;
         } else {
-          data = new byte[inputStream.available()];
-          inputStream.read(data);
+          data = Arrays.copyOf(buffer, dataRead);
         }
 
         byte[] decryptedChunk = cipher.processDecryption(data);
